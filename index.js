@@ -3,17 +3,18 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const server_port = process.env.SERVER_PORT;
+const serverPort = process.env.server_port;
 
 app.use(cors({ origin: '*' }));
+app.use(bodyParser.json());
 
 // Routes settings
 const login = require("./routes/login");
 app.use("/login", login);
 
-app.listen(server_port, (error) => {
+app.listen(serverPort, (error) => {
   if(!error) {
-    console.log(`Server is running on port ${server_port}`);
+    console.log(`Server is running on port ${serverPort}`);
   }
   else {
     console.log('Error: ', error);
