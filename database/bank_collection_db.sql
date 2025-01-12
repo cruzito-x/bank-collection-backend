@@ -59,7 +59,7 @@ create table bills (
 
 create table roles (
 	id int not null,
-    role_id int not null primary key,
+    role_id varchar(255) not null primary key,
     role varchar(25) not null
 );
 
@@ -69,7 +69,7 @@ create table users (
 	username varchar(100) not null,
     password varchar(100) not null,
     email varchar(255) not null,
-    role int not null,
+    role varchar(255) not null,
     foreign key (role) references roles(role_id)
 );
 
