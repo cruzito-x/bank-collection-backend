@@ -30,6 +30,22 @@ create table transactions (
     foreign key (transaction_type) references transaction_types(transaction_id)
 );
 
+create table denominations (
+    id int not null,
+    denomination_id varchar(255) not null primary key,
+    value decimal(5,2) not null, -- Valor de la denominación, ejemplo: 0.05, 1.00, 50.00
+    type varchar(50) not null -- 'Billete' o 'Moneda'
+);
+
+create table transaction_denominations (
+    id int not null,
+    transaction_id varchar(255) not null,
+    denomination_id varchar(255) not null,
+    quantity int not null,
+    foreign key (transaction_id) references transactions(transaction_id),
+    foreign key (denomination_id) references denominations(denomination_id)
+);
+
 create table collectors (
 	id int not null,
     collector_id varchar(255) not null primary key,
