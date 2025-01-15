@@ -20,16 +20,26 @@ exports.saveNewType = (request, response) => {
     "INSERT INTO transaction_types (transaction_id, transaction_type) VALUES (?, ?)";
 
   db.query(newType, [transaction_id, transaction_type], (error, result) => {
-    if(error) {
+    if (error) {
       return response
-       .status(500)
-       .json({ message: "Error Interno del Servidor" });
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
     }
 
-    if(!transaction_id || !transaction_type) {
-      return response.status(400).json({ message: "Por Favor, Introduzca Información" });
+    if (!transaction_id || !transaction_type) {
+      return response
+        .status(400)
+        .json({
+          icon: "success",
+          message: "Por Favor, Introduzca Información",
+        });
     }
 
-    return response.status(200).json({ message: "Nuevo Tipo de Transacción Guardado Correctamente" });
+    return response
+      .status(200)
+      .json({
+        icon: "success",
+        message: "Nuevo Tipo de Transacción Guardado Correctamente",
+      });
   });
 };

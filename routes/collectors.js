@@ -3,5 +3,6 @@ const router = express.Router();
 const collectors = require("../controllers/collectors");
 
 router.get("/", collectors.getCollectors);
+router.post("/save", collectors.saveNewCollector);
 
 module.exports = router;
