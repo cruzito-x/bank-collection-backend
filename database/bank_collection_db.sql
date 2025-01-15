@@ -1,108 +1,109 @@
-create database bank_collection_db;
+CREATE DATABASE bank_collection_db;
 
-use bank_collection_db;
+USE bank_collection_db;
 
-create table costumers (
-	id int not null,
-    costumer_id varchar(255) not null primary key,
-    name varchar(100) not null,
-    identity_doc varchar(20) not null,
-    email varchar(255) not null,
-    account_number varchar(19) not null,
-    balance decimal(5, 2) not null
+CREATE TABLE customers (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    customer_id VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    identity_doc VARCHAR(20) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    account_number VARCHAR(19) NOT NULL,
+    balance DECIMAL(10, 2) NOT NULL
 );
 
-create table transaction_types (
-	id int not null,
-    transaction_id int not null primary key,
-    transaction_type varchar(25) not null
+CREATE TABLE transaction_types (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    transaction_type_id VARCHAR(255) NOT NULL,
+    transaction_type VARCHAR(25) NOT NULL
 );
 
-create table transactions (
-	id int not null,
-    transaction_id varchar(255) not null primary key,
-    costumer_id varchar(255) not null,
-    transaction_type int not null,
-    amount int not null,
-    date_hour datetime not null,
-    authorized_by varchar(100) not null,
-    foreign key (costumer_id) references costumers(costumer_id),
-    foreign key (transaction_type) references transaction_types(transaction_id)
+CREATE TABLE transactions (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    transaction_id VARCHAR(255) NOT NULL,
+    customer_id INT NOT NULL,
+    transaction_type_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    date_hour DATETIME NOT NULL,
+    authorized_by VARCHAR(100) NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers (id),
+    FOREIGN KEY (transaction_type_id) REFERENCES transaction_types (id)
 );
 
-create table denominations (
-    id int not null,
-    denomination_id varchar(255) not null primary key,
-    value decimal(5,2) not null, -- Valor de la denominación, ejemplo: 0.05, 1.00, 50.00
-    type varchar(50) not null -- 'Billete' o 'Moneda'
+CREATE TABLE denominations (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    denomination_id VARCHAR(255) NOT NULL,
+    value DECIMAL(10, 2) NOT NULL,
+    type VARCHAR(50) NOT NULL
 );
 
-create table transaction_denominations (
-    id int not null,
-    transaction_id varchar(255) not null,
-    denomination_id varchar(255) not null,
-    quantity int not null,
-    foreign key (transaction_id) references transactions(transaction_id),
-    foreign key (denomination_id) references denominations(denomination_id)
+CREATE TABLE transaction_denominations (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    transaction_id INT NOT NULL,
+    denomination_id INT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (transaction_id) REFERENCES transactions (id),
+    FOREIGN KEY (denomination_id) REFERENCES denominations (id)
 );
 
-create table collectors (
-	id int not null,
-    collector_id varchar(255) not null primary key,
-    service_name int not null,
-    description varchar(255) not null
+CREATE TABLE collectors (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    collector_id VARCHAR(255) NOT NULL,
+    service_name VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL
 );
 
-create table payments_collectors (
-	id int not null,
-    payment_id varchar(255) not null primary key,
-    costumer_id varchar(255) not null,
-    collector_id varchar(255) not null,
-    amount decimal(5,2) not null,
-    date_hour datetime not null,
-    foreign key (costumer_id) references costumers(costumer_id),
-    foreign key (collector_id) references collectors(collector_id)
+CREATE TABLE payments_collectors (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    payment_id VARCHAR(255) NOT NULL,
+    customer_id INT NOT NULL,
+    collector_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    date_hour DATETIME NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers (id),
+    FOREIGN KEY (collector_id) REFERENCES collectors (id)
 );
 
-create table bills (
-	id int not null,
-    bill_id varchar(255) not null primary key,
-    transaction_id varchar(255) not null,
-    amount decimal(5,2) not null,
-    mail_sent boolean not null,
-    foreign key (transaction_id) references transactions(transaction_id)
+CREATE TABLE bills (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    bill_id VARCHAR(255) NOT NULL,
+    transaction_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    mail_sent BOOLEAN NOT NULL,
+    FOREIGN KEY (transaction_id) REFERENCES transactions (id)
 );
 
-create table roles (
-	id int not null,
-    role_id int not null primary key,
-    role varchar(25) not null
+CREATE TABLE roles (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    role_id INT NOT NULL,
+    role VARCHAR(25) NOT NULL
 );
 
-create table users (
-	id int not null,
-    user_id varchar(255) not null primary key,
-	username varchar(100) not null,
-    password varchar(100) not null,
-    email varchar(255) not null,
-    role int not null,
-    foreign key (role) references roles(role_id)
+CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    role_id INT NOT NULL,
+    FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 
-create table approvals (
-	id int not null,
-    approval_id varchar(255) not null primary key,
-    transaction_id varchar(255) not null,
-    authorizer_id varchar(255) not null,
-    date_hour datetime not null,
-    foreign key (authorizer_id) references users(user_id)
+CREATE TABLE approvals (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    approval_id VARCHAR(255) NOT NULL,
+    transaction_id INT NOT NULL,
+    authorizer_id INT NOT NULL,
+    date_hour DATETIME NOT NULL,
+    FOREIGN KEY (transaction_id) REFERENCES transactions (id),
+    FOREIGN KEY (authorizer_id) REFERENCES users (id)
 );
 
-create table audit (
-	id int not null,
-    user_id varchar(255) not null,
-    action varchar(255) not null,
-    date_hour datetime not null,
-    detail varchar(255) not null,
-    foreign key (user_id) references users(user_id)
+CREATE TABLE audit (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    date_hour DATETIME NOT NULL,
+    detail VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );

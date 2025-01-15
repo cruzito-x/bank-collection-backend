@@ -9,10 +9,12 @@ exports.login = (request, response) => {
     .digest("hex");
   const loggedIn = "SELECT * FROM users WHERE username = ? AND password = ?";
 
+  // console.log(hashedPassword);
+
   if (!username || !password) {
     return response
       .status(400)
-      .json({ message: "Por favor, Introduzca un Usuario y una Contraseña" });
+      .json({ message: "Por Favor, Introduzca un Usuario y una Contraseña" });
   }
 
   db.query(loggedIn, [username, hashedPassword], (error, results) => {

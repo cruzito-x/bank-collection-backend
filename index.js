@@ -10,9 +10,13 @@ app.use(bodyParser.json());
 
 // Routes settings
 const login = require("./routes/login");
+const collectors = require("./routes/collectors");
+const transactionTypes = require("./routes/transactionTypes");
 const users = require("./routes/users");
 
 app.use("/login", login);
+app.use("/collectors", collectors);
+app.use("/transaction-types", transactionTypes);
 app.use("/users", users);
 
 app.listen(serverPort, (error) => {
