@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 exports.getTypes = (request, response) => {
-  const types = "SELECT transaction_type FROM transaction_types";
+  const types = "SELECT id, transaction_type FROM transaction_types";
 
   db.query(types, (error, result) => {
     if (error) {

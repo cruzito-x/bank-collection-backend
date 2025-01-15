@@ -11,12 +11,14 @@ app.use(bodyParser.urlencoded({ extended: true}));
 
 // Routes settings
 const login = require("./routes/login");
+const customers = require("./routes/customers");
 const collectors = require("./routes/collectors");
 const transactionTypes = require("./routes/transactionTypes");
 const users = require("./routes/users");
 const audit = require("./routes/audit");
 
 app.use("/login", login);
+app.use("/customers", customers);
 app.use("/collectors", collectors);
 app.use("/transaction-types", transactionTypes);
 app.use("/users", users);
