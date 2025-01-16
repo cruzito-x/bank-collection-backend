@@ -14,7 +14,8 @@ const login = require("./routes/login");
 const customers = require("./routes/customers");
 const collectors = require("./routes/collectors");
 const paymentsCollectors = require("./routes/paymentsCollectors");
-const transactionTypes = require("./routes/transactionTypes");
+const transactions = require("./routes/transactions");
+const transactionTypes = require("./routes/transactionsTypes");
 const users = require("./routes/users");
 const audit = require("./routes/audit");
 
@@ -22,7 +23,8 @@ app.use("/login", login);
 app.use("/customers", customers);
 app.use("/collectors", collectors);
 app.use("/payments-collectors", paymentsCollectors);
-app.use("/transaction-types", transactionTypes);
+app.use("/transactions", transactions);
+app.use("/transactions-types", transactionTypes);
 app.use("/users", users);
 app.use("/audit", audit);
 
