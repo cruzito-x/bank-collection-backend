@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const crypto = require("crypto");
+const audit = require("../global/audit");
 
 exports.getCollectors = (request, response) => {
   const collectors = "SELECT * FROM collectors";
@@ -28,7 +29,7 @@ exports.saveNewCollector = (request, response) => {
       });
   }
 
-  const getCollectorCounter = "SELECT COUNT(*) as collectorsCounter FROM collectors";
+  const getCollectorCounter = "SELECT COUNT(*) AS collectorsCounter FROM collectors";
 
   db.query(getCollectorCounter, (error, result) => {
     if (error) {
@@ -56,6 +57,8 @@ exports.saveNewCollector = (request, response) => {
             message: "Error Interno del Servidor",
           });
         }
+
+        audit(1, "Añadir Colector", "Adición de Nuevo Colector");
 
         return response.status(200).json({
           icon: "success",

@@ -1,6 +1,6 @@
 const db = require("../config/db");
 const crypto = require("crypto");
-const auditActions = require("../global/audit");
+const audit = require("../global/audit");
 
 exports.login = (request, response) => {
   const { username, password } = request.body;
@@ -31,7 +31,7 @@ exports.login = (request, response) => {
         .json({ message: "Usuario o Contraseña no Válidos" });
     }
 
-    auditActions(
+    audit(
       results[0].id,
       "Inicio de Sesión",
       "Inicio de Sesión Correcto"
@@ -40,7 +40,9 @@ exports.login = (request, response) => {
     return response.status(200).json({
       icon: "success",
       message: "¡Inicio de Sesión Correcto!",
-      isSupervisor: results[0].role === 1 ? true : false,
+      user_id: results[0].id,
+      username: results[0].username,
+      isSupervisor: results[0].role_id === 1 ? true : false,
     });
   });
 };
