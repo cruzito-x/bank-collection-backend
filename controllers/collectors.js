@@ -20,16 +20,13 @@ exports.saveNewCollector = (request, response) => {
   const { service_name, description } = request.body;
 
   if (!service_name || !description) {
-    console.log("El Nombre del Servicio y la Descripción Son Requeridos")
-    return response
-      .status(400)
-      .json({
-        icon: "error",
-        message: "El Nombre del Servicio y la Descripción Son Requeridos",
-      });
+    return response.status(400).json({
+      message: "El Nombre del Servicio y la Descripción Son Requeridos",
+    });
   }
 
-  const getCollectorCounter = "SELECT COUNT(*) AS collectorsCounter FROM collectors";
+  const getCollectorCounter =
+    "SELECT COUNT(*) AS collectorsCounter FROM collectors";
 
   db.query(getCollectorCounter, (error, result) => {
     if (error) {
@@ -53,7 +50,6 @@ exports.saveNewCollector = (request, response) => {
       (error, result) => {
         if (error) {
           return response.status(500).json({
-            icon: "error",
             message: "Error Interno del Servidor",
           });
         }

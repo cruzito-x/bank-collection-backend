@@ -10,8 +10,6 @@ exports.login = (request, response) => {
     .digest("hex");
   const loggedIn = "SELECT * FROM users WHERE username = ? AND password = ?";
 
-  // console.log(hashedPassword);
-
   if (!username || !password) {
     return response
       .status(400)

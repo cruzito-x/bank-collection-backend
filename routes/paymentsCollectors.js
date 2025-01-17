@@ -3,6 +3,11 @@ const router = express.Router();
 const paymentsCollectors = require("../controllers/paymentsCollectors");
 
 router.get("/", paymentsCollectors.getCollectorsPayments);
+router.get(
+  "/total-payments-amount",
+  paymentsCollectors.getTotalPaymentsAumount
+);
+router.get("/payments-by-collector", paymentsCollectors.paymentsByCollector);
 router.post("/save-new-payment", paymentsCollectors.saveNewPayment);
 
 module.exports = router;
