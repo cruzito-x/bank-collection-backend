@@ -57,7 +57,7 @@ exports.saveNewCollector = (request, response) => {
         audit(1, "Añadir Colector", "Adición de Nuevo Colector");
 
         return response.status(200).json({
-          icon: "success",
+          
           message: "¡Colector Añadido Exitosamente!",
         });
       }

@@ -78,8 +78,13 @@ exports.saveNewPayment = (request, response) => {
             .json({ message: "Error Interno del Servidor" });
         }
 
+        audit(
+          result[0].id,
+          "Pago a Colector",
+          "Pago Realizado a Colector"
+        );
+
         return response.status(200).json({
-          icon: "success",
           message: "¡Pago Registrado Correctamente!",
         });
       }

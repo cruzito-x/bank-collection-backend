@@ -16,31 +16,30 @@ exports.login = (request, response) => {
       .json({ message: "Por Favor, Introduzca un Usuario y una Contraseña" });
   }
 
-  db.query(loggedIn, [username, hashedPassword], (error, results) => {
+  db.query(loggedIn, [username, hashedPassword], (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    if (results.length === 0) {
+    if (result.length === 0) {
       return response
         .status(401)
         .json({ message: "Usuario o Contraseña no Válidos" });
     }
 
     audit(
-      results[0].id,
+      result[0].id,
       "Inicio de Sesión",
       "Inicio de Sesión Correcto"
     );
 
     return response.status(200).json({
-      icon: "success",
       message: "¡Inicio de Sesión Correcto!",
-      user_id: results[0].id,
-      username: results[0].username,
-      isSupervisor: results[0].role_id === 1 ? true : false,
+      user_id: result[0].id,
+      username: result[0].username,
+      isSupervisor: result[0].role_id === 1 ? true : false,
     });
   });
 };

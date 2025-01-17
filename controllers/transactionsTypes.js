@@ -30,15 +30,13 @@ exports.saveNewType = (request, response) => {
       return response
         .status(400)
         .json({
-          icon: "success",
-          message: "Por Favor, Introduzca Información",
+          message: "Por Favor, Introduzca la Información Correspondiente",
         });
     }
 
     return response
       .status(200)
       .json({
-        icon: "success",
         message: "Nuevo Tipo de Transacción Guardado Correctamente",
       });
   });
