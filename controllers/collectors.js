@@ -3,7 +3,8 @@ const crypto = require("crypto");
 const audit = require("../global/audit");
 
 exports.getCollectors = (request, response) => {
-  const collectors = "SELECT * FROM collectors";
+  const collectors =
+    "SELECT collectors.id, collectors.service_name AS collector, services.service_name, services.description FROM collectors INNER JOIN services ON services.collector_id = collectors.id";
 
   db.query(collectors, (error, result) => {
     if (error) {
@@ -57,7 +58,6 @@ exports.saveNewCollector = (request, response) => {
         audit(1, "Añadir Colector", "Adición de Nuevo Colector");
 
         return response.status(200).json({
-          
           message: "¡Colector Añadido Exitosamente!",
         });
       }

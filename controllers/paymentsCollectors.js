@@ -1,9 +1,10 @@
 const db = require("../config/db");
 const crypto = require("crypto");
+const audit = require("../global/audit");
 
 exports.getCollectorsPayments = (request, response) => {
   const paymentsCollectors =
-    "SELECT customers.name AS customer, collectors.service_name AS service, payments_collectors.amount, payments_collectors.date_hour FROM payments_collectors INNER JOIN customers ON payments_collectors.customer_id = customers.id INNER JOIN collectors ON payments_collectors.collector_id = collectors.id ORDER BY date_hour DESC";
+    "SELECT customers.name AS customer, collectors.service_name AS collector, services.service_name AS service, payments_collectors.amount, payments_collectors.date_hour FROM payments_collectors INNER JOIN customers ON payments_collectors.customer_id = customers.id INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN services ON services.id = payments_collectors.service_id ORDER BY date_hour DESC";
 
   db.query(paymentsCollectors, (error, result) => {
     if (error) {
@@ -47,11 +48,11 @@ exports.paymentsByCollector = (request, response) => {
 };
 
 exports.saveNewPayment = (request, response) => {
-  const { customer_id, collector_id, amount } = request.body;
+  const { customer_id, collector_id, service_id, amount } = request.body;
   const getPaymentsCounter =
     "SELECT COUNT(*) AS paymentsCounter FROM payments_collectors";
   const newPayment =
-    "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, amount, date_hour) VALUES (?, ?, ?, ?, now());";
+    "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, date_hour) VALUES (?, ?, ?, ?, ?, now());";
 
   db.query(getPaymentsCounter, (error, result) => {
     if (error) {
@@ -69,7 +70,7 @@ exports.saveNewPayment = (request, response) => {
 
     db.query(
       newPayment,
-      [payment_id, customer_id, collector_id, amount],
+      [payment_id, customer_id, collector_id, service_id, amount],
       (error, result) => {
         if (error) {
           console.error(error);
@@ -78,11 +79,11 @@ exports.saveNewPayment = (request, response) => {
             .json({ message: "Error Interno del Servidor" });
         }
 
-        audit(
-          result[0].id,
-          "Pago a Colector",
-          "Pago Realizado a Colector"
-        );
+        // audit(
+        //   result[0].id,
+        //   "Pago a Colector",
+        //   "Pago Realizado a Colector"
+        // );
 
         return response.status(200).json({
           message: "¡Pago Registrado Correctamente!",
