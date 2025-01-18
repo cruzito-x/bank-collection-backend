@@ -18,49 +18,121 @@ exports.getCollectors = (request, response) => {
 };
 
 exports.saveNewCollector = (request, response) => {
-  const { service_name, description } = request.body;
+  const {
+    collector_name,
+    collector_description,
+    service_name,
+    service_description,
+  } = request.body;
 
-  if (!service_name || !description) {
+  if (
+    !collector_name ||
+    !collector_description ||
+    !service_name ||
+    !service_description
+  ) {
     return response.status(400).json({
-      message: "El Nombre del Servicio y la Descripción Son Requeridos",
+      message: "Por Favor, Rellene Todos los Campos",
     });
   }
 
   const getCollectorCounter =
     "SELECT COUNT(*) AS collectorsCounter FROM collectors";
+  const getServiceCounter = "SELECT COUNT(*) AS servicesCounter FROM services";
 
-  db.query(getCollectorCounter, (error, result) => {
+  db.beginTransaction((error) => {
     if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
+      return db.rollback(() => {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      });
     }
 
-    const collectorCounter = result[0].collectorsCounter;
-    const collector_id = crypto
-      .createHash("sha256")
-      .update((collectorCounter + 1).toString())
-      .digest("hex");
+    db.query(getCollectorCounter, (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
 
-    const newCollector =
-      "INSERT INTO collectors (collector_id, service_name, description) VALUES (?, ?, ?)";
+      const collectorCounter = result[0].collectorsCounter;
+      const collector_id = crypto
+        .createHash("sha256")
+        .update((collectorCounter + 1).toString())
+        .digest("hex");
 
-    db.query(
-      newCollector,
-      [collector_id, service_name, description],
-      (error, result) => {
-        if (error) {
-          return response.status(500).json({
-            message: "Error Interno del Servidor",
+      const newCollector =
+        "INSERT INTO collectors (collector_id, service_name, description) VALUES (?, ?, ?)";
+
+      db.query(
+        newCollector,
+        [collector_id, collector_name, collector_description],
+        (error, result) => {
+          if (error) {
+            return db.rollback(() => {
+              return response.status(500).json({
+                message: "Error Interno del Servidor",
+              });
+            });
+          }
+
+          db.query(getServiceCounter, (error, result) => {
+            if (error) {
+              return db.rollback(() => {
+                return response
+                  .status(500)
+                  .json({ message: "Error Interno del Servidor" });
+              });
+            }
+
+            const serviceCounter = result[0].servicesCounter;
+            const service_id = crypto
+              .createHash("sha256")
+              .update((serviceCounter + 1).toString())
+              .digest("hex");
+
+            const newService =
+              "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
+
+            db.query(
+              newService,
+              [
+                service_id,
+                collectorCounter + 1,
+                service_name,
+                service_description,
+                0,
+              ],
+              (error, result) => {
+                if (error) {
+                  return db.rollback(() => {
+                    return response.status(500).json({
+                      message: "Error Interno del Servidor",
+                    });
+                  });
+                }
+
+                db.commit((error) => {
+                  if (error) {
+                    return db.rollback(() => {
+                      return response
+                        .status(500)
+                        .json({ message: "Error Interno del Servidor" });
+                    });
+                  }
+                });
+
+                audit(1, "Añadir Colector", "Adición de Nuevo Colector");
+
+                return response.status(200).json({
+                  message: "¡Colector Añadido Exitosamente!",
+                });
+              }
+            );
           });
         }
-
-        audit(1, "Añadir Colector", "Adición de Nuevo Colector");
-
-        return response.status(200).json({
-          message: "¡Colector Añadido Exitosamente!",
-        });
-      }
-    );
+      );
+    });
   });
 };
