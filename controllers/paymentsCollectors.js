@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const crypto = require("crypto");
-const audit = require("../global/audit");
+const audit = require("../global/audit/audit");
+const { sendMail } = require("../global/mail/mailer");
 
 exports.getCollectorsPayments = (request, response) => {
   const paymentsCollectors =
@@ -34,7 +35,7 @@ exports.getTotalPaymentsAumount = (request, response) => {
 
 exports.paymentsByCollector = (request, response) => {
   const paymentsByCollector =
-    "SELECT collectors.service_name AS service, payments_collectors.amount, (payments_collectors.amount * 100 / (SELECT SUM(payments_collectors.amount) FROM payments_collectors)) AS percentage FROM payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id";
+    "SELECT service, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.service_name AS service, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY collectors.service_name) AS percentagesByCollector";
 
   db.query(paymentsByCollector, (error, result) => {
     if (error) {
@@ -53,6 +54,7 @@ exports.saveNewPayment = (request, response) => {
     "SELECT COUNT(*) AS paymentsCounter FROM payments_collectors";
   const newPayment =
     "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, date_hour) VALUES (?, ?, ?, ?, ?, now());";
+  const getCustomerEmail = "SELECT email FROM customers WHERE id = ?";
 
   db.query(getPaymentsCounter, (error, result) => {
     if (error) {
@@ -79,6 +81,30 @@ exports.saveNewPayment = (request, response) => {
             .json({ message: "Error Interno del Servidor" });
         }
 
+        db.query(getCustomerEmail, [customer_id], async (error, result) => {
+          if (error) {
+            console.error(error);
+            return response
+              .status(500)
+              .json({ message: "Error Interno del Servidor" });
+          }
+
+          const customerEmail = result[0].email;
+
+          try {
+            await sendMail(
+              customerEmail,
+              "BANCO - ¡PAGO DE SERVICIO ÉXITOSO!",
+              "Esta es una prueba de correo electrónico"
+            );
+          } catch (error) {
+            console.error("Error sending mail:", error);
+            response
+              .status(500)
+              .json({ message: "Error al Enviar la Factura" });
+          }
+        });
+
         // audit(
         //   result[0].id,
         //   "Pago a Colector",
@@ -86,7 +112,7 @@ exports.saveNewPayment = (request, response) => {
         // );
 
         return response.status(200).json({
-          message: "¡Pago Registrado Correctamente!",
+          message: "¡Pago Registrado Correctamente!, Factura Enviada",
         });
       }
     );

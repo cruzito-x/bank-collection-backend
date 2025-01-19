@@ -1,6 +1,6 @@
 const db = require("../config/db");
 const crypto = require("crypto");
-const audit = require("../global/audit");
+const audit = require("../global/audit/audit");
 
 exports.login = (request, response) => {
   const { username, password } = request.body;

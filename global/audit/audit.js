@@ -1,4 +1,4 @@
-const db = require("../config/db");
+const db = require("../../config/db");
 
 function audit(user_id, action, detail) {
   const audit =
