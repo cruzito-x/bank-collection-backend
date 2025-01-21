@@ -7,7 +7,7 @@ const isValidateEmail = (email) => {
   return validateEmailPattern.test(email);
 };
 
-const sendMail = async (to, subject, html) => {
+const sendMail = async (to, subject, text, html) => {
   if (!isValidateEmail(to)) {
     return;
   } else {
@@ -16,6 +16,7 @@ const sendMail = async (to, subject, html) => {
         from: process.env.RESEND_SENDER,
         to,
         subject,
+        text,
         html,
       });
       console.log("Email sent:", result);

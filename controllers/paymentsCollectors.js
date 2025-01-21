@@ -114,6 +114,7 @@ exports.saveNewPayment = (request, response) => {
                 // customerEmail,
                 "xdigitalbit@gmail.com",
                 "Pago de Servicio Éxitoso",
+                "Prueba de email",
                 `<div style="font-family: Arial, sans-serif; color: #333333; line-height: 1.6; margin: 0; padding: 20px; background-color: #eef1f7; border: none; border-radius: 8px; max-width: 600px; margin: auto;">
                 <p style="margin: 0 0 20px; font-size: 16px;"> Hola, <br />
                 <span style="font-size: 18px; font-weight: bold;">${customerName}</span><br />
