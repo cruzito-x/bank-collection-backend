@@ -1,49 +1,29 @@
-require("dotenv").config();
-const nodemailer = require("nodemailer");
-const { google } = require("googleapis");
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const oAuth2Client = new google.auth.OAuth2(
-  process.env.MAIL_CLIENT_ID,
-  process.env.MAIL_CLIENT_SECRET,
-  process.env.MAIL_REDIRECT_URI
-);
+const isValidateEmail = (email) => {
+  const validateEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-oAuth2Client.setCredentials({
-  refresh_token: process.env.MAIL_SENDER_REFRESH_TOKEN,
-});
+  return validateEmailPattern.test(email);
+};
 
-async function sendMail(customer_email, subject, text) {
-  try {
-    const accessToken = await oAuth2Client.getAccessToken();
-    if (!accessToken.token) {
-      throw new Error("No se pudo obtener el token de acceso");
+const sendMail = async (to, subject, text, html) => {
+  if (!isValidateEmail(to)) {
+    return;
+  } else {
+    try {
+      const result = await resend.emails.send({
+        from: process.env.RESEND_SENDER,
+        to,
+        subject,
+        text,
+        html,
+      });
+      console.log("Email sent:", result);
+    } catch (error) {
+      console.error("Error sending email:", error);
     }
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: process.env.MAIL_SENDER,
-        pass: process.env.MAIL_SENDER_PASSWORD,
-        refreshToken: process.env.MAIL_SENDER_REFRESH_TOKEN,
-        accessToken: accessToken.token,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.MAIL_SENDER,
-      to: customer_email,
-      subject: subject,
-      text: text,
-    };
-
-    const result = await transporter.sendMail(mailOptions);
-    console.log("Email sent to:", customer_email);
-    return result;
-  } catch (error) {
-    console.error("Error sending mail:", error.message);
-    throw new Error("Error sending mail: " + error.message);
   }
-}
+};
 
 module.exports = { sendMail };
