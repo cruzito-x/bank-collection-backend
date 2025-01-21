@@ -7,13 +7,13 @@ const isValidateEmail = (email) => {
   return validateEmailPattern.test(email);
 };
 
-const sendMail = async (to, subject, text, html) => {
+const sendMail = async (from, to, subject, text, html) => {
   if (!isValidateEmail(to)) {
     return;
   } else {
     try {
       const result = await resend.emails.send({
-        from: process.env.RESEND_SENDER,
+        from: from+process.env.RESEND_SENDER,
         to,
         subject,
         text,

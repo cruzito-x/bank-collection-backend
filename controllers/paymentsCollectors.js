@@ -112,6 +112,7 @@ exports.saveNewPayment = (request, response) => {
 
               await sendMail(
                 // customerEmail,
+                collectorName,
                 "xdigitalbit@gmail.com",
                 "Pago de Servicio Éxitoso",
                 "Prueba de email",
@@ -122,7 +123,9 @@ exports.saveNewPayment = (request, response) => {
                 por el servicio de <strong>${serviceName}</strong> de <strong>${collectorName}</strong> ha sido registrado correctamente. </p>
                 
                 <div style="text-align: center; margin: 20px 0;">
-                <p style="margin: 0; font-size: 14px; color: #555555;"> Cancelado el día: <strong style="font-size: 16px; color: #333333;">${moment(new Date()).format("DD/MM/YYYY hh:mm a")}</strong> </p>
+                <p style="margin: 0; font-size: 14px; color: #555555;"> Cancelado el día: <br /> <strong style="font-size: 16px; color: #333333;">${moment(
+                  new Date()
+                ).format("DD/MM/YYYY hh:mm a")}</strong> </p>
                 </div>
                 
                 <div style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border: 1px solid #eeeeee; border-radius: 8px;">
@@ -131,7 +134,7 @@ exports.saveNewPayment = (request, response) => {
                 </div>
                 
                 <p style="margin-top: 20px; font-size: 16px; color: #333;"> Feliz Día. <br />
-                <strong>Att. El Banco</strong>
+                <strong>Att. El Banco X</strong>
                 </p>
                 </div>`
               );
