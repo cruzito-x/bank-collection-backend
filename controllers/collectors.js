@@ -4,7 +4,7 @@ const audit = require("../global/audit/audit");
 
 exports.getCollectors = (request, response) => {
   const collectors =
-    "SELECT collectors.id, collectors.service_name AS collector, services.service_name, services.description FROM collectors INNER JOIN services ON services.collector_id = collectors.id";
+    "SELECT collectors.id, collectors.service_name AS collector, services.service_name, services.description FROM collectors INNER JOIN services ON services.collector_id = collectors.id ORDER BY collectors.service_name ASC";
 
   db.query(collectors, (error, result) => {
     if (error) {
