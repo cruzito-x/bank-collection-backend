@@ -2,7 +2,7 @@ const db = require("../config/db");
 
 exports.getTransactions = (request, response) => {
   const transactions =
-    "SELECT transactions.id, customers.name as customer, transaction_types.transaction_type, transactions.amount, transactions.date_hour as datetime, users.username as authorized_by FROM transactions INNER JOIN customers ON transactions.customer_id = customers.id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users ON users.user_id = transactions.authorized_by";
+    "SELECT transactions.id, customers.name as customer, transaction_types.transaction_type, transactions.amount, transactions.date_hour as datetime, users.username as authorized_by FROM transactions INNER JOIN customers ON transactions.customer_id = customers.id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users ON users.user_id = transactions.authorized_by ORDER BY transactions.date_hour DESC";
 
   db.query(transactions, (error, result) => {
     if (error) {
