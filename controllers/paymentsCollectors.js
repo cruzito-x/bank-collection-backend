@@ -140,13 +140,13 @@ exports.saveNewPayment = (request, response) => {
               );
             }
           );
-        });
 
-        // audit(
-        //   result[0].id,
-        //   "Pago a Colector",
-        //   `Pago de $${amount} Realizado a ${collectorName}` 
-        // );
+          // audit(
+          //   user_id,
+          //   "Pago a Colector",
+          //   `Pago de $${amount} Realizado a ${collectorName}`
+          // );
+        });
 
         return response.status(200).json({
           message: "¡Pago Registrado Correctamente! Factura Enviada",
