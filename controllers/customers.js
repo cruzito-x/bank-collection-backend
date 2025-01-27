@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 exports.getCustomers = (request, response) => {
-  const customers = "SELECT * FROM customers";
+  const customers = "SELECT * FROM customers WHERE deleted_at IS NULL";
 
   db.query(customers, (error, results) => {
     if (error) {
@@ -30,11 +30,44 @@ exports.updateCustomer = (request, response) => {
           .json({ message: "Error interno del Servidor" });
       }
 
-      response
-        .status(200)
-        .json({
-          message: "¡Datos de Cliente Actualizados Satisfactoriamente!",
-        });
+      response.status(200).json({
+        message: "¡Datos de Cliente Actualizados!",
+      });
     }
   );
+};
+
+exports.deleteCustomer = (request, response) => {
+  const { id } = request.params;
+  const deleteCustomer = "UPDATE customers SET deleted_at = now() WHERE id = ?";
+
+  db.query(deleteCustomer, [id], (error, results) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error interno del Servidor" });
+    }
+
+    response.status(200).json({
+      message: "¡Cliente Eliminado!",
+    });
+  });
+};
+
+exports.searchCustomer = (request, response) => {
+  const { name = "", identity_doc = "", balance } = request.query;
+  let ORDER_BY = balance == 0 ? "ASC" : "DESC";
+
+  const searchCustomer = `SELECT * FROM customers WHERE deleted_at IS NULL AND (? = "" OR name LIKE ?) AND (? = "" OR identity_doc LIKE ?) ORDER BY balance ${ORDER_BY}`;
+  const customerData = [name, `%${name}%`, identity_doc, `%${identity_doc}%`];
+
+  db.query(searchCustomer, customerData, (error, results) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error interno del Servidor" });
+    }
+
+    response.status(200).json(results);
+  });
 };
