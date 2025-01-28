@@ -1,13 +1,43 @@
 require("dotenv").config();
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
+const fs = require("fs");
+const path = require("path");
+const moment = require("moment");
+const app = express();
 const serverPort = process.env.server_port;
+const logsFolder = path.join(__dirname, "logs");
+
+if (!fs.existsSync(logsFolder)) {
+  fs.mkdirSync(logsFolder, { recursive: true });
+}
+
+const logs = fs.createWriteStream(path.join(logsFolder, "express.log"), {
+  flags: "a",
+});
+
+console.log = (...log) => {
+  logs.write(
+    `[LOG] ${moment(new Date()).format("YYYY/MM/DD HH:mm")} - ${log.join(
+      " "
+    )}\n`
+  );
+};
+
+console.error = (...log) => {
+  logs.write(
+    `[ERROR] ${moment(new Date()).format("YYYY/MM/DD HH:mm")} - ${log.join(
+      " "
+    )}\n`
+  );
+};
 
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan("combined", { stream: logs }));
 
 // Routes settings
 const login = require("./routes/login");
