@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 exports.getCustomers = (request, response) => {
-  const customers = "SELECT * FROM customers WHERE deleted_at IS NULL";
+  const customers = "SELECT * FROM customers WHERE deleted_at IS NULL ORDER BY balance DESC";
 
   db.query(customers, (error, results) => {
     if (error) {
@@ -56,7 +56,7 @@ exports.deleteCustomer = (request, response) => {
 
 exports.searchCustomer = (request, response) => {
   const { name = "", identity_doc = "", balance } = request.query;
-  let ORDER_BY = balance == 0 ? "ASC" : "DESC";
+  let ORDER_BY = balance == 0 ? "DESC" : "ASC";
 
   const searchCustomer = `SELECT * FROM customers WHERE deleted_at IS NULL AND (? = "" OR name LIKE ?) AND (? = "" OR identity_doc LIKE ?) ORDER BY balance ${ORDER_BY}`;
   const customerData = [name, `%${name}%`, identity_doc, `%${identity_doc}%`];
