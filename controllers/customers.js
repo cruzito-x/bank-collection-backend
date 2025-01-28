@@ -58,8 +58,8 @@ exports.searchCustomer = (request, response) => {
   const { name = "", identity_doc = "", balance } = request.query;
   let ORDER_BY = balance == 0 ? "DESC" : "ASC";
 
-  const searchCustomer = `SELECT * FROM customers WHERE deleted_at IS NULL AND (? = "" OR name LIKE ?) AND (? = "" OR identity_doc LIKE ?) ORDER BY balance ${ORDER_BY}`;
-  const customerData = [name, `%${name}%`, identity_doc, `%${identity_doc}%`];
+  const searchCustomer = `SELECT * FROM customers WHERE deleted_at IS NULL AND (name LIKE ? OR identity_doc LIKE ?) ORDER BY balance ${ORDER_BY}`;
+  const customerData = [name, identity_doc];
 
   db.query(searchCustomer, customerData, (error, results) => {
     if (error) {
