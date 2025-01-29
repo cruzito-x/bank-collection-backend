@@ -30,22 +30,27 @@ exports.getTransactionsByDates = (request, response) => {
       break;
   }
 
+  const fullStartDate = `${startDay} 00:00:00`;
+  const fullEndDate = `${endDay} 23:59:59`;
+
   const differenceInDays =
     (new Date(endDay) - new Date(startDay)) / (1000 * 60 * 60 * 24);
 
   let transactionsByDates;
   const transactionsByDatesParams = [
-    startDay,
-    endDay,
+    fullStartDate,
+    fullEndDate,
     transactionTypeFilter,
     amountRange[0],
     amountRange[1],
   ];
 
+  console.log(transactionsByDatesParams);
+
   if (differenceInDays === 0) {
     // Today
     transactionsByDates =
-      "SELECT DATE_FORMAT(transactions.date_hour, '%W') AS interval_name, SUM(transactions.amount) AS totalAmount, COUNT(transactions.id) AS transactionsCounter FROM transactions INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id WHERE DATE(transactions.date_hour) = ? AND transactions.transaction_type_id = ? AND transactions.amount BETWEEN ? AND ? GROUP BY interval_name ORDER BY MIN(transactions.date_hour) ASC";
+      "SELECT DATE_FORMAT(transactions.date_hour, '%W') AS interval_name, SUM(transactions.amount) AS totalAmount, COUNT(transactions.id) AS transactionsCounter FROM transactions INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id WHERE transactions.date_hour BETWEEN ? AND ? AND transactions.transaction_type_id = ? AND transactions.amount BETWEEN ? AND ? GROUP BY interval_name ORDER BY MIN(transactions.date_hour) ASC";
   } else if (differenceInDays >= 7 && differenceInDays < 31) {
     // Last 7 days
     transactionsByDates =
