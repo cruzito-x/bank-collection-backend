@@ -75,9 +75,9 @@ exports.saveTransaction = (request, response) => {
     const transactionsNumber = result[0].totalTransactions;
     const transactionId = `TX${String(transactionsNumber).padStart(6, "0")}`;
 
-    db.beginTransaction((err) => {
-      if (err) {
-        console.error("Error al iniciar la transacción:", err);
+    db.beginTransaction((error) => {
+      if (error) {
+        console.error("Error al iniciar la transacción:", error);
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
@@ -193,7 +193,11 @@ exports.saveTransaction = (request, response) => {
             } else if (transaction_type === 2) {
               const updateBalance =
                 "UPDATE customers SET balance = balance - ? WHERE id = ?";
-              db.query(updateBalance, [amount, customer], transactionSuccess);
+              db.query(
+                updateBalance,
+                [amount < 10000 ? amount : 0, customer],
+                transactionSuccess
+              );
             } else if (transaction_type === 3) {
               const updateSenderBalance =
                 "UPDATE customers SET balance = balance - ? WHERE id = ?";

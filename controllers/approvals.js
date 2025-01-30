@@ -41,7 +41,6 @@ exports.approveOrRejectTransaction = (request, response) => {
     updateApproval,
     [isApproved, authorizer, new Date(), approvalId],
     (error, results) => {
-      console.log(error);
       if (error) {
         return response
           .status(500)
@@ -63,6 +62,37 @@ exports.approveOrRejectTransaction = (request, response) => {
           }
         }
       );
+
+      const getSenderId =
+        "SELECT customers.id, transactions.amount FROM customers INNER JOIN transactions ON transactions.customer_id = customers.id WHERE transactions.transaction_id = ?";
+
+      db.query(getSenderId, [transactionId], (error, results) => {
+        console.error(error);
+        if (error) {
+          return response
+            .status(500)
+            .json({ message: "Error interno del Servidor" });
+        }
+
+        console.error(results[0]);
+        const amount = results[0].amount;
+        const customer_sender_id = results[0].id;
+
+        const updateCustomerBalance =
+          "UPDATE customers SET balance = balance - ? WHERE id = ?";
+
+        db.query(
+          updateCustomerBalance,
+          [amount, customer_sender_id],
+          (error, results) => {
+            if (error) {
+              return response
+                .status(500)
+                .json({ message: "Error interno del Servidor" });
+            }
+          }
+        );
+      });
 
       let approvedStatus = approvalStatus === 1 ? "Aprobada" : "Rechazada";
 
