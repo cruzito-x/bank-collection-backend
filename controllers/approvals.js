@@ -49,12 +49,12 @@ exports.approveOrRejectTransaction = (request, response) => {
       }
 
       const updateTransactionStatus =
-        "UPDATE transactions SET status = ? WHERE transaction_id = ?";
+        "UPDATE transactions SET status = ?, authorized_by = ? WHERE transaction_id = ?";
       let transactionStatus = approvalStatus === 1 ? 2 : 3;
 
       db.query(
         updateTransactionStatus,
-        [transactionStatus, transactionId],
+        [transactionStatus, authorizer, transactionId],
         (error, results) => {
           if (error) {
             return response

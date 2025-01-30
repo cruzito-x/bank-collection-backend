@@ -2,7 +2,7 @@ const db = require("../config/db");
 
 exports.getTransactions = (request, response) => {
   const transactions =
-    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, receivers.name AS receiver, receivers.email AS receiver_email, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users ON users.id = transactions.authorized_by ORDER BY datetime DESC";
+    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, transactions.sender_account, receivers.name AS receiver, receivers.email AS receiver_email, transactions.receiver_account, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, cashier.username as realized_by, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users cashier ON cashier.id = transactions.realized_by LEFT JOIN users ON users.id = transactions.authorized_by ORDER BY datetime DESC";
 
   db.query(transactions, (error, result) => {
     console.error(error);
@@ -49,8 +49,17 @@ exports.getCustomersData = (request, response) => {
 };
 
 exports.saveTransaction = (request, response) => {
-  const { customer, transaction_type, sender_account_number, receiver_account_number, amount, concept } =
-    request.body;
+  const {
+    customer,
+    transaction_type,
+    sender_account_number,
+    receiver_account_number,
+    amount,
+    concept,
+  } = request.body;
+
+  const realized_by = 1;
+  let authorized_by = 1;
 
   const transactionsCounter =
     "SELECT (COUNT(*) + 1) AS totalTransactions FROM transactions";
@@ -79,6 +88,7 @@ exports.saveTransaction = (request, response) => {
 
       if (transaction_type === 2 && amount >= 10000) {
         status = 1;
+        authorized_by = null;
 
         const approvalsCounter =
           "SELECT (COUNT(*) + 1) AS totalApprovals FROM approvals";
@@ -93,13 +103,6 @@ exports.saveTransaction = (request, response) => {
           const waitingForApproval =
             "INSERT INTO approvals (approval_id, transaction_id, is_approved, authorizer_id, date_hour) VALUES (?, ?, ?, ?, ?)";
           const approvalId = `APPVL${String(approvalsNumber).padStart(6, "0")}`;
-
-          console.log(
-            "Approval Id: ",
-            approvalId,
-            "Transaction Id: ",
-            transactionsNumber
-          );
 
           db.query(
             waitingForApproval,
@@ -117,7 +120,7 @@ exports.saveTransaction = (request, response) => {
       }
 
       const saveTransaction =
-        "INSERT INTO transactions (transaction_id, customer_id, sender_account, receiver_id, receiver_account, transaction_type_id, amount, concept, status, date_hour, authorized_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO transactions (transaction_id, customer_id, sender_account, receiver_id, receiver_account, transaction_type_id, amount, concept, status, date_hour, realized_by, authorized_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
       if (transaction_type === 3) {
         const getReceiverByAccountNumber =
@@ -170,7 +173,8 @@ exports.saveTransaction = (request, response) => {
             concept,
             status,
             new Date(),
-            1,
+            realized_by,
+            authorized_by,
           ],
           (error, result) => {
             if (error) {
@@ -182,18 +186,17 @@ exports.saveTransaction = (request, response) => {
               });
             }
 
-            // Ejecutar el tipo de transacción correspondiente
             if (transaction_type === 1) {
-              // DEPÓSITO: Sumar balance al cliente
-              const updateBalance = `UPDATE customers SET balance = balance + ? WHERE id = ?`;
+              const updateBalance =
+                "UPDATE customers SET balance = balance + ? WHERE id = ?";
               db.query(updateBalance, [amount, customer], transactionSuccess);
             } else if (transaction_type === 2) {
-              // RETIRO: Restar balance al cliente
-              const updateBalance = `UPDATE customers SET balance = balance - ? WHERE id = ?`;
+              const updateBalance =
+                "UPDATE customers SET balance = balance - ? WHERE id = ?";
               db.query(updateBalance, [amount, customer], transactionSuccess);
             } else if (transaction_type === 3) {
-              // TRANSFERENCIA: Restar al remitente y sumar al receptor
-              const updateSenderBalance = `UPDATE customers SET balance = balance - ? WHERE id = ?`;
+              const updateSenderBalance =
+                "UPDATE customers SET balance = balance - ? WHERE id = ?";
               db.query(
                 updateSenderBalance,
                 [amount, customer],
