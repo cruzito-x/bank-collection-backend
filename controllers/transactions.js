@@ -5,6 +5,7 @@ exports.getTransactions = (request, response) => {
     "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, receivers.name AS receiver, receivers.email AS receiver_email, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users ON users.id = transactions.authorized_by ORDER BY datetime DESC";
 
   db.query(transactions, (error, result) => {
+    console.error(error);
     if (error) {
       return response
         .status(500)
@@ -48,7 +49,7 @@ exports.getCustomersData = (request, response) => {
 };
 
 exports.saveTransaction = (request, response) => {
-  const { customer, transaction_type, account_number, amount, concept } =
+  const { customer, transaction_type, sender_account_number, receiver_account_number, amount, concept } =
     request.body;
 
   const transactionsCounter =
@@ -116,7 +117,7 @@ exports.saveTransaction = (request, response) => {
       }
 
       const saveTransaction =
-        "INSERT INTO transactions (transaction_id, customer_id, receiver_id, transaction_type_id, amount, concept, status, date_hour, authorized_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO transactions (transaction_id, customer_id, sender_account, receiver_id, receiver_account, transaction_type_id, amount, concept, status, date_hour, authorized_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
       if (transaction_type === 3) {
         const getReceiverByAccountNumber =
@@ -124,7 +125,7 @@ exports.saveTransaction = (request, response) => {
 
         db.query(
           getReceiverByAccountNumber,
-          [account_number],
+          [receiver_account_number],
           (error, result) => {
             if (error) {
               console.error(error);
@@ -144,11 +145,11 @@ exports.saveTransaction = (request, response) => {
             }
 
             receiver_id = result[0].id;
-            processTransaction(); // Ejecuta la transacción con receptor válido
+            processTransaction();
           }
         );
       } else {
-        processTransaction(); // Ejecuta la transacción sin receptor
+        processTransaction();
       }
 
       function processTransaction() {
@@ -161,7 +162,9 @@ exports.saveTransaction = (request, response) => {
           [
             transactionId,
             customer,
+            sender_account_number,
             receiver_id,
+            receiver_account_number,
             transaction_type,
             amount,
             concept,
