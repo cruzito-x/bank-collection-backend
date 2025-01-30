@@ -7,5 +7,7 @@ router.get(
   "/transactions-by-customer/:id",
   transactions.getTransactionByCustomer
 );
+router.get("/customers", transactions.getCustomersData);
+router.post("/save-new-transaction", transactions.saveTransaction);
 
 module.exports = router;

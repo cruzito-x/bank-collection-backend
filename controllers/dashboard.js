@@ -23,7 +23,7 @@ exports.getTransactionsByDates = (request, response) => {
       amountRange = [2000, 4999];
       break;
     case 6:
-      amountRange = [5000, Infinity];
+      amountRange = [5000, 1000000000];
       break;
     default:
       amountRange = [1, 99];

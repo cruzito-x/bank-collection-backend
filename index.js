@@ -48,6 +48,7 @@ const services = require("./routes/services");
 const paymentsCollectors = require("./routes/paymentsCollectors");
 const transactions = require("./routes/transactions");
 const transactionTypes = require("./routes/transactionsTypes");
+const approvals = require("./routes/approvals");
 const users = require("./routes/users");
 const audit = require("./routes/audit");
 
@@ -59,6 +60,7 @@ app.use("/services", services);
 app.use("/payments-collectors", paymentsCollectors);
 app.use("/transactions", transactions);
 app.use("/transactions-types", transactionTypes);
+app.use("/approvals", approvals);
 app.use("/users", users);
 app.use("/audit", audit);
 
