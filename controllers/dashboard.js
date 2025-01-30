@@ -45,8 +45,6 @@ exports.getTransactionsByDates = (request, response) => {
     amountRange[1],
   ];
 
-  console.log(transactionsByDatesParams);
-
   if (differenceInDays === 0) {
     // Today
     transactionsByDates =

@@ -2,7 +2,7 @@ const db = require("../config/db");
 
 exports.getApprovals = (request, response) => {
   const approvals =
-    "SELECT approvals.approval_id, transactions.transaction_id AS transaction_id, transaction_types.transaction_type, customers.name AS sender_name, customers.email AS sender_email, receivers.name AS receiver_name, receivers.email AS receiver_email, transactions.amount, transactions.concept, users.username AS authorized_by, transactions.date_hour AS datetime FROM transactions INNER JOIN approvals ON approvals.transaction_id = transactions.id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN users ON users.id = approvals.authorizer_id";
+    "SELECT approvals.approval_id, transactions.transaction_id AS transaction_id, transaction_types.transaction_type, customers.name AS sender_name, customers.email AS sender_email, receivers.name AS receiver_name, receivers.email AS receiver_email, transactions.amount, transactions.concept, users.username AS authorized_by, approvals.date_hour AS authorized_at, transactions.date_hour AS datetime, approvals.is_approved FROM transactions INNER JOIN approvals ON approvals.transaction_id = transactions.id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id LEFT JOIN users ON users.id = approvals.authorizer_id ORDER BY datetime DESC";
 
   db.query(approvals, (error, results) => {
     if (error) {
@@ -35,12 +35,13 @@ exports.approveOrRejectTransaction = (request, response) => {
   const approvalStatus = parseInt(isApproved, 10);
 
   const updateApproval =
-    "UPDATE approvals SET is_approved = ?, authorizer_id = ? WHERE approval_id = ?";
+    "UPDATE approvals SET is_approved = ?, authorizer_id = ?, date_hour = ? WHERE approval_id = ?";
 
   db.query(
     updateApproval,
-    [isApproved, authorizer, approvalId],
+    [isApproved, authorizer, new Date(), approvalId],
     (error, results) => {
+      console.log(error);
       if (error) {
         return response
           .status(500)

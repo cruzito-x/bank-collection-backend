@@ -2,7 +2,7 @@ const db = require("../config/db");
 
 exports.getTransactions = (request, response) => {
   const transactions =
-    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, receiver_customer.name as receiver, receiver_customer.email AS receiver_email, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receiver_customer ON receiver_customer.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users ON users.id = transactions.authorized_by ORDER BY transactions.date_hour DESC";
+    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, receivers.name AS receiver, receivers.email AS receiver_email, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users ON users.id = transactions.authorized_by ORDER BY datetime DESC";
 
   db.query(transactions, (error, result) => {
     if (error) {
@@ -19,7 +19,7 @@ exports.getTransactionByCustomer = (request, response) => {
   const { id } = request.params;
 
   const transactionsByCustomer =
-    "SELECT transactions.id, customers.name AS customer, receiver.name AS receiver, transaction_types.transaction_type, transactions.amount, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receiver ON transactions.receiver_id = receiver.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by WHERE transactions.customer_id = ? ORDER BY transactions.date_hour DESC";
+    "SELECT transactions.id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, transactions.amount, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by WHERE transactions.customer_id = ? ORDER BY datetime DESC";
 
   db.query(transactionsByCustomer, [id], (error, result) => {
     if (error) {
@@ -65,7 +65,6 @@ exports.saveTransaction = (request, response) => {
     const transactionsNumber = result[0].totalTransactions;
     const transactionId = `TX${String(transactionsNumber).padStart(6, "0")}`;
 
-    // Iniciar Transacción
     db.beginTransaction((err) => {
       if (err) {
         console.error("Error al iniciar la transacción:", err);
@@ -91,7 +90,7 @@ exports.saveTransaction = (request, response) => {
           const approvalsNumber = result[0].totalApprovals;
 
           const waitingForApproval =
-            "INSERT INTO approvals (approval_id, transaction_id, authorizer_id, date_hour) VALUES (?, ?, ?, ?)";
+            "INSERT INTO approvals (approval_id, transaction_id, is_approved, authorizer_id, date_hour) VALUES (?, ?, ?, ?, ?)";
           const approvalId = `APPVL${String(approvalsNumber).padStart(6, "0")}`;
 
           console.log(
@@ -103,7 +102,7 @@ exports.saveTransaction = (request, response) => {
 
           db.query(
             waitingForApproval,
-            [approvalId, transactionsNumber, null, new Date()],
+            [approvalId, transactionsNumber, null, null, null],
             (error, result) => {
               if (error) {
                 console.error(
@@ -119,7 +118,6 @@ exports.saveTransaction = (request, response) => {
       const saveTransaction =
         "INSERT INTO transactions (transaction_id, customer_id, receiver_id, transaction_type_id, amount, concept, status, date_hour, authorized_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      // Si es transferencia, obtenemos el receptor
       if (transaction_type === 3) {
         const getReceiverByAccountNumber =
           "SELECT id FROM customers WHERE account_number = ?";
