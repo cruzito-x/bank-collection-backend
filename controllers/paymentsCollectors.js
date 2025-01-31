@@ -2,7 +2,6 @@ const db = require("../config/db");
 const crypto = require("crypto");
 const audit = require("../global/audit/audit");
 const { sendMail } = require("../global/mail/mailer");
-const moment = require("moment");
 
 exports.getCollectorsPayments = (request, response) => {
   const paymentsCollectors =
@@ -111,32 +110,13 @@ exports.saveNewPayment = (request, response) => {
               const serviceName = result[0].service;
 
               await sendMail(
-                // customerEmail,
                 collectorName,
                 "xdigitalbit@gmail.com",
-                "Pago de Servicio Éxitoso",
+                "¡Su Pago ha Sido Aprobado!",
                 "Prueba de email",
-                `<div style="font-family: Arial, sans-serif; color: #333333; line-height: 1.6; margin: 0; padding: 20px; background-color: #eef1f7; border: none; border-radius: 8px; max-width: 600px; margin: auto;">
-                <p style="margin: 0 0 20px; font-size: 16px;"> Hola, <br />
-                <span style="font-size: 18px; font-weight: bold;">${customerName}</span><br />
-                Tu pago de <span style="font-weight: bold; color: #16bb69;">$${amount}</span>
-                por el servicio de <strong>${serviceName}</strong> de <strong>${collectorName}</strong> ha sido registrado correctamente. </p>
-                
-                <div style="text-align: center; margin: 20px 0;">
-                <p style="margin: 0; font-size: 14px; color: #555555;"> Cancelado el día: <br /> <strong style="font-size: 16px; color: #333333;">${moment(
-                  new Date()
-                ).format("DD/MM/YYYY hh:mm a")}</strong> </p>
-                </div>
-                
-                <div style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border: 1px solid #eeeeee; border-radius: 8px;">
-                <p style="margin: 0; font-size: 14px; color: #555555;"> Este es un comprobante de pago. Para mayor información, consulta con tu banco o contacta a 
-                <a href="mailto:onboarding@resend.dev" style="color: #007bff; text-decoration: none;">onboarding@resend.dev</a>. </p>
-                </div>
-                
-                <p style="margin-top: 20px; font-size: 16px; color: #333;"> Feliz Día. <br />
-                <strong>Att. El Banco X</strong>
-                </p>
-                </div>`
+                customerName,
+                serviceName,
+                amount
               );
             }
           );
