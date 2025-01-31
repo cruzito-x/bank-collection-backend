@@ -6,7 +6,7 @@ const moment = require("moment");
 
 exports.getCollectorsPayments = (request, response) => {
   const paymentsCollectors =
-    "SELECT customers.name AS customer, collectors.service_name AS collector, services.service_name AS service, payments_collectors.amount, payments_collectors.date_hour FROM payments_collectors INNER JOIN customers ON payments_collectors.customer_id = customers.id INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN services ON services.id = payments_collectors.service_id ORDER BY date_hour DESC";
+    "SELECT payments_collectors.payment_id, customers.name AS customer, collectors.service_name AS collector, services.service_name AS service, payments_collectors.amount, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN customers ON payments_collectors.customer_id = customers.id INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN users ON users.id = payments_collectors.registered_by ORDER BY datetime DESC";
 
   db.query(paymentsCollectors, (error, result) => {
     if (error) {

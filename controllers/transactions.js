@@ -16,13 +16,13 @@ exports.getTransactions = (request, response) => {
   });
 };
 
-exports.getTransactionByCustomer = (request, response) => {
-  const { id } = request.params;
+exports.getTransactionByCustomerAndAccountNumber = (request, response) => {
+  const { id, account } = request.params;
 
   const transactionsByCustomer =
-    "SELECT transactions.id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, transactions.amount, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by WHERE transactions.customer_id = ? ORDER BY datetime DESC";
+    "SELECT transactions.id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, transactions.amount, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by LEFT JOIN accounts ON accounts.account_number = transactions.sender_account OR accounts.account_number = transactions.receiver_account WHERE transactions.customer_id = ? AND accounts.account_number = ? AND customers.deleted_at IS NULL AND accounts.deleted_at IS NULL ORDER BY datetime DESC";
 
-  db.query(transactionsByCustomer, [id], (error, result) => {
+  db.query(transactionsByCustomer, [id, account], (error, result) => {
     if (error) {
       return response
         .status(500)
@@ -33,9 +33,9 @@ exports.getTransactionByCustomer = (request, response) => {
   });
 };
 
-exports.getCustomersData = (request, response) => {
+exports.getCustomers = (request, response) => {
   const customersData =
-    "SELECT id, name, identity_doc, account_number FROM customers WHERE deleted_at IS NULL ORDER BY id ASC";
+    "SELECT customers.id, customers.name, customers.identity_doc, accounts.account_number FROM customers INNER JOIN accounts ON accounts.owner_id = customers.id WHERE customers.deleted_at IS NULL AND accounts.deleted_at IS NULL ORDER BY id ASC";
 
   db.query(customersData, (error, result) => {
     if (error) {
@@ -124,7 +124,7 @@ exports.saveTransaction = (request, response) => {
 
       if (transaction_type === 3) {
         const getReceiverByAccountNumber =
-          "SELECT id FROM customers WHERE account_number = ?";
+          "SELECT owner_id FROM accounts WHERE account_number = ?";
 
         db.query(
           getReceiverByAccountNumber,
@@ -147,7 +147,7 @@ exports.saveTransaction = (request, response) => {
               });
             }
 
-            receiver_id = result[0].id;
+            receiver_id = result[0].owner_id;
             processTransaction();
           }
         );
@@ -156,6 +156,7 @@ exports.saveTransaction = (request, response) => {
       }
 
       function processTransaction() {
+        console.log(receiver_id);
         if (receiver_id === null) {
           receiver_id = customer;
         }
@@ -188,11 +189,11 @@ exports.saveTransaction = (request, response) => {
 
             if (transaction_type === 1) {
               const updateBalance =
-                "UPDATE customers SET balance = balance + ? WHERE id = ?";
+                "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
               db.query(updateBalance, [amount, customer], transactionSuccess);
             } else if (transaction_type === 2) {
               const updateBalance =
-                "UPDATE customers SET balance = balance - ? WHERE id = ?";
+                "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
               db.query(
                 updateBalance,
                 [amount < 10000 ? amount : 0, customer],
@@ -200,16 +201,12 @@ exports.saveTransaction = (request, response) => {
               );
             } else if (transaction_type === 3) {
               const updateSenderBalance =
-                "UPDATE customers SET balance = balance - ? WHERE id = ?";
+                "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
               db.query(
                 updateSenderBalance,
-                [amount, customer],
+                [amount, sender_account_number],
                 (error, result) => {
                   if (error) {
-                    console.error(
-                      "Error al restar balance del remitente:",
-                      error
-                    );
                     return db.rollback(() => {
                       response
                         .status(500)
@@ -217,10 +214,11 @@ exports.saveTransaction = (request, response) => {
                     });
                   }
 
-                  const updateReceiverBalance = `UPDATE customers SET balance = balance + ? WHERE id = ?`;
+                  const updateReceiverBalance =
+                    "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
                   db.query(
                     updateReceiverBalance,
-                    [amount, receiver_id],
+                    [amount, receiver_account_number],
                     transactionSuccess
                   );
                 }

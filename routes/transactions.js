@@ -4,10 +4,10 @@ const transactions = require("../controllers/transactions");
 
 router.get("/", transactions.getTransactions);
 router.get(
-  "/transactions-by-customer/:id",
-  transactions.getTransactionByCustomer
+  "/transactions-by-customer/:id/account/:account",
+  transactions.getTransactionByCustomerAndAccountNumber
 );
-router.get("/customers", transactions.getCustomersData);
+router.get("/customers", transactions.getCustomers);
 router.post("/save-new-transaction", transactions.saveTransaction);
 
 module.exports = router;
