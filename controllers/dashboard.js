@@ -74,7 +74,7 @@ exports.getTransactionsByDates = (request, response) => {
       "SELECT DATE_FORMAT(transactions.date_hour, '%W') AS interval_name, SUM(transactions.amount) AS totalAmount, COUNT(transactions.id) AS transactionsCounter FROM transactions INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id WHERE DATE(transactions.date_hour) BETWEEN ? AND ? AND transactions.transaction_type_id = ? AND transactions.amount BETWEEN ? AND ? GROUP BY interval_name ORDER BY MIN(transactions.date_hour) ASC";
   }
 
-  db.query(transactionsByDates, transactionsByDatesParams, (error, results) => {
+  db.query(transactionsByDates, transactionsByDatesParams, (error, result) => {
     if (error) {
       console.error(error);
 
@@ -90,11 +90,11 @@ exports.getTransactionsByDates = (request, response) => {
               label: `${moment(startDay).format("YYYY/MM/DD")} - ${moment(
                 endDay
               ).format("YYYY/MM/DD")}`,
-              totalAmount: results[0]?.totalAmount || 0,
-              transactionsCounter: results[0]?.transactionsCounter || 0,
+              totalAmount: result[0]?.totalAmount || 0,
+              transactionsCounter: result[0]?.transactionsCounter || 0,
             },
           ]
-        : results.map((row) => ({
+        : result.map((row) => ({
             label: row.interval_name,
             totalAmount: row.totalAmount,
             transactionsCounter: row.transactionsCounter,
