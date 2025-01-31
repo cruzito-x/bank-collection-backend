@@ -29,10 +29,10 @@ const sendMail = async (
         html: `<p style="text-align: center; font-size: 15px">
         <strong>¡Hola!</strong> El pago de tu factura fue exitoso. ¡Gracias por utilizar los servicios de <strong style="color: #007bff;">${from}</strong>!
         </p>
-        <div style="font-family: Montserrat; width: 350px; margin: auto; padding: 15px; border: 1px solid #c9c9c9; border-radius: 20px; background-color: #ffffff;">
+        <div style="font-family: Montserrat, Arial, Helvetica, sans-serif; width: 350px; margin: auto; padding: 15px; border: 1px solid #c9c9c9; border-radius: 20px; background-color: #ffffff;">
           <h1 style="text-align: center; font-size: 60px; color: #007bff;">$${amount}</h1>
           <p style="text-align: center; font-size: 13px; color: #000000;">
-            <strong style="font-size: 13px;"> ¡Pago Exitoso! </strong>
+            <strong style="font-size: 13px;"> Detalles del Pago </strong>
           </p>
           <div style="margin: 10px 0;">
             <p style="font-size: 14px; color: #000000;">
