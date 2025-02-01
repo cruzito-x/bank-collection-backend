@@ -14,30 +14,43 @@ exports.getTypes = (request, response) => {
   });
 };
 
-exports.saveNewType = (request, response) => {
-  const { transaction_id, transaction_type } = request.body;
-  const newType =
-    "INSERT INTO transaction_types (transaction_id, transaction_type) VALUES (?, ?)";
+exports.saveNewTransactionType = (request, response) => {
+  const { transactionType } = request.body;
+  const newTransactionType =
+    "INSERT INTO transaction_types (transaction_type_id, transaction_type) VALUES (?, ?)";
+  const getTotalTransactionTypes =
+    "SELECT COUNT(*) AS transactionTypesCounter FROM transaction_types";
 
-  db.query(newType, [transaction_id, transaction_type], (error, result) => {
+  if (!transactionType) {
+    return response.status(400).json({
+      message: "Por Favor, Rellene Todos los Campos",
+    });
+  }
+
+  db.query(getTotalTransactionTypes, (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    if (!transaction_id || !transaction_type) {
-      return response
-        .status(400)
-        .json({
-          message: "Por Favor, Introduzca la Información Correspondiente",
-        });
-    }
+    const transactionTypeId = result[0].transactionTypesCounter + 1;
 
-    return response
-      .status(200)
-      .json({
-        message: "Nuevo Tipo de Transacción Guardado Correctamente",
-      });
+    db.query(
+      newTransactionType,
+      [transactionTypeId, transactionType],
+      (error, result) => {
+        console.error("2. ", error);
+        if (error) {
+          return response
+            .status(500)
+            .json({ message: "Error Interno del Servidor" });
+        }
+
+        return response.status(200).json({
+          message: "Nuevo Tipo de Transacción Guardado Correctamente",
+        });
+      }
+    );
   });
 };

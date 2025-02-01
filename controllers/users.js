@@ -55,6 +55,11 @@ exports.updateUser = (request, response) => {
 
     if (!new_password) {
       new_password = password;
+    } else {
+      new_password = crypto
+        .createHash("sha256")
+        .update(new_password)
+        .digest("hex");
     }
 
     db.query(
@@ -79,8 +84,6 @@ exports.updateUserRole = (request, response) => {
   const { id } = request.params;
   const { newRole } = request.body;
 
-  console.log(newRole);
-
   const updateUserRole = "UPDATE users SET role_id = ? WHERE id = ?";
 
   db.query(updateUserRole, [newRole, id], (error, result) => {
@@ -94,4 +97,8 @@ exports.updateUserRole = (request, response) => {
       .status(200)
       .json({ message: "Rol del Usuario Actualizado Correctamente" });
   });
+};
+
+exports.deleteUser = (request, response) => {
+  const { id } = request.params;
 };
