@@ -4,7 +4,7 @@ const audit = require("../global/audit/audit");
 
 exports.getCollectors = (request, response) => {
   const collectors =
-    "SELECT collectors.id, collectors.service_name AS collector, services.service_name, services.description FROM collectors INNER JOIN services ON services.collector_id = collectors.id ORDER BY collectors.service_name ASC";
+    "SELECT collectors.id, collectors.service_name AS collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id GROUP BY collectors.id, collectors.service_name ORDER BY collectors.service_name ASC";
 
   db.query(collectors, (error, result) => {
     if (error) {
@@ -134,5 +134,21 @@ exports.saveNewCollector = (request, response) => {
         }
       );
     });
+  });
+};
+
+exports.viewPaymentsCollectorDetails = (request, response) => {
+  const { id } = request.params;
+  const viewPaymentsCollectorDetails =
+    "SELECT payments_collectors.id, collectors.service_name AS collector, COALESCE(services.service_name, 'Desconocido') AS service, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN customers ON customers.id = payments_collectors.customer_id LEFT JOIN services ON payments_collectors.service_id = services.id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE collectors.id = ? ORDER BY datetime DESC";
+
+  db.query(viewPaymentsCollectorDetails, [id], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
   });
 };

@@ -33,7 +33,7 @@ exports.getTotalPaymentsAumount = (request, response) => {
   });
 };
 
-exports.paymentsByCollector = (request, response) => {
+exports.obtainedPaymentsByCollector = (request, response) => {
   const paymentsByCollector =
     "SELECT service, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.service_name AS service, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY collectors.service_name) AS percentagesByCollector";
 

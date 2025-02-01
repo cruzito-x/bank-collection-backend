@@ -7,7 +7,7 @@ router.get(
   "/total-payments-amount",
   paymentsCollectors.getTotalPaymentsAumount
 );
-router.get("/payments-by-collector", paymentsCollectors.paymentsByCollector);
+router.get("/payments-by-collector", paymentsCollectors.obtainedPaymentsByCollector);
 router.post("/save-new-payment", paymentsCollectors.saveNewPayment);
 
 module.exports = router;
