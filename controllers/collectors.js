@@ -4,7 +4,7 @@ const audit = require("../global/audit/audit");
 
 exports.getCollectors = (request, response) => {
   const collectors =
-    "SELECT collectors.id, collectors.service_name AS collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id GROUP BY collectors.id, collectors.service_name ORDER BY collectors.service_name ASC";
+    "SELECT collectors.id, collectors.service_name AS collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.deleted_at IS NULL GROUP BY collectors.id, collectors.service_name ORDER BY collectors.service_name ASC";
 
   db.query(collectors, (error, result) => {
     if (error) {
@@ -163,5 +163,52 @@ exports.viewPaymentsCollectorDetails = (request, response) => {
     }
 
     return response.status(200).json(result);
+  });
+};
+
+exports.deleteCollector = (request, response) => {
+  const user_id = 1;
+  const { id } = request.params;
+  const deleteCollector = "UPDATE collectors SET deleted_at = ? WHERE id = ?";
+
+  db.query(deleteCollector, [new Date(), id], (error, result) => {
+    if (error) {
+      console.error(error);
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    const deleteCollectorServices =
+      "UPDATE services SET deleted_at = ? WHERE collector_id = ?";
+
+    db.query(deleteCollectorServices, [new Date(), id], (error, result) => {
+      if (error) {
+        console.error(error);
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      const getCollectorName =
+        "SELECT service_name FROM collectors WHERE id = ?";
+
+      db.query(getCollectorName, [id], (error, results) => {
+        if (error) {
+          console.error(error);
+          return response
+            .status(500)
+            .json({ message: "Error Interno del Servidor" });
+        }
+
+        audit(
+          user_id,
+          "Eliminación de Colector",
+          `Se Eliminó Tanto al Colector ${results[0].service_name} Como a sus Servicios`
+        );
+      });
+    });
+
+    response.status(200).json({ message: "¡Colector Eliminado Exitosamente!"});
   });
 };

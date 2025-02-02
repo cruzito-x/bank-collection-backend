@@ -5,5 +5,6 @@ const collectors = require("../controllers/collectors");
 router.get("/", collectors.getCollectors);
 router.post("/save-collector", collectors.saveNewCollector);
 router.get("/view-payments-collector-details/:id", collectors.viewPaymentsCollectorDetails);
+router.put("/delete-collector/:id", collectors.deleteCollector);
 
 module.exports = router;
