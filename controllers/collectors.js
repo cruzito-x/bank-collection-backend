@@ -18,6 +18,7 @@ exports.getCollectors = (request, response) => {
 };
 
 exports.saveNewCollector = (request, response) => {
+  const user_id = 1;
   const {
     collector_name,
     collector_description,
@@ -36,10 +37,6 @@ exports.saveNewCollector = (request, response) => {
     });
   }
 
-  const getCollectorCounter =
-    "SELECT COUNT(*) AS collectorsCounter FROM collectors";
-  const getServiceCounter = "SELECT COUNT(*) AS servicesCounter FROM services";
-
   db.beginTransaction((error) => {
     if (error) {
       return db.rollback(() => {
@@ -48,6 +45,9 @@ exports.saveNewCollector = (request, response) => {
           .json({ message: "Error Interno del Servidor" });
       });
     }
+
+    const getCollectorCounter =
+      "SELECT COUNT(*) AS collectorsCounter FROM collectors";
 
     db.query(getCollectorCounter, (error, result) => {
       if (error) {
@@ -76,6 +76,9 @@ exports.saveNewCollector = (request, response) => {
               });
             });
           }
+
+          const getServiceCounter =
+            "SELECT COUNT(*) AS servicesCounter FROM services";
 
           db.query(getServiceCounter, (error, result) => {
             if (error) {
@@ -123,7 +126,17 @@ exports.saveNewCollector = (request, response) => {
                   }
                 });
 
-                audit(1, "Añadir Colector", "Adición de Nuevo Colector");
+                audit(
+                  user_id,
+                  "Colector Registrado",
+                  `Se Registró al Colector ${collector_name}`
+                );
+
+                audit(
+                  user_id,
+                  "Servicio Registrado",
+                  `Se Registró el Servicio ${service_name} del Colector ${collector_name}`
+                );
 
                 return response.status(200).json({
                   message: "¡Colector Añadido Exitosamente!",

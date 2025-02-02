@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const audit = require("../global/audit/audit");
 
 exports.getTypes = (request, response) => {
   const types =
@@ -16,9 +17,8 @@ exports.getTypes = (request, response) => {
 };
 
 exports.saveNewTransactionType = (request, response) => {
+  const user_id = 1;
   const { transactionType } = request.body;
-  const newTransactionType =
-    "INSERT INTO transaction_types (transaction_type_id, transaction_type) VALUES (?, ?)";
   const getTotalTransactionTypes =
     "SELECT COUNT(*) AS transactionTypesCounter FROM transaction_types";
 
@@ -36,6 +36,8 @@ exports.saveNewTransactionType = (request, response) => {
     }
 
     const transactionTypeId = result[0].transactionTypesCounter + 1;
+    const newTransactionType =
+      "INSERT INTO transaction_types (transaction_type_id, transaction_type) VALUES (?, ?)";
 
     db.query(
       newTransactionType,
@@ -47,7 +49,13 @@ exports.saveNewTransactionType = (request, response) => {
             .json({ message: "Error Interno del Servidor" });
         }
 
-        return response.status(200).json({
+        audit(
+          user_id,
+          "Nuevo Tipo de Transacción Registrado",
+          `${transactionType} Registrado`
+        );
+
+        response.status(200).json({
           message: "Nuevo Tipo de Transacción Guardado Correctamente",
         });
       }
@@ -56,6 +64,7 @@ exports.saveNewTransactionType = (request, response) => {
 };
 
 exports.updateTransactionType = (request, response) => {
+  const user_id = 1;
   const { id } = request.params;
   const { transactionType } = request.body;
 
@@ -69,6 +78,12 @@ exports.updateTransactionType = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
+    audit(
+      user_id,
+      "Tipo de Transacción Actualizado",
+      `Se Actualizó el Nombre del Tipo de Transacción con Código ${id}`
+    );
+
     return response.status(200).json({
       message: "Tipo de Transacción Actualizado Correctamente",
     });
@@ -76,6 +91,7 @@ exports.updateTransactionType = (request, response) => {
 };
 
 exports.deleteTransactionType = (request, response) => {
+  const user_id = 1;
   const { id } = request.params;
 
   const deleteTransactionType =
@@ -87,6 +103,23 @@ exports.deleteTransactionType = (request, response) => {
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
+
+    const deletedTransactionTypeName =
+      "SELECT transaction_type FROM transaction_types WHERE id =?";
+
+    db.query(deletedTransactionTypeName, [id], (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      audit(
+        user_id,
+        "Tipo de Transacción Eliminado",
+        `Se Eliminó el Tipo de Transacción ${result[0].transaction_type}`
+      );
+    });
 
     return response.status(200).json({
       message: "Tipo de Transacción Eliminado Correctamente",

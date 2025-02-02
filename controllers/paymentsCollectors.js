@@ -49,15 +49,10 @@ exports.obtainedPaymentsByCollector = (request, response) => {
 };
 
 exports.saveNewPayment = (request, response) => {
+  const user_id = 1;
   const { customer_id, collector_id, service_id, amount } = request.body;
   const getPaymentsCounter =
     "SELECT COUNT(*) AS paymentsCounter FROM payments_collectors";
-  const newPayment =
-    "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, date_hour) VALUES (?, ?, ?, ?, ?, now());";
-  const getCustomerNameAndEmail =
-    "SELECT name, email FROM customers WHERE id = ?";
-  const getCollectorAndServiceName =
-    "SELECT collectors.service_name AS collector, services.service_name AS service FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.id = ?";
 
   db.query(getPaymentsCounter, (error, result) => {
     if (error) {
@@ -73,9 +68,20 @@ exports.saveNewPayment = (request, response) => {
       .update((paymentsCounter + 1).toString())
       .digest("hex");
 
+    const newPayment =
+      "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, registered_by, date_hour) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
     db.query(
       newPayment,
-      [payment_id, customer_id, collector_id, service_id, amount],
+      [
+        payment_id,
+        customer_id,
+        collector_id,
+        service_id,
+        amount,
+        user_id,
+        new Date(),
+      ],
       (error, result) => {
         if (error) {
           console.error(error);
@@ -83,6 +89,9 @@ exports.saveNewPayment = (request, response) => {
             .status(500)
             .json({ message: "Error Interno del Servidor" });
         }
+
+        const getCustomerNameAndEmail =
+          "SELECT name, email FROM customers WHERE id = ?";
 
         db.query(getCustomerNameAndEmail, [customer_id], (error, result) => {
           if (error) {
@@ -94,6 +103,9 @@ exports.saveNewPayment = (request, response) => {
 
           const customerName = result[0].name;
           const customerEmail = result[0].email;
+
+          const getCollectorAndServiceName =
+            "SELECT collectors.service_name AS collector, services.service_name AS service FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.id = ?";
 
           db.query(
             getCollectorAndServiceName,
@@ -118,14 +130,14 @@ exports.saveNewPayment = (request, response) => {
                 serviceName,
                 amount
               );
+
+              audit(
+                user_id,
+                "Pago a Colector Realizado",
+                `Pago de $${amount} Realizado a ${collectorName} por ${serviceName}`
+              );
             }
           );
-
-          // audit(
-          //   user_id,
-          //   "Pago a Colector",
-          //   `Pago de $${amount} Realizado a ${collectorName}`
-          // );
         });
 
         return response.status(200).json({

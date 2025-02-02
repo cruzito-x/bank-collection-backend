@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const audit = require("../global/audit/audit");
 
 exports.getTransactions = (request, response) => {
   const transactions =
@@ -52,8 +53,9 @@ exports.getCustomers = (request, response) => {
 };
 
 exports.saveTransaction = (request, response) => {
+  const user_id = 2;
   const {
-    sender_id,
+    customer,
     transaction_type,
     sender_account_number,
     receiver_account_number,
@@ -134,14 +136,14 @@ exports.saveTransaction = (request, response) => {
 
       function processTransaction() {
         if (receiver_id === null) {
-          receiver_id = sender_id;
+          receiver_id = customer;
         }
 
         db.query(
           saveTransaction,
           [
             transactionId,
-            sender_id,
+            customer,
             sender_account_number,
             receiver_id,
             receiver_account_number,
@@ -221,6 +223,12 @@ exports.saveTransaction = (request, response) => {
                   });
                 }
 
+                audit(
+                  user_id,
+                  "Transacción Registrada",
+                  `Se Creo la Transacción ${transactionId}, de $${amount}`
+                );
+
                 return response.status(200).json({
                   message: "¡Transacción Registrada, en Espera de Aprobación!",
                 });
@@ -293,6 +301,12 @@ exports.saveTransaction = (request, response) => {
                 .json({ message: "Error Interno del Servidor" });
             });
           }
+
+          audit(
+            user_id,
+            "Transacción Registrada",
+            `Se Creo la Transacción ${transactionId}, de $${amount}`
+          );
 
           return response
             .status(200)

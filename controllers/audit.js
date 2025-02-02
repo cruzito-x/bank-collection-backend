@@ -2,7 +2,7 @@ const db = require("../config/db");
 
 exports.getAudits = (request, response) => {
   const audits =
-    "SELECT users.username, audit.action, audit.date_hour as datetime, audit.detail as details FROM audit INNER JOIN users ON users.id = audit.user_id ORDER BY datetime DESC;";
+    "SELECT users.username, audit.action, audit.date_hour as datetime, audit.details FROM audit INNER JOIN users ON users.id = audit.user_id ORDER BY datetime DESC;";
 
   db.query(audits, (error, result) => {
     if (error) {

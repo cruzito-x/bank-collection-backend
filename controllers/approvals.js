@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const audit = require("../global/audit/audit");
 
 exports.getApprovals = (request, response) => {
   const approvals =
@@ -31,6 +32,7 @@ exports.getNotifications = (request, response) => {
 };
 
 exports.approveOrRejectTransaction = (request, response) => {
+  const user_id = 1;
   const { approvalId, transactionId, isApproved, authorizer } = request.params;
   const approvalStatus = parseInt(isApproved, 10);
 
@@ -88,6 +90,12 @@ exports.approveOrRejectTransaction = (request, response) => {
                 .status(500)
                 .json({ message: "Error interno del Servidor" });
             }
+
+            audit(
+              user_id,
+              "Transacción Aprobada",
+              `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`
+            );
           }
         );
       });

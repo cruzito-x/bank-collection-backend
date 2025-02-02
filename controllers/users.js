@@ -1,8 +1,9 @@
 const db = require("../config/db");
+const audit = require("../global/audit/audit");
 
 exports.getUsers = (request, response) => {
   const users =
-    "SELECT id, username, email, CASE WHEN role_id = 1 THEN 'Supervisor' ELSE 'Cajero' END AS role FROM users";
+    "SELECT id, username, email, CASE WHEN role_id = 1 THEN 'Supervisor' ELSE 'Cajero' END AS role FROM users WHERE deleted_at IS NULL";
   db.query(users, (error, result) => {
     if (error) {
       return response
@@ -29,6 +30,7 @@ exports.getUsersRoles = (request, response) => {
 };
 
 exports.updateUser = (request, response) => {
+  const user_id = 1;
   const { id } = request.params;
   const { username, email } = request.body;
   let { new_password } = request.body;
@@ -72,6 +74,12 @@ exports.updateUser = (request, response) => {
             .json({ message: "Error Interno del Servidor" });
         }
 
+        audit(
+          user_id,
+          "Usuario Actualizado",
+          `Se Actualizaron los Datos del Usuario ${username}`
+        );
+
         response
           .status(200)
           .json({ message: "Usuario Actualizado Correctamente" });
@@ -81,6 +89,7 @@ exports.updateUser = (request, response) => {
 };
 
 exports.updateUserRole = (request, response) => {
+  const user_id = 1;
   const { id } = request.params;
   const { newRole } = request.body;
 
@@ -93,6 +102,26 @@ exports.updateUserRole = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
+    const getUsername =
+      "SELECT users.username, roles.role FROM users INNER JOIN roles ON roles.id = users.role_id WHERE users.id = ?";
+
+    db.query(getUsername, [id], (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      const username = result[0].username;
+      const role = result[0].role;
+
+      audit(
+        user_id,
+        "Asignación de Nuevo Rol",
+        `Se Asignó el Rol ${role} al Usuario ${username}`
+      );
+    });
+
     response
       .status(200)
       .json({ message: "Rol del Usuario Actualizado Correctamente" });
@@ -100,5 +129,32 @@ exports.updateUserRole = (request, response) => {
 };
 
 exports.deleteUser = (request, response) => {
+  const user_id = 1;
   const { id } = request.params;
+
+  const deleteUser = "UPDATE users SET deleted_at = ? WHERE id = ?";
+
+  db.query(deleteUser, [new Date(), id], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    const getUsername = "SELECT username FROM users WHERE id = ?";
+
+    db.query(getUsername, [id], (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      const username = result[0].username;
+
+      audit(user_id, "Usuario Eliminado", `Se Eliminó el Usuario ${username}`);
+    });
+
+    response.status(200).json({ message: "Usuario Eliminado Correctamente" });
+  });
 };

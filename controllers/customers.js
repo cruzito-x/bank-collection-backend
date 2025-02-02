@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const audit = require("../global/audit/audit");
 
 exports.getCustomers = (request, response) => {
   const customers = "SELECT * FROM customers WHERE deleted_at IS NULL";
@@ -31,17 +32,24 @@ exports.getAccountsByCustomer = (request, response) => {
 };
 
 exports.updateCustomer = (request, response) => {
+  const user_id = 1;
   const { id } = request.params;
   const { name, identity_doc, email } = request.body;
   const updateCustomer =
-    "UPDATE customers SET name = ?, identity_doc = ?, email = ? WHERE id = ?";
+    "UPDATE customers SET name = ?, email = ? WHERE id = ?";
 
-  db.query(updateCustomer, [name, identity_doc, email, id], (error, result) => {
+  db.query(updateCustomer, [name, email, id], (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error interno del Servidor" });
     }
+
+    audit(
+      user_id,
+      "Cliente Actualizado",
+      `Se Actualizaron los Datos del Cliente con Número de Identidad ${identity_doc}`
+    );
 
     response.status(200).json({
       message: "¡Datos de Cliente Actualizados!",
@@ -50,6 +58,7 @@ exports.updateCustomer = (request, response) => {
 };
 
 exports.deleteCustomer = (request, response) => {
+  const user_id = 1;
   const { id } = request.params;
   const deleteCustomer = "UPDATE customers SET deleted_at = now() WHERE id = ?";
 
@@ -59,6 +68,22 @@ exports.deleteCustomer = (request, response) => {
         .status(500)
         .json({ message: "Error interno del Servidor" });
     }
+
+    const getCustomerById = "SELECT identity_doc FROM customers WHERE id = ?";
+
+    db.query(getCustomerById, [id], (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error interno del Servidor" });
+      }
+
+      audit(
+        user_id,
+        "Cliente Eliminado",
+        `Se Eliminó al Cliente con Número de Identidad ${result[0].identity_doc}`
+      );
+    });
 
     response.status(200).json({
       message: "¡Cliente Eliminado!",

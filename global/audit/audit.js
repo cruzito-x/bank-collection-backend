@@ -1,10 +1,10 @@
 const db = require("../../config/db");
 
-function audit(user_id, action, detail) {
+function audit(user_id, action, details) {
   const audit =
-    "INSERT INTO audit (user_id, action, date_hour, detail) VALUES (?, ?, now(), ?)";
+    "INSERT INTO audit (user_id, action, date_hour, details) VALUES (?, ?, ?, ?)";
 
-  db.query(audit, [user_id, action, detail], (error, result) => {
+  db.query(audit, [user_id, action, new Date(), details], (error, result) => {
     if (error) {
       console.error("Error al auditar acción:", error);
       return;
