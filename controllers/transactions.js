@@ -5,7 +5,6 @@ exports.getTransactions = (request, response) => {
     "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, transactions.sender_account, receivers.name AS receiver, receivers.email AS receiver_email, transactions.receiver_account, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, cashier.username as realized_by, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users cashier ON cashier.id = transactions.realized_by LEFT JOIN users ON users.id = transactions.authorized_by ORDER BY datetime DESC";
 
   db.query(transactions, (error, result) => {
-    console.error(error);
     if (error) {
       return response
         .status(500)
@@ -54,7 +53,7 @@ exports.getCustomers = (request, response) => {
 
 exports.saveTransaction = (request, response) => {
   const {
-    customer,
+    sender_id,
     transaction_type,
     sender_account_number,
     receiver_account_number,
@@ -65,10 +64,10 @@ exports.saveTransaction = (request, response) => {
   const realized_by = 1;
   let authorized_by = 1;
 
-  const transactionsCounter =
-    "SELECT (COUNT(*) + 1) AS totalTransactions FROM transactions";
+  const getLastTransactionId =
+    "SELECT id FROM transactions ORDER BY id DESC LIMIT 1";
 
-  db.query(transactionsCounter, (error, result) => {
+  db.query(getLastTransactionId, (error, result) => {
     if (error) {
       console.error(error);
       return response
@@ -76,8 +75,8 @@ exports.saveTransaction = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
-    const transactionsNumber = result[0].totalTransactions;
-    const transactionId = `TX${String(transactionsNumber).padStart(6, "0")}`;
+    const lastId = result.length > 0 ? result[0].id + 1 : 0;
+    const transactionId = `TSC${String(lastId).padStart(6, "0")}`;
 
     db.beginTransaction((error) => {
       if (error) {
@@ -89,38 +88,12 @@ exports.saveTransaction = (request, response) => {
 
       let receiver_id = null;
       let status = 2;
+      let needsApproval = false;
 
       if (transaction_type === 2 && amount >= 10000) {
         status = 1;
         authorized_by = null;
-
-        const approvalsCounter =
-          "SELECT (COUNT(*) + 1) AS totalApprovals FROM approvals";
-
-        db.query(approvalsCounter, (error, result) => {
-          if (error) {
-            console.error("Error al obtener el número de aprobaciones:", error);
-          }
-
-          const approvalsNumber = result[0].totalApprovals;
-
-          const waitingForApproval =
-            "INSERT INTO approvals (approval_id, transaction_id, is_approved, authorizer_id, date_hour) VALUES (?, ?, ?, ?, ?)";
-          const approvalId = `APPVL${String(approvalsNumber).padStart(6, "0")}`;
-
-          db.query(
-            waitingForApproval,
-            [approvalId, transactionsNumber, null, null, null],
-            (error, result) => {
-              if (error) {
-                console.error(
-                  "Error al agregar a la lista de espera:",
-                  error.message
-                );
-              }
-            }
-          );
-        });
+        needsApproval = true;
       }
 
       const saveTransaction =
@@ -160,16 +133,15 @@ exports.saveTransaction = (request, response) => {
       }
 
       function processTransaction() {
-        console.log(receiver_id);
         if (receiver_id === null) {
-          receiver_id = customer;
+          receiver_id = sender_id;
         }
 
         db.query(
           saveTransaction,
           [
             transactionId,
-            customer,
+            sender_id,
             sender_account_number,
             receiver_id,
             receiver_account_number,
@@ -191,45 +163,115 @@ exports.saveTransaction = (request, response) => {
               });
             }
 
-            if (transaction_type === 1) {
-              const updateBalance =
-                "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
-              db.query(updateBalance, [amount, customer], transactionSuccess);
-            } else if (transaction_type === 2) {
-              const updateBalance =
-                "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
-              db.query(
-                updateBalance,
-                [amount < 10000 ? amount : 0, customer],
-                transactionSuccess
-              );
-            } else if (transaction_type === 3) {
-              const updateSenderBalance =
-                "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
-              db.query(
-                updateSenderBalance,
-                [amount, sender_account_number],
-                (error, result) => {
-                  if (error) {
-                    return db.rollback(() => {
-                      response
-                        .status(500)
-                        .json({ message: "Error Interno del Servidor" });
-                    });
-                  }
-
-                  const updateReceiverBalance =
-                    "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
-                  db.query(
-                    updateReceiverBalance,
-                    [amount, receiver_account_number],
-                    transactionSuccess
-                  );
-                }
-              );
+            if (needsApproval) {
+              waitingForApproval();
+            } else {
+              updateBalances();
             }
           }
         );
+      }
+
+      function waitingForApproval() {
+        const approvalsCounter =
+          "SELECT id FROM approvals ORDER BY id DESC LIMIT 1";
+
+        db.query(approvalsCounter, (error, result) => {
+          if (error) {
+            console.error("Error al obtener el último ID de approvals:", error);
+            return db.rollback(() => {
+              response
+                .status(500)
+                .json({ message: "Error Interno del Servidor" });
+            });
+          }
+
+          const lastApprovalId = result.length > 0 ? result[0].id : 0;
+          const approvalId = `APVL${String(lastApprovalId + 1).padStart(
+            6,
+            "0"
+          )}`;
+
+          const waitingForApproval =
+            "INSERT INTO approvals (approval_id, transaction_id, is_approved, authorizer_id, date_hour) VALUES (?, ?, ?, ?, ?)";
+
+          db.query(
+            waitingForApproval,
+            [approvalId, lastId, null, null, null],
+            (error, result) => {
+              if (error) {
+                console.error(
+                  "Error al agregar a la lista de espera:",
+                  error.message
+                );
+                return db.rollback(() => {
+                  response
+                    .status(500)
+                    .json({ message: "Error Interno del Servidor" });
+                });
+              }
+
+              db.commit((error) => {
+                if (error) {
+                  console.error("Error al confirmar la transacción:", error);
+                  return db.rollback(() => {
+                    response
+                      .status(500)
+                      .json({ message: "Error Interno del Servidor" });
+                  });
+                }
+
+                return response.status(200).json({
+                  message: "¡Transacción Registrada, en Espera de Aprobación!",
+                });
+              });
+            }
+          );
+        });
+      }
+
+      function updateBalances() {
+        if (transaction_type === 1) {
+          const updateBalance =
+            "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
+          db.query(
+            updateBalance,
+            [amount, receiver_account_number],
+            transactionSuccess
+          );
+        } else if (transaction_type === 2) {
+          const updateBalance =
+            "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
+          db.query(
+            updateBalance,
+            [amount, sender_account_number],
+            transactionSuccess
+          );
+        } else if (transaction_type === 3) {
+          const updateSenderBalance =
+            "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
+          db.query(
+            updateSenderBalance,
+            [amount, sender_account_number],
+            (error, result) => {
+              if (error) {
+                return db.rollback(() => {
+                  response
+                    .status(500)
+                    .json({ message: "Error Interno del Servidor" });
+                });
+              }
+
+              const updateReceiverBalance =
+                "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
+              db.query(
+                updateReceiverBalance,
+                [amount, receiver_account_number],
+                transactionSuccess
+              );
+            }
+          );
+        }
       }
 
       function transactionSuccess(error, result) {
@@ -242,10 +284,9 @@ exports.saveTransaction = (request, response) => {
           });
         }
 
-        // Confirmar transacción
-        db.commit((err) => {
-          if (err) {
-            console.error("Error al confirmar la transacción:", err);
+        db.commit((error) => {
+          if (error) {
+            console.error("Error al confirmar la transacción:", error);
             return db.rollback(() => {
               response
                 .status(500)

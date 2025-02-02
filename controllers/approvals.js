@@ -77,7 +77,7 @@ exports.approveOrRejectTransaction = (request, response) => {
         const customer_sender_id = result[0].id;
 
         const updateCustomerBalance =
-          "UPDATE customers SET balance = balance - ? WHERE id = ?";
+          "UPDATE accounts SET balance = balance - ? WHERE owner_id = ?";
 
         db.query(
           updateCustomerBalance,
