@@ -49,7 +49,9 @@ const sendMail = async (
             </p>
             <p style="font-size: 14px; color: #000000;">
               <strong>Fecha de Pago</strong> <br />
-              <label style="color: #5b5b5b;"> ${moment(new Date()).format("YYYY/MM/DD - hh:mm A")}</label>
+              <label style="color: #5b5b5b;"> ${moment(new Date()).format(
+                "DD/MM/YYYY - hh:mm A"
+              )}</label>
             </p>
           </div>
         </div>
@@ -57,10 +59,9 @@ const sendMail = async (
         <div style="text-align: center; margin-top: 20px">
           <p style="margin: 0; font-size: 14px; color: #000000;"> Este es un comprobante de pago. <br />
           Para mayor información, consulta en las oficinas del banco o contacta a <a href="mailto:onboarding@resend.dev" style="color: #007bff; text-decoration: none;">onboarding@resend.dev</a>. </p>
-          <p> &copy; cruzito-x - ${new Date().getFullYear()} All Rights Reserved. </p>
+          <p> Banco Bambú&reg; - ${new Date().getFullYear()} All Rights Reserved. </p>
         </div>`,
       });
-      console.log("Email sent:", result);
     } catch (error) {
       console.error("Error sending email:", error);
     }

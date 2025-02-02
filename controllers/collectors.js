@@ -135,7 +135,7 @@ exports.saveNewCollector = (request, response) => {
                 audit(
                   user_id,
                   "Servicio Registrado",
-                  `Se Registró el Servicio ${service_name} del Colector ${collector_name}`
+                  `Se Registró el Servicio ${service_name} del Colector ${collector_name} desde la Vista de Colectores`
                 );
 
                 return response.status(200).json({
@@ -163,6 +163,40 @@ exports.viewPaymentsCollectorDetails = (request, response) => {
     }
 
     return response.status(200).json(result);
+  });
+};
+
+exports.updateCollector = (request, response) => {
+  const user_id = 1;
+  const { id } = request.params;
+  const { collector, description } = request.body;
+
+  if (!collector || !description) {
+    return response.status(400).json({
+      message: "Por Favor, Rellene Todos los Campos",
+    });
+  }
+
+  const updateCollector =
+    "UPDATE collectors SET service_name = ?, description = ? WHERE id = ?";
+
+  db.query(updateCollector, [collector, description, id], (error, result) => {
+    if (error) {
+      console.error(error);
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    audit(
+      user_id,
+      "Colector Modificado",
+      `Se Modificó el Colector ${collector}`
+    );
+
+    response.status(200).json({
+      message: "¡Datos de Colector Actualizados Exitosamente!",
+    });
   });
 };
 
@@ -209,6 +243,6 @@ exports.deleteCollector = (request, response) => {
       });
     });
 
-    response.status(200).json({ message: "¡Colector Eliminado Exitosamente!"});
+    response.status(200).json({ message: "¡Colector Eliminado Exitosamente!" });
   });
 };
