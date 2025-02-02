@@ -20,13 +20,14 @@ exports.getTransactionByCustomerAndAccountNumber = (request, response) => {
   const { id, account } = request.params;
 
   const transactionsByCustomerAndAccountNumber =
-    "SELECT transactions.id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, transactions.sender_account, transactions.amount, transactions.receiver_account, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN accounts ON accounts.account_number = transactions.sender_account OR accounts.account_number = transactions.receiver_account LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by LEFT JOIN accounts AS sender_account ON sender_account.account_number = transactions.sender_account AND sender_account.deleted_at IS NULL LEFT JOIN accounts AS receiver_account ON receiver_account.account_number = transactions.receiver_account AND receiver_account.deleted_at IS NULL WHERE transactions.customer_id = ? AND accounts.account_number = ? AND customers.deleted_at IS NULL AND accounts.deleted_at IS NULL ORDER BY datetime DESC";
+    "SELECT DISTINCT transactions.id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, transactions.sender_account, transactions.amount, transactions.receiver_account, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by LEFT JOIN accounts AS sender_account ON sender_account.account_number = transactions.sender_account AND sender_account.deleted_at IS NULL LEFT JOIN accounts AS receiver_account ON receiver_account.account_number = transactions.receiver_account AND receiver_account.deleted_at IS NULL WHERE (transactions.sender_account = ? OR transactions.receiver_account = ?) AND customers.deleted_at IS NULL ORDER BY datetime DESC";
 
   db.query(
     transactionsByCustomerAndAccountNumber,
     [id, account],
     (error, result) => {
       if (error) {
+        console.error(error);
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
