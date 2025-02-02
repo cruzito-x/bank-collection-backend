@@ -24,13 +24,15 @@ exports.saveNewCollector = (request, response) => {
     collector_description,
     service_name,
     service_description,
+    price,
   } = request.body;
 
   if (
     !collector_name ||
     !collector_description ||
     !service_name ||
-    !service_description
+    !service_description ||
+    !price
   ) {
     return response.status(400).json({
       message: "Por Favor, Rellene Todos los Campos",
@@ -46,21 +48,18 @@ exports.saveNewCollector = (request, response) => {
       });
     }
 
-    const getCollectorCounter =
-      "SELECT COUNT(*) AS collectorsCounter FROM collectors";
+    const getLastCollectorId =
+      "SELECT id FROM collectors ORDER BY id DESC LIMIT 1";
 
-    db.query(getCollectorCounter, (error, result) => {
+    db.query(getLastCollectorId, (error, result) => {
       if (error) {
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
       }
 
-      const collectorCounter = result[0].collectorsCounter;
-      const collector_id = crypto
-        .createHash("sha256")
-        .update((collectorCounter + 1).toString())
-        .digest("hex");
+      const latestCollectorId = result.length > 0 ? result[0].id + 1 : 0;
+      const collector_id = `CLT${String(latestCollectorId).padStart(6, "0")}`;
 
       const newCollector =
         "INSERT INTO collectors (collector_id, service_name, description) VALUES (?, ?, ?)";
@@ -77,10 +76,10 @@ exports.saveNewCollector = (request, response) => {
             });
           }
 
-          const getServiceCounter =
-            "SELECT COUNT(*) AS servicesCounter FROM services";
+          const getLastServiceId =
+            "SELECT id FROM services ORDER BY id DESC LIMIT 1";
 
-          db.query(getServiceCounter, (error, result) => {
+          db.query(getLastServiceId, (error, result) => {
             if (error) {
               return db.rollback(() => {
                 return response
@@ -89,23 +88,20 @@ exports.saveNewCollector = (request, response) => {
               });
             }
 
-            const serviceCounter = result[0].servicesCounter;
-            const service_id = crypto
-              .createHash("sha256")
-              .update((serviceCounter + 1).toString())
-              .digest("hex");
+            const latestServiceId = result.length > 0 ? result[0].id + 1 : 0;
+            const service_id = `SRV${String(latestServiceId).padStart(6, "0")}`;
 
-            const newService =
+            const saveNewService =
               "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
 
             db.query(
-              newService,
+              saveNewService,
               [
                 service_id,
-                collectorCounter + 1,
+                latestCollectorId,
                 service_name,
                 service_description,
-                0,
+                price,
               ],
               (error, result) => {
                 if (error) {
@@ -135,7 +131,7 @@ exports.saveNewCollector = (request, response) => {
                 audit(
                   user_id,
                   "Servicio Registrado",
-                  `Se Registró el Servicio ${service_name} del Colector ${collector_name} desde la Vista de Colectores`
+                  `Se Registró el Servicio ${service_name} del Colector ${collector_name}`
                 );
 
                 return response.status(200).json({
@@ -194,7 +190,7 @@ exports.updateCollector = (request, response) => {
       `Se Modificó el Colector ${collector}`
     );
 
-    response.status(200).json({
+    return response.status(200).json({
       message: "¡Datos de Colector Actualizados Exitosamente!",
     });
   });
@@ -243,6 +239,8 @@ exports.deleteCollector = (request, response) => {
       });
     });
 
-    response.status(200).json({ message: "¡Colector Eliminado Exitosamente!" });
+    return response
+      .status(200)
+      .json({ message: "¡Colector Eliminado Exitosamente!" });
   });
 };
