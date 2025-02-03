@@ -1,6 +1,21 @@
 const moment = require("moment");
 const db = require("../config/db");
 
+exports.getLatestCollectorAndCollectorPayemntData = (request, response) => {
+  const getLatestData =
+    "SELECT collectors.service_name AS collector, (SELECT collectors.service_name FROM collectors ORDER BY collectors.id DESC LIMIT 1) AS most_recent_collector, payments_collectors.amount, (SELECT transactions.transaction_id FROM transactions INNER JOIN approvals ON approvals.transaction_id = transactions.id WHERE approvals.is_approved IS NOT NULL AND approvals.is_approved = 1 ORDER BY approvals.transaction_id DESC LIMIT 1) AS latest_approved_transaction FROM collectors INNER JOIN payments_collectors ON payments_collectors.collector_id = collectors.id ORDER BY payments_collectors.date_hour DESC LIMIT 1";
+
+  db.query(getLatestData, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
+
 exports.getTransactionsByDates = (request, response) => {
   const { startDay, endDay, amountFilter, transactionTypeFilter } =
     request.params;
@@ -85,9 +100,9 @@ exports.getTransactionsByDates = (request, response) => {
       differenceInDays >= 31 && differenceInDays < 90
         ? [
             {
-              label: `${moment(startDay).format("YYYY/MM/DD")} - ${moment(
+              label: `${moment(startDay).format("DD/MM/YYYY")} - ${moment(
                 endDay
-              ).format("YYYY/MM/DD")}`,
+              ).format("DD/MM/YYYY")}`,
               totalAmount: result[0]?.totalAmount || 0,
               transactionsCounter: result[0]?.transactionsCounter || 0,
             },

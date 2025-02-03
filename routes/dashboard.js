@@ -1,15 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const dahsboard = require("../controllers/dashboard");
+const dashboard = require("../controllers/dashboard");
 
 router.get(
-  "/transactions-by-dates/:startDay/:endDay/:amountFilter/:transactionTypeFilter",
-  dahsboard.getTransactionsByDates
+  "/get-latest-collector-and-collectorPayemnt-data",
+  dashboard.getLatestCollectorAndCollectorPayemntData
 );
-router.get("/transactions-by-collector", dahsboard.getTransactionsByCollector);
+router.get(
+  "/transactions-by-dates/:startDay/:endDay/:amountFilter/:transactionTypeFilter",
+  dashboard.getTransactionsByDates
+);
+router.get("/transactions-by-collector", dashboard.getTransactionsByCollector);
 router.get(
   "/transactions-by-denomination",
-  dahsboard.getTransactionsByDenomination
+  dashboard.getTransactionsByDenomination
 );
 
 module.exports = router;
