@@ -56,7 +56,7 @@ exports.saveNewTransactionType = (request, response) => {
         );
 
         response.status(200).json({
-          message: "Nuevo Tipo de Transacción Guardado Correctamente",
+          message: "¡Nuevo Tipo de Transacción Registrado Exitosamente!",
         });
       }
     );
@@ -85,7 +85,7 @@ exports.updateTransactionType = (request, response) => {
     );
 
     return response.status(200).json({
-      message: "Tipo de Transacción Actualizado Correctamente",
+      message: "¡Tipo de Transacción Actualizado Exitosamente!",
     });
   });
 };
@@ -122,7 +122,7 @@ exports.deleteTransactionType = (request, response) => {
     });
 
     return response.status(200).json({
-      message: "Tipo de Transacción Eliminado Correctamente",
+      message: "¡Tipo de Transacción Eliminado Exitosamente!",
     });
   });
 };

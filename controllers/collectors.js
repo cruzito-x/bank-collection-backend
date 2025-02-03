@@ -70,9 +70,9 @@ exports.saveNewCollector = (request, response) => {
         (error, result) => {
           if (error) {
             return db.rollback(() => {
-              return response.status(500).json({
-                message: "Error Interno del Servidor",
-              });
+              return response
+                .status(500)
+                .json({ message: "Error Interno del Servidor" });
             });
           }
 
@@ -106,9 +106,9 @@ exports.saveNewCollector = (request, response) => {
               (error, result) => {
                 if (error) {
                   return db.rollback(() => {
-                    return response.status(500).json({
-                      message: "Error Interno del Servidor",
-                    });
+                    return response
+                      .status(500)
+                      .json({ message: "Error Interno del Servidor" });
                   });
                 }
 
@@ -135,7 +135,7 @@ exports.saveNewCollector = (request, response) => {
                 );
 
                 return response.status(200).json({
-                  message: "¡Colector Añadido Exitosamente!",
+                  message: "¡Colector Registrado Exitosamente!",
                 });
               }
             );
@@ -178,7 +178,6 @@ exports.updateCollector = (request, response) => {
 
   db.query(updateCollector, [collector, description, id], (error, result) => {
     if (error) {
-      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
@@ -203,7 +202,6 @@ exports.deleteCollector = (request, response) => {
 
   db.query(deleteCollector, [new Date(), id], (error, result) => {
     if (error) {
-      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
@@ -214,7 +212,6 @@ exports.deleteCollector = (request, response) => {
 
     db.query(deleteCollectorServices, [new Date(), id], (error, result) => {
       if (error) {
-        console.error(error);
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
@@ -225,7 +222,6 @@ exports.deleteCollector = (request, response) => {
 
       db.query(getCollectorName, [id], (error, results) => {
         if (error) {
-          console.error(error);
           return response
             .status(500)
             .json({ message: "Error Interno del Servidor" });

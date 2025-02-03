@@ -24,7 +24,6 @@ exports.saveNewService = (request, response) => {
 
   db.query(getLastServiceId, (error, result) => {
     if (error) {
-      console.error("Error al obtener el último ID de servicios:", error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
@@ -41,7 +40,6 @@ exports.saveNewService = (request, response) => {
       [service_id, collector, service, description, price],
       (error, result) => {
         if (error) {
-          console.error("Error al guardar el servicio:", error);
           return response
             .status(500)
             .json({ message: "Error al guardar el servicio" });
@@ -68,7 +66,7 @@ exports.saveNewService = (request, response) => {
 
         response
           .status(200)
-          .json({ message: "¡Servicio Guardado Exitosamente!" });
+          .json({ message: "¡Servicio Registrado Exitosamente!" });
       }
     );
   });
@@ -130,7 +128,7 @@ exports.updateService = (request, response) => {
       );
 
       return response.status(200).json({
-        message: "¡Servicio Actualizado Correctamente!",
+        message: "¡Servicio Actualizado Exitosamente!",
       });
     }
   );
@@ -143,7 +141,6 @@ exports.deleteService = (request, response) => {
   const deleteService = "UPDATE services SET deleted_at = ? WHERE id = ?";
   db.query(deleteService, [new Date(), id], (error, result) => {
     if (error) {
-      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
@@ -154,7 +151,6 @@ exports.deleteService = (request, response) => {
 
     db.query(getServiceName, [id], (error, result) => {
       if (error) {
-        console.error(error);
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
@@ -171,7 +167,7 @@ exports.deleteService = (request, response) => {
 
       return response
         .status(200)
-        .json({ message: "¡Servicio Eliminado Correctamente!" });
+        .json({ message: "¡Servicio Eliminado Exitosamente!" });
     });
   });
 };

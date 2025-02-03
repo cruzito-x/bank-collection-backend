@@ -12,7 +12,7 @@ exports.getApprovals = (request, response) => {
         .json({ message: "Error interno del Servidor" });
     }
 
-    response.status(200).json(result);
+    return response.status(200).json(result);
   });
 };
 
@@ -27,7 +27,7 @@ exports.getNotifications = (request, response) => {
         .json({ message: "Error interno del Servidor" });
     }
 
-    response.status(200).json(result);
+    return response.status(200).json(result);
   });
 };
 
@@ -91,18 +91,24 @@ exports.approveOrRejectTransaction = (request, response) => {
                 .json({ message: "Error interno del Servidor" });
             }
 
-            audit(
-              user_id,
-              "Transacción Aprobada",
-              `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`
-            );
+            approvalStatus === 1
+              ? audit(
+                  user_id,
+                  "Transacción Aprobada",
+                  `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`
+                )
+              : audit(
+                  user_id,
+                  "Transacción Rechazada",
+                  `Se Rechazó la Transacción ${transactionId} por un Monto de $${amount}`
+                );
           }
         );
       });
 
       let approvedStatus = approvalStatus === 1 ? "Aprobada" : "Rechazada";
 
-      response.status(200).json({
+      return response.status(200).json({
         message: `Transacción ${approvedStatus}`,
       });
     }

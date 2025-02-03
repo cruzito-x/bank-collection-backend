@@ -6,11 +6,11 @@ exports.getAudits = (request, response) => {
 
   db.query(audits, (error, result) => {
     if (error) {
-      response.status(500).json({
-        message: "Error Interno del Servidor",
-      });
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
     }
 
-    response.status(200).json(result);
+    return response.status(200).json(result);
   });
 };

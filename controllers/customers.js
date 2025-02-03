@@ -11,7 +11,7 @@ exports.getCustomers = (request, response) => {
         .json({ message: "Error interno del Servidor" });
     }
 
-    response.status(200).json(result);
+    return response.status(200).json(result);
   });
 };
 
@@ -51,8 +51,8 @@ exports.updateCustomer = (request, response) => {
       `Se Actualizaron los Datos del Cliente con Número de Identidad ${identity_doc}`
     );
 
-    response.status(200).json({
-      message: "¡Datos de Cliente Actualizados!",
+    return response.status(200).json({
+      message: "¡Datos de Cliente Actualizados Exitosamente!",
     });
   });
 };
@@ -85,8 +85,8 @@ exports.deleteCustomer = (request, response) => {
       );
     });
 
-    response.status(200).json({
-      message: "¡Cliente Eliminado!",
+    return response.status(200).json({
+      message: "¡Cliente Eliminado Exitosamente!",
     });
   });
 };
@@ -105,6 +105,6 @@ exports.searchCustomer = (request, response) => {
         .json({ message: "Error interno del Servidor" });
     }
 
-    response.status(200).json(result);
+    return response.status(200).json(result);
   });
 };

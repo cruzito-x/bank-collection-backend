@@ -11,7 +11,7 @@ exports.getUsers = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
-    response.status(200).json(result);
+    return response.status(200).json(result);
   });
 };
 
@@ -25,7 +25,7 @@ exports.getUsersRoles = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
-    response.status(200).json(result);
+    return response.status(200).json(result);
   });
 };
 
@@ -82,7 +82,7 @@ exports.updateUser = (request, response) => {
 
         response
           .status(200)
-          .json({ message: "Usuario Actualizado Correctamente" });
+          .json({ message: "Usuario Actualizado Exitosamente" });
       }
     );
   });
@@ -124,7 +124,7 @@ exports.updateUserRole = (request, response) => {
 
     response
       .status(200)
-      .json({ message: "Rol del Usuario Actualizado Correctamente" });
+      .json({ message: "Rol del Usuario Actualizado Exitosamente" });
   });
 };
 
@@ -155,6 +155,8 @@ exports.deleteUser = (request, response) => {
       audit(user_id, "Usuario Eliminado", `Se Eliminó el Usuario ${username}`);
     });
 
-    response.status(200).json({ message: "Usuario Eliminado Correctamente" });
+    return response
+      .status(200)
+      .json({ message: "Usuario Eliminado Exitosamente" });
   });
 };

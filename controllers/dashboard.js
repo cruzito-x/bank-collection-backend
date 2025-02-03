@@ -76,11 +76,9 @@ exports.getTransactionsByDates = (request, response) => {
 
   db.query(transactionsByDates, transactionsByDatesParams, (error, result) => {
     if (error) {
-      console.error(error);
-
-      return response.status(500).json({
-        message: "Error Interno del Servidor",
-      });
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
     }
 
     const transactionsByDatesResults =
@@ -152,7 +150,7 @@ exports.getTransactionsByDenomination = (request, response) => {
     const totalDenominations = denominations.map((denomination) => ({
       denomination:
         `${denomination >= 1 ? "Billetes de:" : "Monedas de:"} $` +
-        denomination.toFixed(2), // Convertir a formato de string para monedas como "0.25"
+        denomination.toFixed(2),
       total: denominationsCounter[denomination],
     }));
 

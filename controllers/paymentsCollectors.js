@@ -51,22 +51,18 @@ exports.obtainedPaymentsByCollector = (request, response) => {
 exports.saveNewPayment = (request, response) => {
   const user_id = 1;
   const { customer_id, collector_id, service_id, amount } = request.body;
-  const getPaymentsCounter =
-    "SELECT COUNT(*) AS paymentsCounter FROM payments_collectors";
+  const getLastPaymentCollectorId =
+    "SELECT id FROM payments_collectors ORDER BY id DESC LIMIT 1";
 
-  db.query(getPaymentsCounter, (error, result) => {
+  db.query(getLastPaymentCollectorId, (error, result) => {
     if (error) {
-      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    const paymentsCounter = result[0].paymentsCounter;
-    const payment_id = crypto
-      .createHash("sha256")
-      .update((paymentsCounter + 1).toString())
-      .digest("hex");
+    const lastId = result.length > 0 ? result[0].id + 1 : 0;
+    const paymentCollectorId = `PAY${String(lastId).padStart(6, "0")}`;
 
     const newPayment =
       "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, registered_by, date_hour) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -74,7 +70,7 @@ exports.saveNewPayment = (request, response) => {
     db.query(
       newPayment,
       [
-        payment_id,
+        paymentCollectorId,
         customer_id,
         collector_id,
         service_id,
@@ -84,7 +80,6 @@ exports.saveNewPayment = (request, response) => {
       ],
       (error, result) => {
         if (error) {
-          console.error(error);
           return response
             .status(500)
             .json({ message: "Error Interno del Servidor" });
@@ -95,7 +90,6 @@ exports.saveNewPayment = (request, response) => {
 
         db.query(getCustomerNameAndEmail, [customer_id], (error, result) => {
           if (error) {
-            console.error(error);
             return response
               .status(500)
               .json({ message: "Error Interno del Servidor" });
@@ -112,7 +106,6 @@ exports.saveNewPayment = (request, response) => {
             [collector_id],
             async (error, result) => {
               if (error) {
-                console.error(error);
                 return response
                   .status(500)
                   .json({ message: "Error Interno del Servidor" });
@@ -141,7 +134,7 @@ exports.saveNewPayment = (request, response) => {
         });
 
         return response.status(200).json({
-          message: "¡Pago Registrado Correctamente! Factura Enviada",
+          message: "¡Pago Registrado Exitosamente!",
         });
       }
     );

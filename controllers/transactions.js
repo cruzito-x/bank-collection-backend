@@ -27,7 +27,6 @@ exports.getTransactionByCustomerAndAccountNumber = (request, response) => {
     [account, id, account, id],
     (error, result) => {
       if (error) {
-        console.error(error);
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
@@ -72,7 +71,6 @@ exports.saveTransaction = (request, response) => {
 
   db.query(getLastTransactionId, (error, result) => {
     if (error) {
-      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
@@ -83,7 +81,6 @@ exports.saveTransaction = (request, response) => {
 
     db.beginTransaction((error) => {
       if (error) {
-        console.error("Error al iniciar la transacción:", error);
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
@@ -111,7 +108,6 @@ exports.saveTransaction = (request, response) => {
           [receiver_account_number],
           (error, result) => {
             if (error) {
-              console.error(error);
               return db.rollback(() => {
                 response
                   .status(500)
@@ -158,7 +154,6 @@ exports.saveTransaction = (request, response) => {
           ],
           (error, result) => {
             if (error) {
-              console.error(error);
               return db.rollback(() => {
                 response
                   .status(500)
@@ -181,7 +176,6 @@ exports.saveTransaction = (request, response) => {
 
         db.query(approvalsCounter, (error, result) => {
           if (error) {
-            console.error("Error al obtener el último ID de approvals:", error);
             return db.rollback(() => {
               response
                 .status(500)
@@ -203,10 +197,6 @@ exports.saveTransaction = (request, response) => {
             [approvalId, lastId, null, null, null],
             (error, result) => {
               if (error) {
-                console.error(
-                  "Error al agregar a la lista de espera:",
-                  error.message
-                );
                 return db.rollback(() => {
                   response
                     .status(500)
@@ -216,7 +206,6 @@ exports.saveTransaction = (request, response) => {
 
               db.commit((error) => {
                 if (error) {
-                  console.error("Error al confirmar la transacción:", error);
                   return db.rollback(() => {
                     response
                       .status(500)
@@ -285,7 +274,6 @@ exports.saveTransaction = (request, response) => {
 
       function transactionSuccess(error, result) {
         if (error) {
-          console.error("Error al actualizar balance:", error);
           return db.rollback(() => {
             response
               .status(500)
@@ -295,7 +283,6 @@ exports.saveTransaction = (request, response) => {
 
         db.commit((error) => {
           if (error) {
-            console.error("Error al confirmar la transacción:", error);
             return db.rollback(() => {
               response
                 .status(500)
@@ -311,7 +298,7 @@ exports.saveTransaction = (request, response) => {
 
           return response
             .status(200)
-            .json({ message: "¡Transacción Registrada Correctamente!" });
+            .json({ message: "¡Transacción Registrada Exitosamente!" });
         });
       }
     });
