@@ -3,7 +3,7 @@ const audit = require("../global/audit/audit");
 
 exports.getServices = (request, response) => {
   const services =
-    "SELECT services.*, services.service_name AS service, collectors.service_name AS collector FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.deleted_at IS NULL";
+    "SELECT services.*, services.service_name AS service, collectors.collector FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.deleted_at IS NULL";
 
   db.query(services, (error, result) => {
     if (error) {
@@ -46,7 +46,7 @@ exports.saveNewService = (request, response) => {
         }
 
         const getCollectorName =
-          "SELECT service_name FROM collectors WHERE id = ?";
+          "SELECT collector FROM collectors WHERE id = ?";
 
         db.query(getCollectorName, [collector], (error, result) => {
           if (error) {
@@ -55,7 +55,7 @@ exports.saveNewService = (request, response) => {
               .json({ message: "Error Interno del Servidor" });
           }
 
-          const collectorName = result[0].service_name;
+          const collectorName = result[0].collector;
 
           audit(
             user_id,
@@ -90,7 +90,7 @@ exports.getServicesByCollector = (request, response) => {
 exports.viewPaymentsByServiceDetails = (request, response) => {
   const { id } = request.params;
   const viewPaymentsByServiceDetails =
-    "SELECT services.service_name AS service, collectors.service_name AS collector, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN collectors ON collectors.id = payments_collectors.collector_id INNER JOIN customers ON customers.id = payments_collectors.customer_id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE services.id = ? ORDER BY datetime DESC";
+    "SELECT services.service_name AS service, collectors.collector, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN collectors ON collectors.id = payments_collectors.collector_id INNER JOIN customers ON customers.id = payments_collectors.customer_id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE services.id = ? ORDER BY datetime DESC";
 
   db.query(viewPaymentsByServiceDetails, [id], (error, result) => {
     if (error) {
@@ -147,7 +147,7 @@ exports.deleteService = (request, response) => {
     }
 
     const getServiceName =
-      "SELECT collectors.service_name AS collector, services.service_name AS service FROM services INNER JOIN collectors ON services.collector_id = collectors.id WHERE services.id = ?";
+      "SELECT collectors.collector, services.service_name AS service FROM services INNER JOIN collectors ON services.collector_id = collectors.id WHERE services.id = ?";
 
     db.query(getServiceName, [id], (error, result) => {
       if (error) {

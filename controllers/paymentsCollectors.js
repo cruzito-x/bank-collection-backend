@@ -5,7 +5,7 @@ const { sendMail } = require("../global/mail/mailer");
 
 exports.getCollectorsPayments = (request, response) => {
   const paymentsCollectors =
-    "SELECT payments_collectors.payment_id, customers.name AS customer, collectors.service_name AS collector, services.service_name AS service, payments_collectors.amount, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN customers ON payments_collectors.customer_id = customers.id INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN users ON users.id = payments_collectors.registered_by ORDER BY datetime DESC";
+    "SELECT payments_collectors.payment_id, customers.name AS customer, collectors.collector, services.service_name AS service, payments_collectors.amount, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN customers ON payments_collectors.customer_id = customers.id INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN users ON users.id = payments_collectors.registered_by ORDER BY datetime DESC";
 
   db.query(paymentsCollectors, (error, result) => {
     if (error) {
@@ -35,7 +35,7 @@ exports.getTotalPaymentsAumount = (request, response) => {
 
 exports.obtainedPaymentsByCollector = (request, response) => {
   const paymentsByCollector =
-    "SELECT service, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.service_name AS service, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY collectors.service_name) AS percentagesByCollector";
+    "SELECT collector, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.collector, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY collectors.collector) AS percentagesByCollector";
 
   db.query(paymentsByCollector, (error, result) => {
     if (error) {
@@ -99,7 +99,7 @@ exports.saveNewPayment = (request, response) => {
           const customerEmail = result[0].email;
 
           const getCollectorAndServiceName =
-            "SELECT collectors.service_name AS collector, services.service_name AS service FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.id = ?";
+            "SELECT collectors.collector, services.service_name AS service FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.id = ?";
 
           db.query(
             getCollectorAndServiceName,

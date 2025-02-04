@@ -3,7 +3,7 @@ const db = require("../config/db");
 
 exports.getLatestCollectorAndCollectorPayemntData = (request, response) => {
   const getLatestData =
-    "SELECT collectors.service_name AS collector, (SELECT collectors.service_name FROM collectors ORDER BY collectors.id DESC LIMIT 1) AS most_recent_collector, payments_collectors.amount, (SELECT transactions.transaction_id FROM transactions INNER JOIN approvals ON approvals.transaction_id = transactions.id WHERE approvals.is_approved IS NOT NULL AND approvals.is_approved = 1 ORDER BY approvals.transaction_id DESC LIMIT 1) AS latest_approved_transaction FROM collectors INNER JOIN payments_collectors ON payments_collectors.collector_id = collectors.id ORDER BY payments_collectors.date_hour DESC LIMIT 1";
+    "SELECT collectors.collector, (SELECT collectors.collector FROM collectors ORDER BY collectors.id DESC LIMIT 1) AS most_recent_collector, (SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id INNER JOIN payments_collectors ON payments_collectors.collector_id = collectors.id ORDER BY payments_collectors.id DESC LIMIT 1) AS payed_collector, payments_collectors.amount, (SELECT transactions.transaction_id FROM transactions INNER JOIN approvals ON approvals.transaction_id = transactions.id WHERE approvals.is_approved IS NOT NULL AND approvals.is_approved = 1 ORDER BY approvals.transaction_id DESC LIMIT 1) AS latest_approved_transaction FROM collectors INNER JOIN payments_collectors ON payments_collectors.collector_id = collectors.id ORDER BY payments_collectors.date_hour DESC LIMIT 1";
 
   db.query(getLatestData, (error, result) => {
     if (error) {
@@ -119,7 +119,7 @@ exports.getTransactionsByDates = (request, response) => {
 
 exports.getTransactionsByCollector = (request, response) => {
   const transactionsByCollector =
-    "SELECT collectors.service_name AS collector, COUNT(*) AS transactionsByCollector FROM payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY payments_collectors.collector_id;";
+    "SELECT collectors.collector, COUNT(*) AS transactionsByCollector FROM payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY payments_collectors.collector_id;";
 
   db.query(transactionsByCollector, (error, result) => {
     if (error) {

@@ -4,7 +4,7 @@ const audit = require("../global/audit/audit");
 
 exports.getCollectors = (request, response) => {
   const collectors =
-    "SELECT collectors.id, collectors.service_name AS collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.deleted_at IS NULL GROUP BY collectors.id, collectors.service_name ORDER BY collectors.service_name ASC";
+    "SELECT collectors.id, collectors.collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.deleted_at IS NULL GROUP BY collectors.id, collectors.collector ORDER BY collectors.collector ASC";
 
   db.query(collectors, (error, result) => {
     if (error) {
@@ -62,7 +62,7 @@ exports.saveNewCollector = (request, response) => {
       const collector_id = `CLT${String(latestCollectorId).padStart(6, "0")}`;
 
       const newCollector =
-        "INSERT INTO collectors (collector_id, service_name, description) VALUES (?, ?, ?)";
+        "INSERT INTO collectors (collector_id, collector, description) VALUES (?, ?, ?)";
 
       db.query(
         newCollector,
@@ -149,7 +149,7 @@ exports.saveNewCollector = (request, response) => {
 exports.viewPaymentsCollectorDetails = (request, response) => {
   const { id } = request.params;
   const viewPaymentsCollectorDetails =
-    "SELECT payments_collectors.id, collectors.service_name AS collector, COALESCE(services.service_name, 'Desconocido') AS service, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN customers ON customers.id = payments_collectors.customer_id LEFT JOIN services ON payments_collectors.service_id = services.id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE collectors.id = ? ORDER BY datetime DESC";
+    "SELECT payments_collectors.id, collectors.collector, COALESCE(services.service_name, 'Desconocido') AS service, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN customers ON customers.id = payments_collectors.customer_id LEFT JOIN services ON payments_collectors.service_id = services.id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE collectors.id = ? ORDER BY datetime DESC";
 
   db.query(viewPaymentsCollectorDetails, [id], (error, result) => {
     if (error) {
@@ -174,7 +174,7 @@ exports.updateCollector = (request, response) => {
   }
 
   const updateCollector =
-    "UPDATE collectors SET service_name = ?, description = ? WHERE id = ?";
+    "UPDATE collectors SET collector = ?, description = ? WHERE id = ?";
 
   db.query(updateCollector, [collector, description, id], (error, result) => {
     if (error) {
@@ -218,7 +218,7 @@ exports.deleteCollector = (request, response) => {
       }
 
       const getCollectorName =
-        "SELECT service_name FROM collectors WHERE id = ?";
+        "SELECT collector FROM collectors WHERE id = ?";
 
       db.query(getCollectorName, [id], (error, results) => {
         if (error) {
@@ -230,7 +230,7 @@ exports.deleteCollector = (request, response) => {
         audit(
           user_id,
           "Eliminación de Colector",
-          `Se Eliminó Tanto al Colector ${results[0].service_name} Como a sus Servicios`
+          `Se Eliminó Tanto al Colector ${results[0].collector} Como a sus Servicios`
         );
       });
     });
