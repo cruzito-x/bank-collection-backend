@@ -51,6 +51,13 @@ exports.obtainedPaymentsByCollector = (request, response) => {
 exports.saveNewPayment = (request, response) => {
   const user_id = 1;
   const { customer_id, collector_id, service_id, amount } = request.body;
+
+  if (customer_id || collector_id || service_id || amount) {
+    return response
+      .status(400)
+      .json({ message: "Por Favor, Rellene Todos los Campos" });
+  }
+
   const getLastPaymentCollectorId =
     "SELECT id FROM payments_collectors ORDER BY id DESC LIMIT 1";
 

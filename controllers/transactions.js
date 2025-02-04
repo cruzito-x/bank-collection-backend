@@ -67,6 +67,18 @@ exports.saveTransaction = (request, response) => {
   const realized_by = 1;
   let authorized_by = 1;
 
+  if (
+    !customer ||
+    !transaction_type ||
+    !sender_account_number ||
+    !receiver_account_number ||
+    !amount
+  ) {
+    return response
+      .status(400)
+      .json({ message: "Por Favor, Rellene Todos los Campos" });
+  }
+
   const getLastTransactionId =
     "SELECT id FROM transactions ORDER BY id DESC LIMIT 1";
 
