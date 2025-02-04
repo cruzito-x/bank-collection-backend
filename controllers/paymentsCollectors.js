@@ -140,3 +140,26 @@ exports.saveNewPayment = (request, response) => {
     );
   });
 };
+
+exports.searchPaymentsCollector = (request, response) => {
+  const { collector } = request.query;
+
+  if (!collector) {
+    return response
+      .status(400)
+      .json({ message: "Por Favor, Introduzca un Nombre de Colector" });
+  }
+
+  const searchPaymentsCollector =
+    "SELECT payments_collectors.payment_id, customers.name AS customer, collectors.collector, services.service_name AS service, payments_collectors.amount, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN customers ON payments_collectors.customer_id = customers.id INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE collectors.collector LIKE ? ORDER BY datetime DESC";
+
+  db.query(searchPaymentsCollector, [`%${collector}%`], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};

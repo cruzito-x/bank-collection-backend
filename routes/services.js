@@ -14,5 +14,6 @@ router.get(
 );
 router.put("/update-service/:id", services.updateService);
 router.put("/delete-service/:id", services.deleteService);
+router.get("/search-service/:collector?/:service?", services.searchService);
 
 module.exports = router;

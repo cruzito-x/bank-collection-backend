@@ -171,3 +171,45 @@ exports.deleteService = (request, response) => {
     });
   });
 };
+
+exports.searchService = (request, response) => {
+  const { collector, service } = request.query;
+
+  if (!collector && !service) {
+    return response.status(400).json({
+      message:
+        "Por Favor, Introduzca un Nombre de Colector o un Nombre de Servicio",
+    });
+  }
+
+  let searchService =
+    "SELECT services.*, services.service_name AS service, collectors.collector FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.deleted_at IS NULL";
+  let serviceData = [];
+
+  if (collector) {
+    searchService += ` AND collectors.collector LIKE ?`;
+    serviceData.push(`%${collector}%`);
+  }
+
+  if (service) {
+    searchService += ` AND services.service_name LIKE ?`;
+    serviceData.push(`%${service}%`);
+  }
+
+  if (collector && service) {
+    searchService +=
+      " AND (collectors.collector LIKE ? OR services.service_name LIKE ?)";
+    serviceData.push(`%${collector}%`);
+    serviceData.push(`%${service}%`);
+  }
+
+  db.query(searchService, serviceData, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
