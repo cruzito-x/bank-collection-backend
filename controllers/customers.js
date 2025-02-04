@@ -92,11 +92,34 @@ exports.deleteCustomer = (request, response) => {
 };
 
 exports.searchCustomer = (request, response) => {
-  const { name = "", identity_doc = "", balance } = request.query;
-  let ORDER_BY = balance == 0 ? "DESC" : "ASC";
+  const { name, identity_doc } = request.query;
 
-  const searchCustomer = `SELECT customers.* FROM customers INNER JOIN accounts ON accounts.owner_id = customers.id WHERE deleted_at IS NULL AND (name LIKE ? OR identity_doc LIKE ?) ORDER BY accounts.balance ${ORDER_BY}`;
-  const customerData = [name, identity_doc];
+  if (!name && !identity_doc) {
+    return response.status(400).json({
+      message: "Por Favor, Proporcione un Nombre o un Número de Identificación",
+    });
+  }
+
+  let searchCustomer = "SELECT * FROM customers WHERE deleted_at IS NULL";
+  let customerData = [];
+
+  if (name && !identity_doc) {
+    searchCustomer += " AND name LIKE ?";
+    customerData.push(`%${name}%`);
+  }
+
+  if (!name && identity_doc) {
+    searchCustomer += " AND identity_doc LIKE ?";
+    customerData.push(`%${identity_doc}%`);
+  }
+
+  if (name && identity_doc) {
+    searchCustomer += " AND (name LIKE ? OR identity_doc LIKE ?)";
+    customerData.push(`%${name}%`);
+    customerData.push(`%${identity_doc}%`);
+  }
+
+  searchCustomer += " ORDER BY id DESC";
 
   db.query(searchCustomer, customerData, (error, result) => {
     if (error) {
