@@ -126,3 +126,30 @@ exports.deleteTransactionType = (request, response) => {
     });
   });
 };
+
+exports.searchTransactionType = (request, response) => {
+  const { transaction_type } = request.query;
+
+  if (!transaction_type) {
+    return response.status(400).json({
+      message: "Por Favor, Introduzca un Nombre de Tipo de Transacción",
+    });
+  }
+
+  const searchTransactionType =
+    "SELECT * FROM transaction_types WHERE transaction_type LIKE ? AND deleted_at IS NULL";
+
+  db.query(
+    searchTransactionType,
+    [`%${transaction_type}%`],
+    (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      return response.status(200).json(result);
+    }
+  );
+};

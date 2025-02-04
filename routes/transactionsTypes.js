@@ -15,5 +15,9 @@ router.put(
   "/delete-transaction-type/:id",
   transactionsTypes.deleteTransactionType
 );
+router.get(
+  "/search-transaction-type/:transaction_type?",
+  transactionsTypes.searchTransactionType
+);
 
 module.exports = router;

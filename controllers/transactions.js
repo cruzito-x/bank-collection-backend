@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const audit = require("../global/audit/audit");
+const moment = require("moment");
 
 exports.getTransactions = (request, response) => {
   const transactions =
@@ -302,5 +303,56 @@ exports.saveTransaction = (request, response) => {
         });
       }
     });
+  });
+};
+
+exports.searchTransaction = (request, response) => {
+  const { transaction_id, realized_by, transaction_type, date } = request.query;
+
+  if (!transaction_id && !realized_by && !transaction_type && !date) {
+    return response.status(400).json({
+      message:
+        "Por Favor, Introduzca un Código de Transacción, un Nombre de Usuario, Seleccione un Tipo de Transacción o Seleccione una Fecha",
+    });
+  }
+
+  let searchTransaction =
+    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, transactions.sender_account, receivers.name AS receiver, receivers.email AS receiver_email, transactions.receiver_account, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, cashier.username as realized_by, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users cashier ON cashier.id = transactions.realized_by LEFT JOIN users ON users.id = transactions.authorized_by WHERE accounts.deleted_at IS NULL ";
+
+  let transactionData = [];
+
+  if (transaction_id) {
+    searchTransaction += " AND transactions.transaction_id LIKE ?";
+    transactionData.push([`%${transaction_id}%`]);
+  }
+
+  if (realized_by) {
+    searchTransaction += " AND cashier.username LIKE ?";
+    transactionData.push([`%${realized_by}%`]);
+  }
+
+  if (transaction_type) {
+    searchTransaction += " AND transaction_types.id LIKE ?";
+    transactionData.push([`%${transaction_type}%`]);
+  }
+
+  if (date) {
+    searchTransaction += " AND transactions.date_hour LIKE ?";
+    transactionData.push([`%${moment(date).format("YYYY-MM-DD")}%`]);
+  }
+
+  searchTransaction += " ORDER BY datetime DESC";
+
+  console.log(searchTransaction);
+  console.log(transactionData);
+
+  db.query(searchTransaction, transactionData, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
   });
 };
