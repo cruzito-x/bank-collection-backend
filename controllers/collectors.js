@@ -217,8 +217,7 @@ exports.deleteCollector = (request, response) => {
           .json({ message: "Error Interno del Servidor" });
       }
 
-      const getCollectorName =
-        "SELECT collector FROM collectors WHERE id = ?";
+      const getCollectorName = "SELECT collector FROM collectors WHERE id = ?";
 
       db.query(getCollectorName, [id], (error, results) => {
         if (error) {
@@ -238,5 +237,28 @@ exports.deleteCollector = (request, response) => {
     return response
       .status(200)
       .json({ message: "¡Colector Eliminado Exitosamente!" });
+  });
+};
+
+exports.searchCollector = (request, response) => {
+  const { collector } = request.query;
+
+  if (!collector) {
+    return response
+      .status(400)
+      .json({ message: "Por Favor, Introduzca un Nombre de Colector" });
+  }
+
+  const searchCollector =
+    "SELECT collectors.id, collectors.collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.collector LIKE ? AND collectors.deleted_at IS NULL GROUP BY collectors.id, collectors.collector ORDER BY collectors.collector ASC";
+
+  db.query(searchCollector, [`%${collector}%`], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
   });
 };
