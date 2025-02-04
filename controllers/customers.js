@@ -96,7 +96,8 @@ exports.searchCustomer = (request, response) => {
 
   if (!name && !identity_doc) {
     return response.status(400).json({
-      message: "Por Favor, Introduzca un Nombre de Cliente o un Número de Identificación",
+      message:
+        "Por Favor, Introduzca un Nombre de Cliente o un Número de Identificación",
     });
   }
 
@@ -126,6 +127,12 @@ exports.searchCustomer = (request, response) => {
       return response
         .status(500)
         .json({ message: "Error interno del Servidor" });
+    }
+
+    if (result.length === 0) {
+      return response
+        .status(404)
+        .json({ message: "No Se Encontraron Resultados" });
     }
 
     return response.status(200).json(result);

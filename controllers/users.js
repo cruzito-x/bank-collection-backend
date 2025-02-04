@@ -160,3 +160,43 @@ exports.deleteUser = (request, response) => {
       .json({ message: "Usuario Eliminado Exitosamente" });
   });
 };
+
+exports.searchUser = (request, response) => {
+  const { username, role } = request.query;
+
+  if (!username && !role) {
+    return response.status(400).json({
+      message: "Por Favor, Proporcione un Nombre o un Rol",
+    });
+  }
+
+  let searchUser =
+    "SELECT id, username, email, CASE WHEN role_id = 1 THEN 'Supervisor' ELSE 'Cajero' END AS role FROM users WHERE deleted_at IS NULL";
+  let userData = [];
+
+  if (username) {
+    searchUser += " AND username LIKE ?";
+    userData.push(`%${username}%`);
+  }
+
+  if (role) {
+    searchUser += " AND role_id = ?";
+    userData.push(role);
+  }
+
+  db.query(searchUser, userData, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    if (result.length === 0) {
+      return response
+        .status(404)
+        .json({ message: "No Se Encontraron Resultados" });
+    }
+
+    return response.status(200).json(result);
+  });
+};

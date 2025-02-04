@@ -114,3 +114,46 @@ exports.approveOrRejectTransaction = (request, response) => {
     }
   );
 };
+
+exports.searchApproval = (request, response) => {
+  const { transaction_id, authorized_by } = request.query;
+
+  if (!transaction_id && !authorized_by) {
+    return response.status(400).json({
+      message:
+        "Por Favor, Introduzca un Código de Transacción o un Nombre de Autorizador",
+    });
+  }
+
+  let searchApproval =
+    "SELECT approvals.approval_id, transactions.transaction_id AS transaction_id, transaction_types.transaction_type, customers.name AS sender_name, customers.email AS sender_email, receivers.name AS receiver_name, receivers.email AS receiver_email, transactions.amount, transactions.concept, realizer.username AS realized_by, users.username AS authorized_by, approvals.date_hour AS authorized_at, transactions.date_hour AS datetime, approvals.is_approved FROM transactions INNER JOIN approvals ON approvals.transaction_id = transactions.id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id LEFT JOIN users realizer ON realizer.id = transactions.realized_by LEFT JOIN users ON users.id = approvals.authorizer_id WHERE transaction_types.id = 2";
+  let approvalData = [];
+
+  if (transaction_id) {
+    searchApproval += " AND transactions.transaction_id LIKE ?";
+    approvalData.push(`%${transaction_id}%`);
+  }
+
+  if (authorized_by) {
+    searchApproval += " AND users.username LIKE ?";
+    approvalData.push(`%${authorized_by}%`);
+  }
+
+  searchApproval += " ORDER BY datetime DESC";
+
+  db.query(searchApproval, approvalData, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error interno del Servidor" });
+    }
+
+    if (result.length === 0) {
+      return response
+        .status(404)
+        .json({ message: "No Se Encontraron Resultados" });
+    }
+
+    return response.status(200).json(result);
+  });
+};

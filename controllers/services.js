@@ -210,6 +210,12 @@ exports.searchService = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
+    if (result.length === 0) {
+      return response
+        .status(404)
+        .json({ message: "No Se Encontraron Resultados" });
+    }
+
     return response.status(200).json(result);
   });
 };
