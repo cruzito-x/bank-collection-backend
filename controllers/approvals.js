@@ -53,7 +53,7 @@ exports.approveOrRejectTransaction = (request, response) => {
       const transaction_id = isNaN(transactionId) ? transactionId : null;
 
       const updateTransactionStatus =
-        "UPDATE transactions SET status = ?, authorized_by = ? WHERE id = COALESCE(?, id) OR transaction_id = COALESCE(?, transaction_id)";
+        "UPDATE transactions SET status = ?, authorized_by = ? WHERE id = ? OR transaction_id = ?";
       let transactionStatus = approvalStatus === 1 ? 2 : 3;
 
       db.query(

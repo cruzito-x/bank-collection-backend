@@ -30,3 +30,19 @@ exports.getAccountsByCustomer = (request, response) => {
     return response.status(200).json(result);
   });
 };
+
+exports.getBalanceByAccount = (request, response) => {
+  const { account_number } = request.params;
+  const balance =
+    "SELECT balance FROM accounts WHERE account_number = ? AND deleted_at IS NULL";
+
+  db.query(balance, [account_number], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
