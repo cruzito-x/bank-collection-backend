@@ -12,5 +12,6 @@ router.get(
   "/search-approval/:transaction_id?/:authorized_by?",
   approvals.searchApproval
 );
+router.get("/latest-approval", approvals.latestApproval);
 
 module.exports = router;

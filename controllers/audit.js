@@ -42,9 +42,6 @@ exports.searchAudit = (request, response) => {
 
   searchAudits += " ORDER BY audit.date_hour DESC";
 
-  console.log(searchAudits);
-  console.log(auditData);
-
   db.query(searchAudits, auditData, (error, result) => {
     if (error) {
       console.error(error);

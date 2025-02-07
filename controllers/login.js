@@ -29,11 +29,7 @@ exports.login = (request, response) => {
         .json({ message: "Usuario o Contraseña no Válidos" });
     }
 
-    audit(
-      result[0].id,
-      "Inicio de Sesión",
-      "Inicio de Sesión Correcto"
-    );
+    audit(result[0].id, "Inicio de Sesión", "Inicio de Sesión Correcto");
 
     return response.status(200).json({
       message: "¡Inicio de Sesión Correcto!",
@@ -41,5 +37,21 @@ exports.login = (request, response) => {
       username: result[0].username,
       isSupervisor: result[0].role_id === 1 ? true : false,
     });
+  });
+};
+
+exports.logout = (request, response) => {
+  const { id } = request.params;
+  const loggedOut = "SELECT * FROM users WHERE id = ?";
+
+  db.query(loggedOut, [id], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    audit(id, "Cierre de Sesión", "Cierre de Sesión Correcto");
+    return response.status(200).json({ message: "¡Cierre de Sesión Exitoso!" });
   });
 };

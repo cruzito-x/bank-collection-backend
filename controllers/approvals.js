@@ -49,68 +49,76 @@ exports.approveOrRejectTransaction = (request, response) => {
           .json({ message: "Error interno del Servidor" });
       }
 
+      const id = !isNaN(transactionId) ? Number(transactionId) : null;
+      const transaction_id = isNaN(transactionId) ? transactionId : null;
+
       const updateTransactionStatus =
-        "UPDATE transactions SET status = ?, authorized_by = ? WHERE transaction_id = ?";
+        "UPDATE transactions SET status = ?, authorized_by = ? WHERE id = COALESCE(?, id) OR transaction_id = COALESCE(?, transaction_id)";
       let transactionStatus = approvalStatus === 1 ? 2 : 3;
 
       db.query(
         updateTransactionStatus,
-        [transactionStatus, authorizer, transactionId],
+        [transactionStatus, authorizer, id, transaction_id],
         (error, result) => {
           if (error) {
             return response
               .status(500)
               .json({ message: "Error interno del Servidor" });
           }
-        }
-      );
 
-      const getSenderId =
-        "SELECT customers.id, transactions.amount FROM customers INNER JOIN transactions ON transactions.customer_id = customers.id WHERE transactions.transaction_id = ?";
+          const getSenderId =
+            "SELECT customers.id, transactions.amount FROM customers INNER JOIN transactions ON transactions.customer_id = customers.id WHERE transactions.transaction_id = ?";
 
-      db.query(getSenderId, [transactionId], (error, result) => {
-        if (error) {
-          return response
-            .status(500)
-            .json({ message: "Error interno del Servidor" });
-        }
-
-        const amount = result[0].amount;
-        const customer_sender_id = result[0].id;
-
-        const updateCustomerBalance =
-          "UPDATE accounts SET balance = balance - ? WHERE owner_id = ?";
-
-        db.query(
-          updateCustomerBalance,
-          [amount, customer_sender_id],
-          (error, result) => {
+          db.query(getSenderId, [transactionId], (error, result) => {
             if (error) {
               return response
                 .status(500)
                 .json({ message: "Error interno del Servidor" });
             }
 
-            approvalStatus === 1
-              ? audit(
-                  user_id,
-                  "Transacción Aprobada",
-                  `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`
-                )
-              : audit(
-                  user_id,
-                  "Transacción Rechazada",
-                  `Se Rechazó la Transacción ${transactionId} por un Monto de $${amount}`
-                );
-          }
-        );
-      });
+            if (result.length === 0) {
+              return response.status(404);
+            }
 
-      let approvedStatus = approvalStatus === 1 ? "Aprobada" : "Rechazada";
+            const amount = result[0].amount;
+            const customer_sender_id = result[0].id;
 
-      return response.status(200).json({
-        message: `Transacción ${approvedStatus}`,
-      });
+            const updateCustomerBalance =
+              "UPDATE accounts SET balance = balance - ? WHERE owner_id = ?";
+
+            db.query(
+              updateCustomerBalance,
+              [amount, customer_sender_id],
+              (error, result) => {
+                if (error) {
+                  return response
+                    .status(500)
+                    .json({ message: "Error interno del Servidor" });
+                }
+
+                approvalStatus === 1
+                  ? audit(
+                      user_id,
+                      "Transacción Aprobada",
+                      `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`
+                    )
+                  : audit(
+                      user_id,
+                      "Transacción Rechazada",
+                      `Se Rechazó la Transacción ${transactionId} por un Monto de $${amount}`
+                    );
+
+                let approvedStatus =
+                  approvalStatus === 1 ? "Aprobada" : "Rechazada";
+
+                return response.status(200).json({
+                  message: `Transacción ${approvedStatus}`,
+                });
+              }
+            );
+          });
+        }
+      );
     }
   );
 };
@@ -152,6 +160,27 @@ exports.searchApproval = (request, response) => {
       return response
         .status(404)
         .json({ message: "No Se Encontraron Resultados" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
+
+exports.latestApproval = (request, response) => {
+  const latestApproval =
+    "SELECT approval_id, transaction_id FROM approvals ORDER BY id DESC LIMIT 1";
+
+  db.query(latestApproval, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error interno del Servidor" });
+    }
+
+    if (result.length === 0) {
+      return response
+        .status(404)
+        .json({ message: "No Hay Nuevas Aprobaciones" });
     }
 
     return response.status(200).json(result);

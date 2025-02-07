@@ -1,10 +1,11 @@
 const db = require("../config/db");
 const audit = require("../global/audit/audit");
 const moment = require("moment");
+const crypto = require("crypto");
 
 exports.getTransactions = (request, response) => {
   const transactions =
-    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, transactions.sender_account, receivers.name AS receiver, receivers.email AS receiver_email, transactions.receiver_account, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, cashier.username as realized_by, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users cashier ON cashier.id = transactions.realized_by LEFT JOIN users ON users.id = transactions.authorized_by ORDER BY datetime DESC";
+    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, CONCAT('**** **** **** ', RIGHT(transactions.sender_account, 4)) AS sender_account, receivers.name AS receiver, receivers.email AS receiver_email, CONCAT('**** **** **** ', RIGHT(transactions.receiver_account, 4)) AS receiver_account, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, cashier.username as realized_by, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users cashier ON cashier.id = transactions.realized_by LEFT JOIN users ON users.id = transactions.authorized_by ORDER BY datetime DESC";
 
   db.query(transactions, (error, result) => {
     if (error) {
@@ -21,7 +22,7 @@ exports.getTransactionByCustomerAndAccountNumber = (request, response) => {
   const { id, account } = request.params;
 
   const transactionsByCustomerAndAccountNumber =
-    "SELECT DISTINCT transactions.id,transactions.transaction_id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, transactions.sender_account, transactions.amount, transactions.receiver_account, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by LEFT JOIN accounts AS sender_account ON sender_account.account_number = transactions.sender_account AND sender_account.deleted_at IS NULL LEFT JOIN accounts AS receiver_account ON receiver_account.account_number = transactions.receiver_account AND receiver_account.deleted_at IS NULL WHERE ((transactions.sender_account = ? AND transactions.customer_id = ?) OR (transactions.receiver_account = ? AND transactions.receiver_id = ?)) AND customers.deleted_at IS NULL ORDER BY datetime DESC";
+    "SELECT DISTINCT transactions.id,transactions.transaction_id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, CONCAT('**** **** **** ', RIGHT(transactions.sender_account, 4)) AS sender_account, transactions.amount, CONCAT('**** **** **** ', RIGHT(transactions.receiver_account, 4)) AS receiver_account, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by LEFT JOIN accounts AS sender_account ON sender_account.account_number = transactions.sender_account AND sender_account.deleted_at IS NULL LEFT JOIN accounts AS receiver_account ON receiver_account.account_number = transactions.receiver_account AND receiver_account.deleted_at IS NULL WHERE ((transactions.sender_account = ? AND transactions.customer_id = ?) OR (transactions.receiver_account = ? AND transactions.receiver_id = ?)) AND customers.deleted_at IS NULL ORDER BY datetime DESC";
 
   db.query(
     transactionsByCustomerAndAccountNumber,
@@ -38,21 +39,6 @@ exports.getTransactionByCustomerAndAccountNumber = (request, response) => {
   );
 };
 
-exports.getCustomers = (request, response) => {
-  const customersData =
-    "SELECT customers.id, customers.name, customers.identity_doc, accounts.account_number FROM customers INNER JOIN accounts ON accounts.owner_id = customers.id WHERE customers.deleted_at IS NULL AND accounts.deleted_at IS NULL ORDER BY id ASC";
-
-  db.query(customersData, (error, result) => {
-    if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
-    }
-
-    return response.status(200).json(result);
-  });
-};
-
 exports.saveTransaction = (request, response) => {
   const user_id = 2;
   const {
@@ -67,13 +53,7 @@ exports.saveTransaction = (request, response) => {
   const realized_by = 1;
   let authorized_by = 1;
 
-  if (
-    !customer ||
-    !transaction_type ||
-    !sender_account_number ||
-    !receiver_account_number ||
-    !amount
-  ) {
+  if (!customer || !transaction_type || !sender_account_number || !amount) {
     return response
       .status(400)
       .json({ message: "Por Favor, Rellene Todos los Campos" });
@@ -365,6 +345,36 @@ exports.searchTransaction = (request, response) => {
       return response
         .status(404)
         .json({ message: "No Se Encontraron Resultados" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
+
+exports.getUserByPin = (request, response) => {
+  const { pin } = request.params;
+  const decryptedPin = crypto.createHash("sha256").update(pin).digest("hex");
+
+  if (!pin) {
+    return response
+      .status(400)
+      .json({ message: "Por Favor, Introduzca una Clave de Aprobación" });
+  }
+
+  let searchUser =
+    "SELECT users.id, roles.role FROM users INNER JOIN roles ON users.role_id = roles.id WHERE users.deleted_at IS NULL AND users.pin = ?";
+
+  db.query(searchUser, [decryptedPin], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    if (result.length === 0) {
+      return response
+        .status(404)
+        .json({ message: "El Pin Introducido no Existe" });
     }
 
     return response.status(200).json(result);

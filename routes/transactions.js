@@ -7,11 +7,11 @@ router.get(
   "/transactions-by-customer/:id/account/:account",
   transactions.getTransactionByCustomerAndAccountNumber
 );
-router.get("/customers", transactions.getCustomers);
 router.post("/save-new-transaction", transactions.saveTransaction);
 router.get(
   "/search-transactions/:transaction_id?/:realized_by?/:transaction_type?/:date?",
   transactions.searchTransaction
 );
+router.get("/user-by-pin/:pin", transactions.getUserByPin);
 
 module.exports = router;
