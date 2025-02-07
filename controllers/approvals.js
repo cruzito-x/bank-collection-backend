@@ -128,8 +128,7 @@ exports.searchApproval = (request, response) => {
 
   if (!transaction_id && !authorized_by) {
     return response.status(400).json({
-      message:
-        "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 

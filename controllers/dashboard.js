@@ -172,3 +172,23 @@ exports.getTransactionsByDenomination = (request, response) => {
     return response.status(200).json(totalDenominations);
   });
 };
+
+exports.getReportsByDate = (request, response) => {
+  const { startDay, endDay } = request.params;
+
+  const fullStartDate = `'${startDay} 00:00:00'`;
+  const fullEndDate = `'${endDay} 23:59:59'`;
+
+  const getReport = `CALL GetReports(${fullStartDate}, ${fullEndDate})`;
+
+  db.query(getReport, (error, result) => {
+    if (error) {
+      console.log(error);
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};

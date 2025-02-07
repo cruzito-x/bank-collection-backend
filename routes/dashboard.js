@@ -15,5 +15,6 @@ router.get(
   "/transactions-by-denomination",
   dashboard.getTransactionsByDenomination
 );
+router.get("/reports-by-date/:startDay/:endDay", dashboard.getReportsByDate);
 
 module.exports = router;
