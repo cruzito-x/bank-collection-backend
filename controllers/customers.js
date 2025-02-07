@@ -80,8 +80,7 @@ exports.searchCustomer = (request, response) => {
 
   if (!name && !identity_doc) {
     return response.status(400).json({
-      message:
-        "Por Favor, Introduzca un Nombre de Cliente o un Número de Identificación",
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 

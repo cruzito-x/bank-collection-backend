@@ -129,7 +129,7 @@ exports.searchApproval = (request, response) => {
   if (!transaction_id && !authorized_by) {
     return response.status(400).json({
       message:
-        "Por Favor, Introduzca un Código de Transacción o un Nombre de Autorizador",
+        "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 

@@ -22,7 +22,7 @@ exports.searchAudit = (request, response) => {
   if (!username && !date) {
     return response.status(400).json({
       message:
-        "Por Favor, Introduzca un Nombre de Usuario o Seleccione una Fecha",
+        "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 

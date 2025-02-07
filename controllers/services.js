@@ -183,8 +183,7 @@ exports.searchService = (request, response) => {
 
   if (!collector && !service) {
     return response.status(400).json({
-      message:
-        "Por Favor, Introduzca un Nombre de Colector o un Nombre de Servicio",
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 

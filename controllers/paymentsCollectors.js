@@ -154,7 +154,9 @@ exports.searchPaymentsCollector = (request, response) => {
   if (!collector) {
     return response
       .status(400)
-      .json({ message: "Por Favor, Introduzca un Nombre de Colector" });
+      .json({
+        message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
+      });
   }
 
   const searchPaymentsCollector =

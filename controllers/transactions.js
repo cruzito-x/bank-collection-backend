@@ -303,8 +303,7 @@ exports.searchTransaction = (request, response) => {
 
   if (!transaction_id && !realized_by && !transaction_type && !date) {
     return response.status(400).json({
-      message:
-        "Por Favor, Introduzca un Código de Transacción, un Nombre de Usuario, Seleccione un Tipo de Transacción o Seleccione una Fecha",
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 

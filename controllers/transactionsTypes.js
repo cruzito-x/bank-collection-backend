@@ -132,7 +132,7 @@ exports.searchTransactionType = (request, response) => {
 
   if (!transaction_type) {
     return response.status(400).json({
-      message: "Por Favor, Introduzca un Nombre de Tipo de Transacción",
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 
