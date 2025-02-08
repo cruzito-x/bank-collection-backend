@@ -21,8 +21,7 @@ exports.searchAudit = (request, response) => {
 
   if (!username && !date) {
     return response.status(400).json({
-      message:
-        "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
     });
   }
 
@@ -44,7 +43,6 @@ exports.searchAudit = (request, response) => {
 
   db.query(searchAudits, auditData, (error, result) => {
     if (error) {
-      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });

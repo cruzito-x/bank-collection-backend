@@ -384,7 +384,6 @@ exports.searchTransaction = (request, response) => {
 
   db.query(searchTransaction, transactionData, (error, result) => {
     if (error) {
-      console.error(error.message);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
