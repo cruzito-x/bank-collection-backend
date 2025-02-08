@@ -23,25 +23,25 @@ exports.getTransactionsByDates = (request, response) => {
   let amountRange;
   switch (parseInt(amountFilter, 10)) {
     case 1:
-      amountRange = [1, 99];
+      amountRange = [1, 100];
       break;
     case 2:
-      amountRange = [100, 499];
+      amountRange = [1, 500];
       break;
     case 3:
-      amountRange = [500, 999];
+      amountRange = [1, 1000];
       break;
     case 4:
-      amountRange = [1000, 1999];
+      amountRange = [1, 2000];
       break;
     case 5:
-      amountRange = [2000, 4999];
+      amountRange = [1, 5000];
       break;
     case 6:
-      amountRange = [5000, 1000000000];
+      amountRange = [1, 10000000000000];
       break;
     default:
-      amountRange = [1, 99];
+      amountRange = [1, 100];
       break;
   }
 
