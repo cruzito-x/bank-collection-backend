@@ -173,6 +173,36 @@ exports.getTransactionsByDenomination = (request, response) => {
   });
 };
 
+exports.getApprovalAndRejectionRates = (request, response) => {
+  const totalApprovedAndRejectedTransactions =
+    "SELECT COUNT(*) AS approved_transactions, (SELECT COUNT(*) FROM transactions WHERE status = 3) AS rejected_transactions FROM transactions WHERE status = 2";
+
+  db.query(totalApprovedAndRejectedTransactions, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
+
+exports.getCustomersWithTheMostMoneyPaid = (request, response) => {
+  const customersWithTheMostMoneyPaid =
+    "SELECT customers.name AS customer, SUM(amount) AS amount FROM payments_collectors INNER JOIN customers ON customers.id = payments_collectors.customer_id GROUP BY payments_collectors.customer_id ORDER BY amount DESC LIMIT 5";
+
+  db.query(customersWithTheMostMoneyPaid, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
+
 exports.getReportsByDate = (request, response) => {
   const { startDay, endDay } = request.params;
 

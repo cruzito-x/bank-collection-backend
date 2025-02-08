@@ -15,6 +15,14 @@ router.get(
   "/transactions-by-denomination",
   dashboard.getTransactionsByDenomination
 );
+router.get(
+  "/approval-and-rejection-rates",
+  dashboard.getApprovalAndRejectionRates
+);
+router.get(
+  "/customers-with-the-most-money-paid",
+  dashboard.getCustomersWithTheMostMoneyPaid
+);
 router.get("/reports-by-date/:startDay/:endDay", dashboard.getReportsByDate);
 
 module.exports = router;
