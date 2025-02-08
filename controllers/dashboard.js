@@ -117,7 +117,7 @@ exports.getTransactionsByDates = (request, response) => {
   });
 };
 
-exports.getTransactionsByCollector = (request, response) => {
+exports.getPaymentsByCollector = (request, response) => {
   const transactionsByCollector =
     "SELECT collectors.collector, COUNT(*) AS transactionsByCollector FROM payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY payments_collectors.collector_id;";
 
@@ -132,7 +132,7 @@ exports.getTransactionsByCollector = (request, response) => {
   });
 };
 
-exports.getTransactionsByDenomination = (request, response) => {
+exports.getPaymentsByCollectorDenominations = (request, response) => {
   const transactionsByDenomination = "SELECT amount FROM payments_collectors";
 
   db.query(transactionsByDenomination, (error, result) => {
@@ -175,7 +175,7 @@ exports.getTransactionsByDenomination = (request, response) => {
 
 exports.getApprovalAndRejectionRates = (request, response) => {
   const totalApprovedAndRejectedTransactions =
-    "SELECT COUNT(*) AS approved_transactions, (SELECT COUNT(*) FROM transactions WHERE status = 3) AS rejected_transactions FROM transactions WHERE status = 2";
+    "SELECT 'Aprobadas' AS transaction_type, COUNT(*) AS total_transactions FROM transactions WHERE status = 2 UNION ALL SELECT 'Rechazadas' AS transaction_type, COUNT(*) AS total_transactions  FROM transactions WHERE status = 3";
 
   db.query(totalApprovedAndRejectedTransactions, (error, result) => {
     if (error) {

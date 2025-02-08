@@ -10,10 +10,10 @@ router.get(
   "/transactions-by-dates/:startDay/:endDay/:amountFilter/:transactionTypeFilter",
   dashboard.getTransactionsByDates
 );
-router.get("/transactions-by-collector", dashboard.getTransactionsByCollector);
+router.get("/payments-by-collector", dashboard.getPaymentsByCollector);
 router.get(
-  "/transactions-by-denomination",
-  dashboard.getTransactionsByDenomination
+  "/payments-by-collector-denominations",
+  dashboard.getPaymentsByCollectorDenominations
 );
 router.get(
   "/approval-and-rejection-rates",
