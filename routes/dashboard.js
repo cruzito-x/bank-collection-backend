@@ -16,7 +16,11 @@ router.get(
   dashboard.getPaymentsByCollectorDenominations
 );
 router.get(
-  "/approval-and-rejection-rates",
+  "/proccessed-amount-by-transacions-and-collectors-payments/:startDay/:endDay",
+  dashboard.getProccessedAmountByTransactionsAndCollectorsPayments
+);
+router.get(
+  "/approval-and-rejection-rates/:startDay/:endDay",
   dashboard.getApprovalAndRejectionRates
 );
 router.get(

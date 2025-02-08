@@ -117,6 +117,72 @@ exports.getTransactionsByDates = (request, response) => {
   });
 };
 
+exports.getApprovalAndRejectionRates = (request, response) => {
+  const { startDay, endDay } = request.params;
+
+  const fullStartDate = `${startDay} 00:00:00`;
+  const fullEndDate = `${endDay} 23:59:59`;
+
+  const totalApprovedAndRejectedTransactions =
+    "SELECT 'Aprobadas' AS transaction_type, COUNT(*) AS total_transactions FROM transactions WHERE status = 2 AND transactions.date_hour BETWEEN ? AND ? UNION ALL SELECT 'Rechazadas' AS transaction_type, COUNT(*) AS total_transactions FROM transactions WHERE status = 3 AND transactions.date_hour BETWEEN ? AND ?";
+
+  db.query(
+    totalApprovedAndRejectedTransactions,
+    [fullStartDate, fullEndDate, fullStartDate, fullEndDate],
+    (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      return response.status(200).json(result);
+    }
+  );
+};
+
+exports.getProccessedAmountByTransactionsAndCollectorsPayments = (
+  request,
+  response
+) => {
+  const { startDay, endDay } = request.params;
+
+  const fullStartDate = `${startDay} 00:00:00`;
+  const fullEndDate = `${endDay} 23:59:59`;
+
+  const processedAmountByTransactionsAndCollectorsPayments =
+    "SELECT transaction_types.transaction_type, SUM(transactions.amount) AS transaction_amount FROM transactions INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id WHERE status = 2 AND (date_hour BETWEEN ? AND ?) GROUP BY transaction_types.transaction_type UNION ALL SELECT 'Pagos a Colectores' AS transaction_type, SUM(amount) AS payments_amount FROM payments_collectors WHERE date_hour BETWEEN ? AND ? GROUP BY transaction_type";
+
+  db.query(
+    processedAmountByTransactionsAndCollectorsPayments,
+    [fullStartDate, fullEndDate, fullStartDate, fullEndDate],
+    (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor", error: error });
+      }
+
+      return response.status(200).json(result);
+    }
+  );
+};
+
+exports.getCustomersWithTheMostMoneyPaid = (request, response) => {
+  const customersWithTheMostMoneyPaid =
+    "SELECT customers.name AS customer, SUM(amount) AS amount FROM payments_collectors INNER JOIN customers ON customers.id = payments_collectors.customer_id GROUP BY payments_collectors.customer_id ORDER BY amount DESC LIMIT 5";
+
+  db.query(customersWithTheMostMoneyPaid, (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
+
+    return response.status(200).json(result);
+  });
+};
+
 exports.getPaymentsByCollector = (request, response) => {
   const transactionsByCollector =
     "SELECT collectors.collector, COUNT(*) AS transactionsByCollector FROM payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY payments_collectors.collector_id;";
@@ -170,36 +236,6 @@ exports.getPaymentsByCollectorDenominations = (request, response) => {
     }));
 
     return response.status(200).json(totalDenominations);
-  });
-};
-
-exports.getApprovalAndRejectionRates = (request, response) => {
-  const totalApprovedAndRejectedTransactions =
-    "SELECT 'Aprobadas' AS transaction_type, COUNT(*) AS total_transactions FROM transactions WHERE status = 2 UNION ALL SELECT 'Rechazadas' AS transaction_type, COUNT(*) AS total_transactions  FROM transactions WHERE status = 3";
-
-  db.query(totalApprovedAndRejectedTransactions, (error, result) => {
-    if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
-    }
-
-    return response.status(200).json(result);
-  });
-};
-
-exports.getCustomersWithTheMostMoneyPaid = (request, response) => {
-  const customersWithTheMostMoneyPaid =
-    "SELECT customers.name AS customer, SUM(amount) AS amount FROM payments_collectors INNER JOIN customers ON customers.id = payments_collectors.customer_id GROUP BY payments_collectors.customer_id ORDER BY amount DESC LIMIT 5";
-
-  db.query(customersWithTheMostMoneyPaid, (error, result) => {
-    if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
-    }
-
-    return response.status(200).json(result);
   });
 };
 
