@@ -52,7 +52,7 @@ exports.saveNewPayment = (request, response) => {
   const user_id = 1;
   const { customer_id, collector_id, service_id, amount } = request.body;
 
-  if (customer_id || collector_id || service_id || amount) {
+  if (!customer_id || !collector_id || !service_id || !amount) {
     return response
       .status(400)
       .json({ message: "Por Favor, Rellene Todos los Campos" });
@@ -152,11 +152,9 @@ exports.searchPaymentsCollector = (request, response) => {
   const { collector } = request.query;
 
   if (!collector) {
-    return response
-      .status(400)
-      .json({
-        message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
-      });
+    return response.status(400).json({
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
+    });
   }
 
   const searchPaymentsCollector =

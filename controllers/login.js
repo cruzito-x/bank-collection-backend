@@ -1,6 +1,6 @@
 const db = require("../config/db");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const audit = require("../global/audit/audit");
 
 exports.login = (request, response) => {
@@ -32,15 +32,15 @@ exports.login = (request, response) => {
 
     audit(result[0].id, "Inicio de Sesión", "Inicio de Sesión Correcto");
 
-    const token = jwt.sign(
-      { id: result[0].id, username: result[0].username },
-      process.env.JWT_SECRET,
-      { expiresIn: "8h" }
-    );
+    // const token = jwt.sign(
+    //   { id: result[0].id, username: result[0].username },
+    //   process.env.JWT_SECRET,
+    //   { expiresIn: "8h" }
+    // );
 
     return response.status(200).json({
       message: "¡Inicio de Sesión Correcto!",
-      token,
+      // token,
       user_id: result[0].id,
       username: result[0].username,
       isSupervisor: result[0].role_id === 1 ? true : false,
