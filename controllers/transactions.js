@@ -357,7 +357,7 @@ exports.searchTransaction = (request, response) => {
   }
 
   let searchTransaction =
-    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, transactions.sender_account, receivers.name AS receiver, receivers.email AS receiver_email, transactions.receiver_account, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, cashier.username as realized_by, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users cashier ON cashier.id = transactions.realized_by LEFT JOIN users ON users.id = transactions.authorized_by WHERE accounts.deleted_at IS NULL ";
+    "SELECT transactions.transaction_id as id, customers.name AS customer, customers.email AS customer_email, CONCAT('**** **** **** ', RIGHT(transactions.sender_account, 4)) AS sender_account, receivers.name AS receiver, receivers.email AS receiver_email, CONCAT('**** **** **** ', RIGHT(transactions.receiver_account, 4)) AS receiver_account, transaction_types.transaction_type, transactions.amount, transactions.concept, transactions.status, transactions.date_hour AS datetime, cashier.username as realized_by, users.username as authorized_by FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id INNER JOIN users cashier ON cashier.id = transactions.realized_by LEFT JOIN users ON users.id = transactions.authorized_by INNER JOIN accounts ON accounts.owner_id = customers.id WHERE accounts.deleted_at IS NULL";
   let transactionData = [];
 
   if (transaction_id) {
@@ -384,6 +384,7 @@ exports.searchTransaction = (request, response) => {
 
   db.query(searchTransaction, transactionData, (error, result) => {
     if (error) {
+      console.error(error.message);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });

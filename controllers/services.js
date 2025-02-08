@@ -20,7 +20,7 @@ exports.saveNewService = (request, response) => {
   const user_id = 1;
   const { collector, service, description, price } = request.body;
 
-  if (collector || service || description || price) {
+  if (!collector || !service || !description || !price) {
     return response
       .status(400)
       .json({ message: "Por Favor, Rellene Todos los Campos" });
