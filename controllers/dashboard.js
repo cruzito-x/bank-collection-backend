@@ -1,7 +1,7 @@
 const moment = require("moment");
 const db = require("../config/db");
 
-exports.getLatestCollectorAndCollectorPayemntData = (request, response) => {
+exports.getLatestCollectorAndCollectorPaymentData = (request, response) => {
   const getLatestData =
     "SELECT collectors.collector, (SELECT collectors.collector FROM collectors WHERE deleted_at IS NULL ORDER BY collectors.id DESC LIMIT 1) AS most_recent_collector, (SELECT services.service_name FROM services INNER JOIN payments_collectors ON payments_collectors.service_id = services.id ORDER BY payments_collectors.id DESC LIMIT 1) AS payed_service, payments_collectors.amount, (SELECT transactions.transaction_id FROM transactions INNER JOIN approvals ON approvals.transaction_id = transactions.id WHERE approvals.is_approved IS NOT NULL AND approvals.is_approved = 1 ORDER BY approvals.transaction_id DESC LIMIT 1) AS latest_approved_transaction FROM collectors INNER JOIN payments_collectors ON payments_collectors.collector_id = collectors.id ORDER BY payments_collectors.date_hour DESC LIMIT 1";
 
@@ -141,7 +141,7 @@ exports.getApprovalAndRejectionRates = (request, response) => {
   );
 };
 
-exports.getProccessedAmountByTransactionsAndCollectorsPayments = (
+exports.getProcessedAmountByTransactionsAndCollectorsPayments = (
   request,
   response
 ) => {

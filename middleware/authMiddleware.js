@@ -2,24 +2,30 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
 const verifyUser = (request, response, next) => {
-  const token = request.headers["authorization"];
+  const authHeader = request.headers["authorization"];
+
+  if (!authHeader) {
+    return response
+      .status(403)
+      .json({ message: "Acceso Denegado, Token no Encontrado" });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
     return response
-      .status(404)
-      .json({ mensaje: "Acceso Denegado, Token no Encontrado" });
+      .status(403)
+      .json({ message: "Acceso Denegado, Token no Encontrado" });
   }
 
-  console.log(process.env.JWT_KEY);
-
   try {
-    const decoded = jwt.verify(token.split(" ")[1], process.env.JWT_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_KEY);
     request.usuario = decoded;
     next();
   } catch (error) {
     return response
       .status(401)
-      .json({ mensaje: "El Token es Invalido o ha Expirado" });
+      .json({ message: "El Token es Invalido o ha Expirado" });
   }
 };
 
