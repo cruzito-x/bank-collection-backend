@@ -6,6 +6,7 @@ function audit(user_id, action, details) {
 
   db.query(audit, [user_id, action, new Date(), details], (error, result) => {
     if (error) {
+      console.error(error);
       return;
     }
   });

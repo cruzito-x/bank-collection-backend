@@ -30,7 +30,7 @@ exports.getUsersRoles = (request, response) => {
 };
 
 exports.updateUser = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const { username, email } = request.body;
   let { new_password } = request.body;
@@ -89,9 +89,15 @@ exports.updateUser = (request, response) => {
 };
 
 exports.updateUserRole = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const { newRole } = request.body;
+
+  if (user_id === id) {
+    return response
+      .status(400)
+      .json({ message: "No Puede Asignar el Rol al Usuario Activo" });
+  }
 
   const updateUserRole = "UPDATE users SET role_id = ? WHERE id = ?";
 
@@ -129,7 +135,7 @@ exports.updateUserRole = (request, response) => {
 };
 
 exports.deleteUser = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
 
   const deleteUser = "UPDATE users SET deleted_at = ? WHERE id = ?";

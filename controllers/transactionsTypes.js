@@ -17,7 +17,7 @@ exports.getTypes = (request, response) => {
 };
 
 exports.saveNewTransactionType = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { transactionType } = request.body;
   const getTotalTransactionTypes =
     "SELECT COUNT(*) AS transactionTypesCounter FROM transaction_types";
@@ -64,7 +64,7 @@ exports.saveNewTransactionType = (request, response) => {
 };
 
 exports.updateTransactionType = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const { transactionType } = request.body;
 
@@ -91,7 +91,7 @@ exports.updateTransactionType = (request, response) => {
 };
 
 exports.deleteTransactionType = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
 
   const deleteTransactionType =

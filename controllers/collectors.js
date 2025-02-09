@@ -18,7 +18,7 @@ exports.getCollectors = (request, response) => {
 };
 
 exports.saveNewCollector = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const {
     collector_name,
     collector_description,
@@ -163,7 +163,7 @@ exports.viewPaymentsCollectorDetails = (request, response) => {
 };
 
 exports.updateCollector = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const { collector, description } = request.body;
 
@@ -196,7 +196,7 @@ exports.updateCollector = (request, response) => {
 };
 
 exports.deleteCollector = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const deleteCollector = "UPDATE collectors SET deleted_at = ? WHERE id = ?";
 
@@ -244,11 +244,9 @@ exports.searchCollector = (request, response) => {
   const { collector } = request.query;
 
   if (!collector) {
-    return response
-      .status(400)
-      .json({
-        message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
-      });
+    return response.status(400).json({
+      message: "Por Favor, Introduzca al Menos un Criterio de Búsqueda",
+    });
   }
 
   const searchCollector =

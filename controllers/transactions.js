@@ -40,7 +40,7 @@ exports.getTransactionByCustomerAndAccountNumber = (request, response) => {
 };
 
 exports.saveTransaction = (request, response) => {
-  const user_id = 2;
+  const user_id = request.headers["user_id"];
   const {
     customer,
     transaction_type,
@@ -50,8 +50,8 @@ exports.saveTransaction = (request, response) => {
     concept,
   } = request.body;
 
-  const realized_by = 1;
-  let authorized_by = 1;
+  const realized_by = user_id;
+  let authorized_by = user_id;
 
   if (!customer || !transaction_type || !sender_account_number || !amount) {
     return response

@@ -17,7 +17,7 @@ exports.getServices = (request, response) => {
 };
 
 exports.saveNewService = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { collector, service, description, price } = request.body;
 
   if (!collector || !service || !description || !price) {
@@ -110,7 +110,7 @@ exports.viewPaymentsByServiceDetails = (request, response) => {
 };
 
 exports.updateService = (request, response) => {
-  user_id = 1;
+  user_id = request.headers["user_id"];
   const { id } = request.params;
   const { collector, service, description, price } = request.body;
 
@@ -141,7 +141,7 @@ exports.updateService = (request, response) => {
 };
 
 exports.deleteService = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
 
   const deleteService = "UPDATE services SET deleted_at = ? WHERE id = ?";

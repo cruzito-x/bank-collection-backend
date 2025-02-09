@@ -32,7 +32,7 @@ exports.getNotifications = (request, response) => {
 };
 
 exports.approveOrRejectTransaction = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { approvalId, transactionId, isApproved, authorizer } = request.params;
   const approvalStatus = parseInt(isApproved, 10);
 
@@ -53,12 +53,12 @@ exports.approveOrRejectTransaction = (request, response) => {
       const transaction_id = isNaN(transactionId) ? transactionId : null;
 
       const updateTransactionStatus =
-        "UPDATE transactions SET status = ?, authorized_by = ? WHERE id = ? OR transaction_id = ?";
+        "UPDATE transactions SET status = ?, realized_by = ?, authorized_by = ? WHERE id = ? OR transaction_id = ?";
       let transactionStatus = approvalStatus === 1 ? 2 : 3;
 
       db.query(
         updateTransactionStatus,
-        [transactionStatus, authorizer, id, transaction_id],
+        [transactionStatus, user_id, authorizer, id, transaction_id],
         (error, result) => {
           if (error) {
             return response
@@ -104,12 +104,12 @@ exports.approveOrRejectTransaction = (request, response) => {
 
                 approvalStatus === 1
                   ? audit(
-                      user_id,
+                      authorizer,
                       "Transacción Aprobada",
                       `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`
                     )
                   : audit(
-                      user_id,
+                      authorizer,
                       "Transacción Rechazada",
                       `Se Rechazó la Transacción ${transactionId} por un Monto de $${amount}`
                     );

@@ -16,7 +16,7 @@ exports.getCustomers = (request, response) => {
 };
 
 exports.updateCustomer = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const { name, identity_doc, email } = request.body;
   const updateCustomer =
@@ -42,7 +42,7 @@ exports.updateCustomer = (request, response) => {
 };
 
 exports.deleteCustomer = (request, response) => {
-  const user_id = 1;
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const deleteCustomer = "UPDATE customers SET deleted_at = now() WHERE id = ?";
 
