@@ -116,7 +116,7 @@ exports.saveTransaction = (request, response) => {
         }
 
         const lastId = result.length > 0 ? result[0].id + 1 : 0;
-        const transactionId = `TSC${String(lastId).padStart(6, "0")}`;
+        const transactionId = `TSC${String(lastId).padStart(8, "0")}`;
 
         db.beginTransaction((error) => {
           if (error) {

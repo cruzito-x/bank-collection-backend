@@ -69,7 +69,7 @@ exports.saveNewPayment = (request, response) => {
     }
 
     const lastId = result.length > 0 ? result[0].id + 1 : 0;
-    const paymentCollectorId = `PAY${String(lastId).padStart(6, "0")}`;
+    const paymentCollectorId = `PAY${String(lastId).padStart(8, "0")}`;
 
     const newPayment =
       "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, registered_by, date_hour) VALUES (?, ?, ?, ?, ?, ?, ?)";

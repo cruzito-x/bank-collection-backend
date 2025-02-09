@@ -36,7 +36,7 @@ exports.saveNewService = (request, response) => {
     }
 
     const latestId = result.length > 0 ? result[0].id + 1 : 0;
-    const service_id = `SRV${String(latestId).padStart(6, "0")}`;
+    const service_id = `SRV${String(latestId).padStart(8, "0")}`;
 
     const saveNewService =
       "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";

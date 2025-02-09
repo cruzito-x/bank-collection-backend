@@ -59,7 +59,7 @@ exports.saveNewCollector = (request, response) => {
       }
 
       const latestCollectorId = result.length > 0 ? result[0].id + 1 : 0;
-      const collector_id = `CLT${String(latestCollectorId).padStart(6, "0")}`;
+      const collector_id = `CLT${String(latestCollectorId).padStart(8, "0")}`;
 
       const newCollector =
         "INSERT INTO collectors (collector_id, collector, description) VALUES (?, ?, ?)";
@@ -89,7 +89,7 @@ exports.saveNewCollector = (request, response) => {
             }
 
             const latestServiceId = result.length > 0 ? result[0].id + 1 : 0;
-            const service_id = `SRV${String(latestServiceId).padStart(6, "0")}`;
+            const service_id = `SRV${String(latestServiceId).padStart(8, "0")}`;
 
             const saveNewService =
               "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
