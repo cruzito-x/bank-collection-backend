@@ -68,11 +68,11 @@ exports.saveNewService = (request, response) => {
             "Servicio Registrado",
             `Se Registró el Servicio ${service} Para el Colector ${collectorName} Desde la Vista Servicios`
           );
-        });
 
-        return response
-          .status(200)
-          .json({ message: "¡Servicio Registrado Exitosamente!" });
+          return response
+            .status(200)
+            .json({ message: "¡Servicio Registrado Exitosamente!" });
+        });
       }
     );
   });
