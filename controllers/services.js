@@ -70,7 +70,7 @@ exports.saveNewService = (request, response) => {
           );
         });
 
-        response
+        return response
           .status(200)
           .json({ message: "¡Servicio Registrado Exitosamente!" });
       }
