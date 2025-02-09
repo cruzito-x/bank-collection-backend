@@ -34,18 +34,26 @@ exports.getTotalPaymentsAumount = (request, response) => {
 };
 
 exports.obtainedPaymentsByCollector = (request, response) => {
+  const { startDay, endDay } = request.params;
+  const fullStartDate = `${startDay} 00:00:00`;
+  const fullEndDate = `${endDay} 23:59:59`;
+
   const paymentsByCollector =
-    "SELECT collector, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.collector, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id GROUP BY collectors.collector) AS percentagesByCollector";
+    "SELECT collector, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.collector, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id WHERE date_hour BETWEEN ? AND ? GROUP BY collectors.collector) AS percentagesByCollector";
 
-  db.query(paymentsByCollector, (error, result) => {
-    if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
+  db.query(
+    paymentsByCollector,
+    [fullStartDate, fullEndDate],
+    (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      return response.status(200).json(result);
     }
-
-    return response.status(200).json(result);
-  });
+  );
 };
 
 exports.saveNewPayment = (request, response) => {

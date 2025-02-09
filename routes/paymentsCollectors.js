@@ -10,7 +10,7 @@ router.get(
   paymentsCollectors.getTotalPaymentsAumount
 );
 router.get(
-  "/payments-by-collector",
+  "/payments-by-collector/:startDay/:endDay",
   verifyUser,
   paymentsCollectors.obtainedPaymentsByCollector
 );
