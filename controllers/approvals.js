@@ -114,11 +114,11 @@ exports.approveOrRejectTransaction = (request, response) => {
                       `Se Rechazó la Transacción ${transactionId} por un Monto de $${amount}`
                     );
 
-                let approvedStatus =
+                let transactionStatus =
                   approvalStatus === 1 ? "Aprobada" : "Rechazada";
 
                 return response.status(200).json({
-                  message: `Transacción ${approvedStatus}`,
+                  message: `Transacción ${transactionStatus}`,
                 });
               }
             );
