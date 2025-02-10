@@ -125,13 +125,15 @@ exports.saveNewCollector = (request, response) => {
                 audit(
                   user_id,
                   "Colector Registrado",
-                  `Se Registró al Colector ${collector_name}`
+                  `Se Registró al Colector ${collector_name}`,
+                  request
                 );
 
                 audit(
                   user_id,
                   "Servicio Registrado",
-                  `Se Registró el Servicio ${service_name} del Colector ${collector_name}`
+                  `Se Registró el Servicio ${service_name} del Colector ${collector_name}`,
+                  request
                 );
 
                 return response.status(200).json({
@@ -186,7 +188,8 @@ exports.updateCollector = (request, response) => {
     audit(
       user_id,
       "Colector Modificado",
-      `Se Modificó el Colector ${collector}`
+      `Se Modificó el Colector ${collector}`,
+      request
     );
 
     return response.status(200).json({
@@ -229,7 +232,8 @@ exports.deleteCollector = (request, response) => {
         audit(
           user_id,
           "Eliminación de Colector",
-          `Se Eliminó Tanto al Colector ${results[0].collector} Como a sus Servicios`
+          `Se Eliminó Tanto al Colector ${results[0].collector} Como a sus Servicios`,
+          request
         );
       });
     });

@@ -66,7 +66,8 @@ exports.saveNewService = (request, response) => {
           audit(
             user_id,
             "Servicio Registrado",
-            `Se Registró el Servicio ${service} Para el Colector ${collectorName} Desde la Vista Servicios`
+            `Se Registró el Servicio ${service} Para el Colector ${collectorName} Desde la Vista Servicios`,
+            request
           );
 
           return response
@@ -130,7 +131,8 @@ exports.updateService = (request, response) => {
       audit(
         user_id,
         "Servicio Actualizado",
-        `Se Actualizó el Servicio ${service} del Colector ${collector}`
+        `Se Actualizó el Servicio ${service} del Colector ${collector}`,
+        request
       );
 
       return response.status(200).json({
@@ -168,7 +170,8 @@ exports.deleteService = (request, response) => {
       audit(
         user_id,
         "Servicio Eliminado",
-        `Se Eliminó el Servicio ${service} del Colector ${collector}`
+        `Se Eliminó el Servicio ${service} del Colector ${collector}`,
+        request
       );
 
       return response

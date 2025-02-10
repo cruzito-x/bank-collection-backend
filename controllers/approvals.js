@@ -106,12 +106,14 @@ exports.approveOrRejectTransaction = (request, response) => {
                   ? audit(
                       authorizer,
                       "Transacción Aprobada",
-                      `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`
+                      `Se Aprobó la Transacción ${transactionId} por un Monto de $${amount}`,
+                      request
                     )
                   : audit(
                       authorizer,
                       "Transacción Rechazada",
-                      `Se Rechazó la Transacción ${transactionId} por un Monto de $${amount}`
+                      `Se Rechazó la Transacción ${transactionId} por un Monto de $${amount}`,
+                      request
                     );
 
                 let transactionStatus =

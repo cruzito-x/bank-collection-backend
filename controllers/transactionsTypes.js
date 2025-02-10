@@ -52,10 +52,11 @@ exports.saveNewTransactionType = (request, response) => {
         audit(
           user_id,
           "Nuevo Tipo de Transacción Registrado",
-          `${transactionType} Registrado`
+          `${transactionType} Registrado`,
+          request
         );
 
-        response.status(200).json({
+        return response.status(200).json({
           message: "¡Nuevo Tipo de Transacción Registrado Exitosamente!",
         });
       }
@@ -81,7 +82,8 @@ exports.updateTransactionType = (request, response) => {
     audit(
       user_id,
       "Tipo de Transacción Actualizado",
-      `Se Actualizó el Nombre del Tipo de Transacción con Código ${id}`
+      `Se Actualizó el Nombre del Tipo de Transacción con Código ${id}`,
+      request
     );
 
     return response.status(200).json({
@@ -117,7 +119,8 @@ exports.deleteTransactionType = (request, response) => {
       audit(
         user_id,
         "Tipo de Transacción Eliminado",
-        `Se Eliminó el Tipo de Transacción ${result[0].transaction_type}`
+        `Se Eliminó el Tipo de Transacción ${result[0].transaction_type}`,
+        request
       );
     });
 

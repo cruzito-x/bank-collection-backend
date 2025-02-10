@@ -255,7 +255,8 @@ exports.saveTransaction = (request, response) => {
                     audit(
                       user_id,
                       "Transacción Registrada",
-                      `Se Creo la Transacción ${transactionId}, de $${amount}`
+                      `Se Creo la Transacción ${transactionId}, de $${amount}`,
+                      request
                     );
 
                     return response.status(200).json({
@@ -333,7 +334,8 @@ exports.saveTransaction = (request, response) => {
               audit(
                 user_id,
                 "Transacción Registrada",
-                `Se Creo la Transacción ${transactionId}, de $${amount}`
+                `Se Creo la Transacción ${transactionId}, de $${amount}`,
+                request
               );
 
               return response

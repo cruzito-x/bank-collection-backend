@@ -32,7 +32,8 @@ exports.updateCustomer = (request, response) => {
     audit(
       user_id,
       "Cliente Actualizado",
-      `Se Actualizaron los Datos del Cliente con Número de Identidad ${identity_doc}`
+      `Se Actualizaron los Datos del Cliente con Número de Identidad ${identity_doc}`,
+      request
     );
 
     return response.status(200).json({
@@ -65,7 +66,8 @@ exports.deleteCustomer = (request, response) => {
       audit(
         user_id,
         "Cliente Eliminado",
-        `Se Eliminó al Cliente con Número de Identidad ${result[0].identity_doc}`
+        `Se Eliminó al Cliente con Número de Identidad ${result[0].identity_doc}`,
+        request
       );
     });
 

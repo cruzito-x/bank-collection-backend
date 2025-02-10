@@ -77,10 +77,11 @@ exports.updateUser = (request, response) => {
         audit(
           user_id,
           "Usuario Actualizado",
-          `Se Actualizaron los Datos del Usuario ${username}`
+          `Se Actualizaron los Datos del Usuario ${username}`,
+          request
         );
 
-        response
+        return response
           .status(200)
           .json({ message: "Usuario Actualizado Exitosamente" });
       }
@@ -124,11 +125,12 @@ exports.updateUserRole = (request, response) => {
       audit(
         user_id,
         "Asignación de Nuevo Rol",
-        `Se Asignó el Rol ${role} al Usuario ${username}`
+        `Se Asignó el Rol ${role} al Usuario ${username}`,
+        request
       );
     });
 
-    response
+    return response
       .status(200)
       .json({ message: "Rol del Usuario Actualizado Exitosamente" });
   });
@@ -158,7 +160,12 @@ exports.deleteUser = (request, response) => {
 
       const username = result[0].username;
 
-      audit(user_id, "Usuario Eliminado", `Se Eliminó el Usuario ${username}`);
+      audit(
+        user_id,
+        "Usuario Eliminado",
+        `Se Eliminó el Usuario ${username}`,
+        request
+      );
     });
 
     return response

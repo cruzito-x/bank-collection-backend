@@ -30,7 +30,12 @@ exports.login = (request, response) => {
         .json({ message: "Usuario o Contraseña no Válidos" });
     }
 
-    audit(result[0].id, "Inicio de Sesión", "Inicio de Sesión Correcto");
+    audit(
+      result[0].id,
+      "Inicio de Sesión",
+      "Inicio de Sesión Correcto",
+      request
+    );
 
     const token = jwt.sign(
       { id: result[0].id, username: result[0].username },
@@ -59,7 +64,7 @@ exports.logout = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
-    audit(id, "Cierre de Sesión", "Cierre de Sesión Correcto");
+    audit(id, "Cierre de Sesión", "Cierre de Sesión Correcto", request);
     return response.status(200).json({ message: "¡Cierre de Sesión Exitoso!" });
   });
 };

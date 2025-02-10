@@ -142,7 +142,8 @@ exports.saveNewPayment = (request, response) => {
               audit(
                 user_id,
                 "Pago a Colector Realizado",
-                `Pago de $${amount} Realizado a ${collectorName} por ${serviceName}`
+                `Pago de $${amount} Realizado a ${collectorName} por ${serviceName}`,
+                request
               );
             }
           );
