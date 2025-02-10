@@ -72,7 +72,7 @@ exports.saveNewService = (request, response) => {
 
           return response
             .status(200)
-            .json({ message: "¡Servicio Registrado Exitosamente!" });
+            .json({ message: "Servicio Registrado con Éxito" });
         });
       }
     );
@@ -136,7 +136,7 @@ exports.updateService = (request, response) => {
       );
 
       return response.status(200).json({
-        message: "¡Servicio Actualizado Exitosamente!",
+        message: "Datos del Servicio Actualizados con Éxito",
       });
     }
   );
@@ -176,7 +176,7 @@ exports.deleteService = (request, response) => {
 
       return response
         .status(200)
-        .json({ message: "¡Servicio Eliminado Exitosamente!" });
+        .json({ message: "Servicio Eliminado con Éxito" });
     });
   });
 };

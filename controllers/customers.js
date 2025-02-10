@@ -37,7 +37,7 @@ exports.updateCustomer = (request, response) => {
     );
 
     return response.status(200).json({
-      message: "¡Datos de Cliente Actualizados Exitosamente!",
+      message: "Datos del Cliente Actualizados con Éxito",
     });
   });
 };
@@ -72,7 +72,7 @@ exports.deleteCustomer = (request, response) => {
     });
 
     return response.status(200).json({
-      message: "¡Cliente Eliminado Exitosamente!",
+      message: "Cliente Eliminado con Éxito",
     });
   });
 };

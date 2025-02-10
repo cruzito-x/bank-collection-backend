@@ -150,7 +150,7 @@ exports.saveNewPayment = (request, response) => {
         });
 
         return response.status(200).json({
-          message: "¡Pago Registrado Exitosamente!",
+          message: "Pago Registrado con Éxito",
         });
       }
     );

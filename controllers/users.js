@@ -83,7 +83,7 @@ exports.updateUser = (request, response) => {
 
         return response
           .status(200)
-          .json({ message: "Usuario Actualizado Exitosamente" });
+          .json({ message: "Usuario Actualizado con Éxito" });
       }
     );
   });
@@ -132,7 +132,7 @@ exports.updateUserRole = (request, response) => {
 
     return response
       .status(200)
-      .json({ message: "Rol del Usuario Actualizado Exitosamente" });
+      .json({ message: "El Rol del Usuario ha Sido Actualizado con Éxito" });
   });
 };
 
@@ -170,7 +170,7 @@ exports.deleteUser = (request, response) => {
 
     return response
       .status(200)
-      .json({ message: "Usuario Eliminado Exitosamente" });
+      .json({ message: "Usuario Eliminado con Éxito" });
   });
 };
 

@@ -255,13 +255,12 @@ exports.saveTransaction = (request, response) => {
                     audit(
                       user_id,
                       "Transacción Registrada",
-                      `Se Creo la Transacción ${transactionId}, de $${amount}`,
+                      `Se Creó la Transacción ${transactionId}, de $${amount}`,
                       request
                     );
 
                     return response.status(200).json({
-                      message:
-                        "¡Transacción Registrada, en Espera de Aprobación!",
+                      message: "Transacción Registrada",
                     });
                   });
                 }
@@ -334,13 +333,13 @@ exports.saveTransaction = (request, response) => {
               audit(
                 user_id,
                 "Transacción Registrada",
-                `Se Creo la Transacción ${transactionId}, de $${amount}`,
+                `Se Creó la Transacción ${transactionId}, de $${amount}`,
                 request
               );
 
               return response
                 .status(200)
-                .json({ message: "¡Transacción Registrada Exitosamente!" });
+                .json({ message: "Transacción Registrada con Éxito" });
             });
           }
         });

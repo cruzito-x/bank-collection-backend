@@ -137,7 +137,7 @@ exports.saveNewCollector = (request, response) => {
                 );
 
                 return response.status(200).json({
-                  message: "¡Colector Registrado Exitosamente!",
+                  message: "Colector Registrado con Éxito",
                 });
               }
             );
@@ -193,7 +193,7 @@ exports.updateCollector = (request, response) => {
     );
 
     return response.status(200).json({
-      message: "¡Datos de Colector Actualizados Exitosamente!",
+      message: "Datos del Colector Actualizados con Éxito",
     });
   });
 };
@@ -240,7 +240,7 @@ exports.deleteCollector = (request, response) => {
 
     return response
       .status(200)
-      .json({ message: "¡Colector Eliminado Exitosamente!" });
+      .json({ message: "Colector Eliminado con Éxito" });
   });
 };
 

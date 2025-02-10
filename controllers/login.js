@@ -44,7 +44,7 @@ exports.login = (request, response) => {
     );
 
     return response.status(200).json({
-      message: "¡Inicio de Sesión Correcto!",
+      message: "Inicio de Sesión Correcto",
       token,
       user_id: result[0].id,
       username: result[0].username,
@@ -65,6 +65,6 @@ exports.logout = (request, response) => {
     }
 
     audit(id, "Cierre de Sesión", "Cierre de Sesión Correcto", request);
-    return response.status(200).json({ message: "¡Cierre de Sesión Exitoso!" });
+    return response.status(200).json({ message: "Cierre de Sesión Correcto" });
   });
 };
