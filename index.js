@@ -39,6 +39,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("combined", { stream: logs }));
 
+// Middlewares Instances
+const { authMiddleware } = require("./middleware/authMiddleware");
+const {
+  timeRestrictionMiddleware,
+} = require("./middleware/timeRestrictionMiddleware");
+
 // Routes settings
 const login = require("./routes/login");
 const dashboard = require("./routes/dashboard");
@@ -53,18 +59,33 @@ const approvals = require("./routes/approvals");
 const users = require("./routes/users");
 const audit = require("./routes/audit");
 
-app.use("/login", login);
-app.use("/dashboard", dashboard);
-app.use("/customers", customers);
-app.use("/collectors", collectors);
-app.use("/services", services);
-app.use("/payments-collectors", paymentsCollectors);
-app.use("/transactions", transactions);
-app.use("/accounts", accounts);
-app.use("/transactions-types", transactionTypes);
-app.use("/approvals", approvals);
-app.use("/users", users);
-app.use("/audit", audit);
+app.use("/login", timeRestrictionMiddleware, login);
+app.use("/dashboard", authMiddleware, timeRestrictionMiddleware, dashboard);
+app.use("/customers", authMiddleware, timeRestrictionMiddleware, customers);
+app.use("/collectors", authMiddleware, timeRestrictionMiddleware, collectors);
+app.use("/services", authMiddleware, timeRestrictionMiddleware, services);
+app.use(
+  "/payments-collectors",
+  authMiddleware,
+  timeRestrictionMiddleware,
+  paymentsCollectors
+);
+app.use(
+  "/transactions",
+  authMiddleware,
+  timeRestrictionMiddleware,
+  transactions
+);
+app.use("/accounts", authMiddleware, timeRestrictionMiddleware, accounts);
+app.use(
+  "/transactions-types",
+  authMiddleware,
+  timeRestrictionMiddleware,
+  transactionTypes
+);
+app.use("/approvals", authMiddleware, timeRestrictionMiddleware, approvals);
+app.use("/users", authMiddleware, timeRestrictionMiddleware, users);
+app.use("/audit", authMiddleware, timeRestrictionMiddleware, audit);
 
 app.listen(serverPort, (error) => {
   if (!error) {
