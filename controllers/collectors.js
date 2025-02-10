@@ -4,7 +4,7 @@ const audit = require("../global/audit/audit");
 
 exports.getCollectors = (request, response) => {
   const collectors =
-    "SELECT collectors.id, collectors.collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.deleted_at IS NULL GROUP BY collectors.id, collectors.collector ORDER BY collectors.collector ASC";
+    "SELECT collectors.id, collectors.collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.deleted_at IS NULL AND services.deleted_at IS NULL GROUP BY collectors.id, collectors.collector ORDER BY collectors.collector ASC";
 
   db.query(collectors, (error, result) => {
     if (error) {
@@ -254,7 +254,7 @@ exports.searchCollector = (request, response) => {
   }
 
   const searchCollector =
-    "SELECT collectors.id, collectors.collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.collector LIKE ? AND collectors.deleted_at IS NULL GROUP BY collectors.id, collectors.collector ORDER BY collectors.collector ASC";
+    "SELECT collectors.id, collectors.collector, collectors.description, GROUP_CONCAT(services.service_name ORDER BY services.service_name ASC SEPARATOR ', ') AS services_names FROM collectors INNER JOIN services ON services.collector_id = collectors.id WHERE collectors.collector LIKE ? AND collectors.deleted_at IS NULL AND services.deleted_at IS NULL GROUP BY collectors.id, collectors.collector ORDER BY collectors.collector ASC";
 
   db.query(searchCollector, [`%${collector}%`], (error, result) => {
     if (error) {
