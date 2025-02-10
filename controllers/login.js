@@ -5,6 +5,7 @@ const audit = require("../global/audit/audit");
 
 exports.login = (request, response) => {
   const { username, password } = request.body;
+
   const hashedPassword = crypto
     .createHash("sha256")
     .update(password)
