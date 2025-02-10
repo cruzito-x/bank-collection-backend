@@ -1,14 +1,11 @@
 const moment = require("moment");
 
 const timeRestrictionMiddleware = (request, response, next) => {
-  const currentTime = moment();
-  const startTime = moment().set({ hour: 8, minute: 30, second: 0 });
-  const endTime = moment().set({ hour: 16, minute: 30, second: 0 });
+  const currentHour = moment();
+  const startHour = moment().set({ hour: 8, minute: 30, second: 0 });
+  const endHour = moment().set({ hour: 16, minute: 30, second: 0 });
 
-  // const startTime = moment().set({ hour: 0, minute: 0, second: 0 });
-  // const endTime = moment().set({ hour: 23, minute: 59, second: 59 });
-
-  if (currentTime.isBefore(startTime) || currentTime.isAfter(endTime)) {
+  if (currentHour.isBefore(startHour) || currentHour.isAfter(endHour)) {
     return response.status(403).json({
       message: "El Acceso al Sistema es Inaccesible Fuera del Horario Laboral",
     });
