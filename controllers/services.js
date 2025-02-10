@@ -145,8 +145,6 @@ exports.updateService = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
-    console.log(result[0].service_name);
-
     if (result.length > 0) {
       return response.status(409).json({
         message:
