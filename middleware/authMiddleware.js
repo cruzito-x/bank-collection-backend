@@ -20,7 +20,8 @@ const authMiddleware = (request, response, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_KEY);
-    request.usuario = decoded;
+    request.user = decoded;
+
     next();
   } catch (error) {
     return response
