@@ -66,94 +66,117 @@ exports.saveNewPayment = (request, response) => {
       .json({ message: "Por Favor, Rellene Todos los Campos" });
   }
 
-  const getLastPaymentCollectorId =
-    "SELECT id FROM payments_collectors ORDER BY id DESC LIMIT 1";
-
-  db.query(getLastPaymentCollectorId, (error, result) => {
+  const compareAmountWithPrice = "SELECT price FROM services WHERE id = ?";
+  db.query(compareAmountWithPrice, [service_id], (error, result) => {
     if (error) {
+      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    const lastId = result.length > 0 ? result[0].id + 1 : 0;
-    const paymentCollectorId = `PAY${String(lastId).padStart(8, "0")}`;
+    if (amount === 0 && result[0].price === 0) {
+      return response.status(400).json({
+        message:
+          "El Monto No Puede Ser Cero, ya que el Precio por Defecto es Cero",
+      });
+    }
 
-    const newPayment =
-      "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, registered_by, date_hour) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    if (amount < result[0].price) {
+      return response.status(400).json({
+        message: "El Monto No Puede Ser Menor al Precio del Servicio",
+      });
+    }
 
-    db.query(
-      newPayment,
-      [
-        paymentCollectorId,
-        customer_id,
-        collector_id,
-        service_id,
-        amount,
-        user_id,
-        new Date(),
-      ],
-      (error, result) => {
-        if (error) {
-          return response
-            .status(500)
-            .json({ message: "Error Interno del Servidor" });
-        }
+    const getLastPaymentCollectorId =
+      "SELECT id FROM payments_collectors ORDER BY id DESC LIMIT 1";
 
-        const getCustomerNameAndEmail =
-          "SELECT name, email FROM customers WHERE id = ?";
+    db.query(getLastPaymentCollectorId, (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
 
-        db.query(getCustomerNameAndEmail, [customer_id], (error, result) => {
+      const lastId = result.length > 0 ? result[0].id + 1 : 0;
+      const paymentCollectorId = `PAY${String(lastId).padStart(8, "0")}`;
+
+      const newPayment =
+        "INSERT INTO payments_collectors (payment_id, customer_id, collector_id, service_id, amount, registered_by, date_hour) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+      db.query(
+        newPayment,
+        [
+          paymentCollectorId,
+          customer_id,
+          collector_id,
+          service_id,
+          amount,
+          user_id,
+          new Date(),
+        ],
+        (error, result) => {
           if (error) {
             return response
               .status(500)
               .json({ message: "Error Interno del Servidor" });
           }
 
-          const customerName = result[0].name;
-          const customerEmail = result[0].email;
+          const getCustomerNameAndEmail =
+            "SELECT name, email FROM customers WHERE id = ?";
 
-          const getCollectorAndServiceName =
-            "SELECT collectors.collector, services.service_name AS service FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.id = ?";
-
-          db.query(
-            getCollectorAndServiceName,
-            [collector_id],
-            async (error, result) => {
-              if (error) {
-                return response
-                  .status(500)
-                  .json({ message: "Error Interno del Servidor" });
-              }
-
-              const collectorName = result[0].collector;
-              const serviceName = result[0].service;
-
-              await sendMail(
-                collectorName,
-                "xdigitalbit@gmail.com",
-                "¡Su Pago ha Sido Aprobado!",
-                "Prueba de email",
-                customerName,
-                serviceName,
-                amount
-              );
-
-              audit(
-                user_id,
-                "Pago a Colector Realizado",
-                `Pago de $${amount} Realizado a ${collectorName} por ${serviceName}`,
-                request
-              );
+          db.query(getCustomerNameAndEmail, [customer_id], (error, result) => {
+            if (error) {
+              return response
+                .status(500)
+                .json({ message: "Error Interno del Servidor" });
             }
-          );
-        });
 
-        return response.status(200).json({
-          message: "Pago Registrado con Éxito",
-        });
-      }
-    );
+            const customerName = result[0].name;
+            const customerEmail = result[0].email;
+
+            const getCollectorAndServiceName =
+              "SELECT collectors.collector, services.service_name AS service FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.id = ?";
+
+            db.query(
+              getCollectorAndServiceName,
+              [collector_id],
+              async (error, result) => {
+                if (error) {
+                  return response
+                    .status(500)
+                    .json({ message: "Error Interno del Servidor" });
+                }
+
+                const collectorName = result[0].collector;
+                const serviceName = result[0].service;
+
+                await sendMail(
+                  collectorName,
+                  "xdigitalbit@gmail.com",
+                  "¡Su Pago ha Sido Aprobado!",
+                  "Prueba de email",
+                  customerName,
+                  serviceName,
+                  amount
+                );
+
+                audit(
+                  user_id,
+                  "Pago a Colector Realizado",
+                  `Pago de $${amount} Realizado a ${collectorName} por ${serviceName}`,
+                  request
+                );
+              }
+            );
+          });
+
+          return response.status(200).json({
+            message: "Pago Registrado con Éxito",
+          });
+        }
+      );
+    });
   });
 };
 
