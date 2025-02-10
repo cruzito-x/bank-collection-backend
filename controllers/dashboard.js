@@ -249,6 +249,7 @@ exports.getReportsByDate = (request, response) => {
 
   db.query(getReport, (error, result) => {
     if (error) {
+      console.error(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
