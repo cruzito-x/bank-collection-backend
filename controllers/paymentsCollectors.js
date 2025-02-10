@@ -39,11 +39,11 @@ exports.obtainedPaymentsByCollector = (request, response) => {
   const fullEndDate = `${endDay} 23:59:59`;
 
   const paymentsByCollector =
-    "SELECT collector, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.collector, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id WHERE date_hour BETWEEN ? AND ? GROUP BY collectors.collector) AS percentagesByCollector";
+    "SELECT collector, amount, (amount * 100 / total) AS percentage FROM (SELECT collectors.collector, SUM(payments_collectors.amount) AS amount, (SELECT SUM(amount) FROM payments_collectors WHERE payments_collectors.date_hour BETWEEN ? AND ?) AS total FROM  payments_collectors INNER JOIN collectors ON collectors.id = payments_collectors.collector_id WHERE payments_collectors.date_hour BETWEEN ? AND ? GROUP BY collectors.collector) AS percentagesByCollector";
 
   db.query(
     paymentsByCollector,
-    [fullStartDate, fullEndDate],
+    [fullStartDate, fullEndDate, fullStartDate, fullEndDate],
     (error, result) => {
       if (error) {
         return response
