@@ -3,7 +3,7 @@ const audit = require("../global/audit/audit");
 
 exports.getServices = (request, response) => {
   const services =
-    "SELECT services.*, services.service_name AS service, collectors.collector FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.deleted_at IS NULL";
+    "SELECT services.*, services.service_name AS service, collectors.collector FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.deleted_at IS NULL ORDER BY collectors.collector ASC";
 
   db.query(services, (error, result) => {
     if (error) {
@@ -26,56 +26,74 @@ exports.saveNewService = (request, response) => {
       .json({ message: "Por Favor, Rellene Todos los Campos" });
   }
 
-  const getLastServiceId = "SELECT id FROM services ORDER BY id DESC LIMIT 1";
+  const serviceName =
+    "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.service_name = ? AND collectors.id = ?";
 
-  db.query(getLastServiceId, (error, result) => {
+  db.query(serviceName, [service, collector], (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    const latestId = result.length > 0 ? result[0].id + 1 : 0;
-    const service_id = `SRV${String(latestId).padStart(8, "0")}`;
+    if (result.length > 0) {
+      return response.status(409).json({
+        message:
+          "Este Servicio ya Está Registrado para El Colector Seleccionado",
+      });
+    }
 
-    const saveNewService =
-      "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
+    const getLastServiceId = "SELECT id FROM services ORDER BY id DESC LIMIT 1";
 
-    db.query(
-      saveNewService,
-      [service_id, collector, service, description, price],
-      (error, result) => {
-        if (error) {
-          return response
-            .status(500)
-            .json({ message: "Error al guardar el servicio" });
-        }
+    db.query(getLastServiceId, (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
 
-        const getCollectorName =
-          "SELECT collector FROM collectors WHERE id = ?";
+      const latestId = result.length > 0 ? result[0].id + 1 : 0;
+      const service_id = `SRV${String(latestId).padStart(8, "0")}`;
 
-        db.query(getCollectorName, [collector], (error, result) => {
+      const saveNewService =
+        "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
+
+      db.query(
+        saveNewService,
+        [service_id, collector, service, description, price],
+        (error, result) => {
           if (error) {
             return response
               .status(500)
-              .json({ message: "Error Interno del Servidor" });
+              .json({ message: "Error al guardar el servicio" });
           }
 
-          const collectorName = result[0].collector;
+          const getCollectorName =
+            "SELECT collector FROM collectors WHERE id = ?";
 
-          audit(
-            user_id,
-            "Servicio Registrado",
-            `Se Registró el Servicio ${service} Para el Colector ${collectorName} Desde la Vista Servicios`,
-            request
-          );
+          db.query(getCollectorName, [collector], (error, result) => {
+            if (error) {
+              return response
+                .status(500)
+                .json({ message: "Error Interno del Servidor" });
+            }
 
-          return response
-            .status(200)
-            .json({ message: "Servicio Registrado con Éxito" });
-        });
-      }
-    );
+            const collectorName = result[0].collector;
+
+            audit(
+              user_id,
+              "Servicio Registrado",
+              `Se Registró el Servicio ${service} Para el Colector ${collectorName} Desde la Vista Servicios`,
+              request
+            );
+
+            return response
+              .status(200)
+              .json({ message: "Servicio Registrado con Éxito" });
+          });
+        }
+      );
+    });
   });
 };
 
@@ -111,35 +129,57 @@ exports.viewPaymentsByServiceDetails = (request, response) => {
 };
 
 exports.updateService = (request, response) => {
-  user_id = request.headers["user_id"];
+  const user_id = request.headers["user_id"];
   const { id } = request.params;
   const { collector, service, description, price } = request.body;
 
-  const updateService =
-    "UPDATE services SET service_name = ?, description = ?, price = ? WHERE id = ?";
+  console.log(id, collector);
 
-  db.query(
-    updateService,
-    [service, description, price, id],
-    (error, result) => {
-      if (error) {
-        return response
-          .status(500)
-          .json({ message: "Error Interno del Servidor" });
-      }
+  const serviceName =
+    "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.id = ? AND collectors.collector = ?";
 
-      audit(
-        user_id,
-        "Servicio Actualizado",
-        `Se Actualizó el Servicio ${service} del Colector ${collector}`,
-        request
-      );
+  db.query(serviceName, [id, collector], (error, result) => {
+    if (error) {
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
+    }
 
-      return response.status(200).json({
-        message: "Datos del Servicio Actualizados con Éxito",
+    console.log(result[0].service_name);
+
+    if (result.length > 0) {
+      return response.status(409).json({
+        message:
+          "Este Servicio ya Está Registrado para El Colector Seleccionado",
       });
     }
-  );
+
+    const updateService =
+      "UPDATE services SET service_name = ?, description = ?, price = ? WHERE id = ?";
+
+    db.query(
+      updateService,
+      [service, description, price, id],
+      (error, result) => {
+        if (error) {
+          return response
+            .status(500)
+            .json({ message: "Error Interno del Servidor" });
+        }
+
+        audit(
+          user_id,
+          "Servicio Actualizado",
+          `Se Actualizó el Servicio ${service} del Colector ${collector}`,
+          request
+        );
+
+        return response.status(200).json({
+          message: "Datos del Servicio Actualizados con Éxito",
+        });
+      }
+    );
+  });
 };
 
 exports.deleteService = (request, response) => {

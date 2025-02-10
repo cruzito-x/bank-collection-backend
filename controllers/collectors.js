@@ -39,47 +39,51 @@ exports.saveNewCollector = (request, response) => {
     });
   }
 
-  db.beginTransaction((error) => {
+  const collectorName =
+    "SELECT collector FROM collectors WHERE collector = ? AND deleted_at IS NULL";
+
+  db.query(collectorName, [collector_name], (error, result) => {
     if (error) {
-      return db.rollback(() => {
-        return response
-          .status(500)
-          .json({ message: "Error Interno del Servidor" });
-      });
+      return response
+        .status(500)
+        .json({ message: "Error Interno del Servidor" });
     }
 
-    const getLastCollectorId =
-      "SELECT id FROM collectors ORDER BY id DESC LIMIT 1";
+    if (result.length > 0) {
+      return response
+        .status(409)
+        .json({ message: "Este Colector ya Está Registrado" });
+    }
 
-    db.query(getLastCollectorId, (error, result) => {
+    db.beginTransaction((error) => {
       if (error) {
-        return response
-          .status(500)
-          .json({ message: "Error Interno del Servidor" });
+        return db.rollback(() => {
+          return response
+            .status(500)
+            .json({ message: "Error Interno del Servidor" });
+        });
       }
 
-      const latestCollectorId = result.length > 0 ? result[0].id + 1 : 0;
-      const collector_id = `CLT${String(latestCollectorId).padStart(8, "0")}`;
+      const getLastCollectorId =
+        "SELECT id FROM collectors ORDER BY id DESC LIMIT 1";
 
-      const newCollector =
-        "INSERT INTO collectors (collector_id, collector, description) VALUES (?, ?, ?)";
+      db.query(getLastCollectorId, (error, result) => {
+        if (error) {
+          return response
+            .status(500)
+            .json({ message: "Error Interno del Servidor" });
+        }
 
-      db.query(
-        newCollector,
-        [collector_id, collector_name, collector_description],
-        (error, result) => {
-          if (error) {
-            return db.rollback(() => {
-              return response
-                .status(500)
-                .json({ message: "Error Interno del Servidor" });
-            });
-          }
+        const latestCollectorId = result.length > 0 ? result[0].id + 1 : 0;
+        const collector_id = `CLT${String(latestCollectorId).padStart(8, "0")}`;
 
-          const getLastServiceId =
-            "SELECT id FROM services ORDER BY id DESC LIMIT 1";
+        const newCollector =
+          "INSERT INTO collectors (collector_id, collector, description) VALUES (?, ?, ?)";
 
-          db.query(getLastServiceId, (error, result) => {
+        db.query(
+          newCollector,
+          [collector_id, collector_name, collector_description],
+          (error, result) => {
             if (error) {
               return db.rollback(() => {
                 return response
@@ -88,31 +92,37 @@ exports.saveNewCollector = (request, response) => {
               });
             }
 
-            const latestServiceId = result.length > 0 ? result[0].id + 1 : 0;
-            const service_id = `SRV${String(latestServiceId).padStart(8, "0")}`;
+            const getLastServiceId =
+              "SELECT id FROM services ORDER BY id DESC LIMIT 1";
 
-            const saveNewService =
-              "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
+            db.query(getLastServiceId, (error, result) => {
+              if (error) {
+                return db.rollback(() => {
+                  return response
+                    .status(500)
+                    .json({ message: "Error Interno del Servidor" });
+                });
+              }
 
-            db.query(
-              saveNewService,
-              [
-                service_id,
-                latestCollectorId,
-                service_name,
-                service_description,
-                price,
-              ],
-              (error, result) => {
-                if (error) {
-                  return db.rollback(() => {
-                    return response
-                      .status(500)
-                      .json({ message: "Error Interno del Servidor" });
-                  });
-                }
+              const latestServiceId = result.length > 0 ? result[0].id + 1 : 0;
+              const service_id = `SRV${String(latestServiceId).padStart(
+                8,
+                "0"
+              )}`;
 
-                db.commit((error) => {
+              const saveNewService =
+                "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
+
+              db.query(
+                saveNewService,
+                [
+                  service_id,
+                  latestCollectorId,
+                  service_name,
+                  service_description,
+                  price,
+                ],
+                (error, result) => {
                   if (error) {
                     return db.rollback(() => {
                       return response
@@ -120,30 +130,40 @@ exports.saveNewCollector = (request, response) => {
                         .json({ message: "Error Interno del Servidor" });
                     });
                   }
-                });
 
-                audit(
-                  user_id,
-                  "Colector Registrado",
-                  `Se Registró al Colector ${collector_name}`,
-                  request
-                );
+                  db.commit((error) => {
+                    if (error) {
+                      return db.rollback(() => {
+                        return response
+                          .status(500)
+                          .json({ message: "Error Interno del Servidor" });
+                      });
+                    }
+                  });
 
-                audit(
-                  user_id,
-                  "Servicio Registrado",
-                  `Se Registró el Servicio ${service_name} del Colector ${collector_name}`,
-                  request
-                );
+                  audit(
+                    user_id,
+                    "Colector Registrado",
+                    `Se Registró al Colector ${collector_name}`,
+                    request
+                  );
 
-                return response.status(200).json({
-                  message: "Colector Registrado con Éxito",
-                });
-              }
-            );
-          });
-        }
-      );
+                  audit(
+                    user_id,
+                    "Servicio Registrado",
+                    `Se Registró el Servicio ${service_name} del Colector ${collector_name}`,
+                    request
+                  );
+
+                  return response.status(200).json({
+                    message: "Colector Registrado con Éxito",
+                  });
+                }
+              );
+            });
+          }
+        );
+      });
     });
   });
 };
@@ -175,25 +195,42 @@ exports.updateCollector = (request, response) => {
     });
   }
 
-  const updateCollector =
-    "UPDATE collectors SET collector = ?, description = ? WHERE id = ?";
+  const collectorName =
+    "SELECT collector FROM collectors WHERE collector = ? AND deleted_at IS NULL";
 
-  db.query(updateCollector, [collector, description, id], (error, result) => {
+  db.query(collectorName, [collector], (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    audit(
-      user_id,
-      "Colector Modificado",
-      `Se Modificó el Colector ${collector}`,
-      request
-    );
+    if (result.length > 0) {
+      return response
+        .status(409)
+        .json({ message: "Este Colector ya Está Registrado" });
+    }
 
-    return response.status(200).json({
-      message: "Datos del Colector Actualizados con Éxito",
+    const updateCollector =
+      "UPDATE collectors SET collector = ?, description = ? WHERE id = ?";
+
+    db.query(updateCollector, [collector, description, id], (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      audit(
+        user_id,
+        "Colector Modificado",
+        `Se Modificó el Colector ${collector}`,
+        request
+      );
+
+      return response.status(200).json({
+        message: "Datos del Colector Actualizados con Éxito",
+      });
     });
   });
 };
