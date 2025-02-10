@@ -446,7 +446,7 @@ UNLOCK TABLES;
 --
 -- Dumping routines for database 'bank_collection_db'
 --
-/*!50003 DROP PROCEDURE IF EXISTS `GetReports` */;
+/*!50003 DROP PROCEDURE IF EXISTS `getReports` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -454,29 +454,32 @@ UNLOCK TABLES;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = '' */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GetReports`(IN start_date DATETIME, IN end_date DATETIME)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getReports`(IN start_date DATETIME, IN end_date DATETIME)
 BEGIN
     -- 1️⃣ Transacciones detalladas con tipo de transacción
     SELECT customers.name AS sender, transactions.sender_account, receivers.name AS receiver, transactions.receiver_account, transactions.amount, transaction_types.transaction_type, CASE WHEN transactions.status = 1 THEN 'En Espera' WHEN transactions.status = 2 THEN 'Aprobada' WHEN transactions.status = 3 THEN 'Rechazada' END AS status, users.username AS authorized_by, transactions.date_hour AS datetime
     FROM transactions INNER JOIN customers ON customers.id = transactions.customer_id INNER JOIN customers receivers ON receivers.id = transactions.receiver_id INNER JOIN users ON users.id = transactions.authorized_by
     INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id
-    WHERE transactions.status != 1 AND transactions.date_hour BETWEEN start_date AND end_date;
+    WHERE transactions.status != 1 AND transactions.date_hour BETWEEN start_date AND end_date
+    ORDER BY transactions.date_hour DESC;
 
     -- 2️⃣ Suma total de montos agrupados por tipo de transacción
     SELECT transaction_types.transaction_type, SUM(transactions.amount) AS amount 
     FROM transactions 
     INNER JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id 
     WHERE transactions.date_hour BETWEEN start_date AND end_date
-    GROUP BY transactions.transaction_type_id;
+    GROUP BY transactions.transaction_type_id
+    ORDER BY amount DESC;
 
     -- 3️⃣ Suma total de montos agrupados por cobrador
     SELECT collectors.collector, SUM(payments_collectors.amount) AS amount 
     FROM payments_collectors 
     INNER JOIN collectors ON collectors.id = payments_collectors.collector_id 
     WHERE payments_collectors.date_hour BETWEEN start_date AND end_date
-    GROUP BY payments_collectors.collector_id;
+    GROUP BY payments_collectors.collector_id
+    ORDER BY amount DESC;
 
     -- 4️⃣ Suma total de montos agrupados por servicio
     SELECT collectors.collector, services.service_name, SUM(payments_collectors.amount) AS amount 
@@ -484,7 +487,8 @@ BEGIN
     INNER JOIN collectors ON collectors.id = payments_collectors.collector_id
     INNER JOIN services ON services.id = payments_collectors.service_id -- Relacionar correctamente con service_id
     WHERE payments_collectors.date_hour BETWEEN start_date AND end_date
-    GROUP BY services.service_name; -- Agrupar por el nombre del servicio
+    GROUP BY services.service_name
+    ORDER BY amount DESC; -- Agrupar por el nombre del servicio
 
 END ;;
 DELIMITER ;
@@ -502,4 +506,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-10 16:10:03
+-- Dump completed on 2025-02-10 16:19:29
