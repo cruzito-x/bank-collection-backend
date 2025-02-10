@@ -15,7 +15,6 @@ function audit(user_id, action, details, request) {
     [user_id, action, details, clientDetails, new Date()],
     (error, result) => {
       if (error) {
-        console.error(error);
         return;
       }
     }
