@@ -67,9 +67,9 @@ exports.approveOrRejectTransaction = (request, response) => {
           }
 
           const getSenderId =
-            "SELECT customers.id, transactions.amount FROM customers INNER JOIN transactions ON transactions.customer_id = customers.id WHERE transactions.transaction_id = ?";
+            "SELECT customers.id, transactions.amount FROM customers INNER JOIN transactions ON transactions.customer_id = customers.id WHERE transactions.id = ? OR transactions.transaction_id = ?";
 
-          db.query(getSenderId, [transactionId], (error, result) => {
+          db.query(getSenderId, [id, transaction_id], (error, result) => {
             if (error) {
               return response
                 .status(500)
