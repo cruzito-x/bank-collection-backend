@@ -3,7 +3,7 @@ const moment = require("moment");
 
 exports.getAudits = (request, response) => {
   const audits =
-    "SELECT users.username, audit.action, audit.date_hour AS datetime, audit.details FROM audit INNER JOIN users ON users.id = audit.user_id ORDER BY datetime DESC";
+    "SELECT users.username, audit.action, audit.details, audit.client_details, audit.date_hour AS datetime FROM audit INNER JOIN users ON users.id = audit.user_id ORDER BY datetime DESC";
 
   db.query(audits, (error, result) => {
     if (error) {
@@ -26,7 +26,7 @@ exports.searchAudit = (request, response) => {
   }
 
   let searchAudits =
-    "SELECT users.username, audit.action, audit.date_hour AS datetime, audit.details FROM audit INNER JOIN users ON users.id = audit.user_id WHERE audit.date_hour IS NOT NULL";
+    "SELECT users.username, audit.action, audit.details, audit.client_details, audit.date_hour AS datetime FROM audit INNER JOIN users ON users.id = audit.user_id WHERE audit.date_hour IS NOT NULL";
   let auditData = [];
 
   if (username) {

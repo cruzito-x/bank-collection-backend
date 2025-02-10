@@ -2,6 +2,7 @@ const db = require("../config/db");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const audit = require("../global/audit/audit");
+const clientIp = require("get-client-ip");
 
 exports.login = (request, response) => {
   const { username, password } = request.body;
@@ -30,7 +31,12 @@ exports.login = (request, response) => {
         .json({ message: "Usuario o Contraseña no Válidos" });
     }
 
-    audit(result[0].id, "Inicio de Sesión", "Inicio de Sesión Correcto");
+    audit(
+      result[0].id,
+      "Inicio de Sesión",
+      "Inicio de Sesión Correcto",
+      clientIp(request)
+    );
 
     const token = jwt.sign(
       { id: result[0].id, username: result[0].username },
