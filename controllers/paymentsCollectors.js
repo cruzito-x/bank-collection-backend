@@ -82,9 +82,9 @@ exports.saveNewPayment = (request, response) => {
       });
     }
 
-    if (amount < result[0].price) {
+    if (amount < result[0].price || amount > result[0].price) {
       return response.status(400).json({
-        message: "El Monto No Puede Ser Menor al Precio del Servicio",
+        message: "El Monto No Puede Ser Menor ni Mayor al Precio del Servicio",
       });
     }
 
