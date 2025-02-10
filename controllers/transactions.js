@@ -59,6 +59,12 @@ exports.saveTransaction = (request, response) => {
       .json({ message: "Por Favor, Rellene Todos los Campos" });
   }
 
+  if (amount < 5) {
+    return response.status(400).json({
+      message: "El valor de la Transacción Debe Ser Mayor o Igual a $5",
+    });
+  }
+
   if (transaction_type !== 1) {
     const getBalanceAndCompareData =
       "SELECT balance FROM accounts WHERE account_number = ?";
