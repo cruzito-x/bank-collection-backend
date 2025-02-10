@@ -82,7 +82,7 @@ exports.updateTransactionType = (request, response) => {
     audit(
       user_id,
       "Tipo de Transacción Actualizado",
-      `Se Actualizó el Nombre del Tipo de Transacción con Código ${id}`,
+      `Se Actualizó el Nombre del Tipo de Transacción ${transactionType}`,
       request
     );
 
