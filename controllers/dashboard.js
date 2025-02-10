@@ -245,7 +245,7 @@ exports.getReportsByDate = (request, response) => {
   const fullStartDate = `'${startDay} 00:00:00'`;
   const fullEndDate = `'${endDay} 23:59:59'`;
 
-  const getReport = `CALL GetReports(${fullStartDate}, ${fullEndDate})`;
+  const getReport = `CALL getReports(${fullStartDate}, ${fullEndDate})`;
 
   db.query(getReport, (error, result) => {
     if (error) {
