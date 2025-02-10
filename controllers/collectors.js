@@ -231,7 +231,7 @@ exports.deleteCollector = (request, response) => {
 
         audit(
           user_id,
-          "Eliminación de Colector",
+          "Colector Eliminado",
           `Se Eliminó Tanto al Colector ${results[0].collector} Como a sus Servicios`,
           request
         );
