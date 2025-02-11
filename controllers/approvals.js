@@ -67,7 +67,7 @@ exports.approveOrRejectTransaction = (request, response) => {
           }
 
           const getSenderId =
-            "SELECT customers.id, transactions.amount FROM customers INNER JOIN transactions ON transactions.customer_id = customers.id WHERE transactions.id = ? OR transactions.transaction_id = ?";
+            "SELECT customers.id, customers.name, customers.email, transactions.amount FROM customers INNER JOIN transactions ON transactions.customer_id = customers.id WHERE transactions.id = ? OR transactions.transaction_id = ?";
 
           db.query(getSenderId, [id, transaction_id], (error, result) => {
             if (error) {
@@ -82,6 +82,8 @@ exports.approveOrRejectTransaction = (request, response) => {
 
             const amount = result[0].amount;
             const customer_sender_id = result[0].id;
+            const customerSenderName = result[0].name;
+            const customerEmail = result[0].email;
 
             let updateCustomerBalance = "";
             if (approvalStatus === 1) {

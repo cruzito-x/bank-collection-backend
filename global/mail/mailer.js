@@ -59,7 +59,7 @@ const sendMail = async (
         <div style="text-align: center; margin-top: 20px">
           <p style="margin: 0; font-size: 14px; color: #000000;"> Este es un comprobante de pago. <br />
           Para mayor información, consulta en las oficinas del banco o contacta a <a href="mailto:onboarding@resend.dev" style="color: #007bff; text-decoration: none;">onboarding@resend.dev</a>. </p>
-          <p> Banco Bambú&reg; - ${new Date().getFullYear()} All Rights Reserved. </p>
+          <p> Banco Bambú&reg; S.A - ${new Date().getFullYear()} All Rights Reserved. </p>
         </div>`,
       });
     } catch (error) {
