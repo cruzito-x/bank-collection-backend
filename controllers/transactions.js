@@ -19,14 +19,17 @@ exports.getTransactions = (request, response) => {
 };
 
 exports.getTransactionByCustomerAndAccountNumber = (request, response) => {
-  const { id, account } = request.params;
+  const { id, account, startDay, endDay } = request.params;
+
+  const fullStartDate = `${startDay} 00:00:00`;
+  const fullEndDate = `${endDay} 23:59:59`;
 
   const transactionsByCustomerAndAccountNumber =
-    "SELECT DISTINCT transactions.id,transactions.transaction_id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, CONCAT('**** **** **** ', RIGHT(transactions.sender_account, 4)) AS sender_account, transactions.amount, CONCAT('**** **** **** ', RIGHT(transactions.receiver_account, 4)) AS receiver_account, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by LEFT JOIN accounts AS sender_account ON sender_account.account_number = transactions.sender_account AND sender_account.deleted_at IS NULL LEFT JOIN accounts AS receiver_account ON receiver_account.account_number = transactions.receiver_account AND receiver_account.deleted_at IS NULL WHERE ((transactions.sender_account = ? AND transactions.customer_id = ?) OR (transactions.receiver_account = ? AND transactions.receiver_id = ?)) AND customers.deleted_at IS NULL ORDER BY datetime DESC";
+    "SELECT DISTINCT transactions.id,transactions.transaction_id, customers.name AS customer, receivers.name AS receiver, transaction_types.transaction_type, CONCAT('**** **** **** ', RIGHT(transactions.sender_account, 4)) AS sender_account, transactions.amount, CONCAT('**** **** **** ', RIGHT(transactions.receiver_account, 4)) AS receiver_account, transactions.date_hour AS datetime, users.username AS authorized_by FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.id LEFT JOIN customers AS receivers ON transactions.receiver_id = receivers.id LEFT JOIN transaction_types ON transaction_types.id = transactions.transaction_type_id LEFT JOIN users ON users.id = transactions.authorized_by LEFT JOIN accounts AS sender_account ON sender_account.account_number = transactions.sender_account AND sender_account.deleted_at IS NULL LEFT JOIN accounts AS receiver_account ON receiver_account.account_number = transactions.receiver_account AND receiver_account.deleted_at IS NULL WHERE ((transactions.sender_account = ? AND transactions.customer_id = ?) OR (transactions.receiver_account = ? AND transactions.receiver_id = ?)) AND transactions.date_hour BETWEEN ? AND ? AND customers.deleted_at IS NULL ORDER BY datetime DESC";
 
   db.query(
     transactionsByCustomerAndAccountNumber,
-    [account, id, account, id],
+    [account, id, account, id, fullStartDate, fullEndDate],
     (error, result) => {
       if (error) {
         return response

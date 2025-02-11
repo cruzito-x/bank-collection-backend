@@ -113,19 +113,27 @@ exports.getServicesByCollector = (request, response) => {
 };
 
 exports.viewPaymentsByServiceDetails = (request, response) => {
-  const { id } = request.params;
+  const { id, startDay, endDay } = request.params;
+
+  const fullStartDate = `${startDay} 00:00:00`;
+  const fullEndDate = `${endDay} 23:59:59`;
+
   const viewPaymentsByServiceDetails =
-    "SELECT services.service_name AS service, collectors.collector, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN collectors ON collectors.id = payments_collectors.collector_id INNER JOIN customers ON customers.id = payments_collectors.customer_id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE services.id = ? ORDER BY datetime DESC";
+    "SELECT services.service_name AS service, collectors.collector, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN services ON services.id = payments_collectors.service_id INNER JOIN collectors ON collectors.id = payments_collectors.collector_id INNER JOIN customers ON customers.id = payments_collectors.customer_id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE services.id = ? AND payments_collectors.date_hour BETWEEN ? AND ? ORDER BY datetime DESC";
 
-  db.query(viewPaymentsByServiceDetails, [id], (error, result) => {
-    if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
+  db.query(
+    viewPaymentsByServiceDetails,
+    [id, fullStartDate, fullEndDate],
+    (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      return response.status(200).json(result);
     }
-
-    return response.status(200).json(result);
-  });
+  );
 };
 
 exports.updateService = (request, response) => {

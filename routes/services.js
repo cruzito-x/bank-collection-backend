@@ -9,7 +9,7 @@ router.get(
   services.getServicesByCollector
 );
 router.get(
-  "/view-payments-by-service-details/:id",
+  "/view-payments-by-service-details/:id/:startDay/:endDay",
   services.viewPaymentsByServiceDetails
 );
 router.put("/update-service/:id", services.updateService);

@@ -169,19 +169,27 @@ exports.saveNewCollector = (request, response) => {
 };
 
 exports.viewPaymentsCollectorDetails = (request, response) => {
-  const { id } = request.params;
+  const { id, startDay, endDay } = request.params;
+
+  const fullStartDate = `${startDay} 00:00:00`;
+  const fullEndDate = `${endDay} 23:59:59`;
+
   const viewPaymentsCollectorDetails =
-    "SELECT payments_collectors.id, collectors.collector, COALESCE(services.service_name, 'Desconocido') AS service, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN customers ON customers.id = payments_collectors.customer_id LEFT JOIN services ON payments_collectors.service_id = services.id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE collectors.id = ? ORDER BY datetime DESC";
+    "SELECT payments_collectors.id, collectors.collector, COALESCE(services.service_name, 'Desconocido') AS service, payments_collectors.amount, customers.name AS payed_by, users.username AS registered_by, payments_collectors.date_hour AS datetime FROM payments_collectors INNER JOIN collectors ON payments_collectors.collector_id = collectors.id INNER JOIN customers ON customers.id = payments_collectors.customer_id LEFT JOIN services ON payments_collectors.service_id = services.id INNER JOIN users ON users.id = payments_collectors.registered_by WHERE collectors.id = ? AND payments_collectors.date_hour BETWEEN ? AND ? ORDER BY datetime DESC";
 
-  db.query(viewPaymentsCollectorDetails, [id], (error, result) => {
-    if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
+  db.query(
+    viewPaymentsCollectorDetails,
+    [id, fullStartDate, fullEndDate],
+    (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      return response.status(200).json(result);
     }
-
-    return response.status(200).json(result);
-  });
+  );
 };
 
 exports.updateCollector = (request, response) => {

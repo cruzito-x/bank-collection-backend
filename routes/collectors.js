@@ -5,7 +5,7 @@ const collectors = require("../controllers/collectors");
 router.get("/", collectors.getCollectors);
 router.post("/save-collector", collectors.saveNewCollector);
 router.get(
-  "/view-payments-collector-details/:id",
+  "/view-payments-collector-details/:id/:startDay/:endDay",
   collectors.viewPaymentsCollectorDetails
 );
 router.put("/update-collector/:id", collectors.updateCollector);

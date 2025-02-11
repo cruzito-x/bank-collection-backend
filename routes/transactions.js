@@ -4,7 +4,7 @@ const transactions = require("../controllers/transactions");
 
 router.get("/", transactions.getTransactions);
 router.get(
-  "/transactions-by-customer/:id/account/:account",
+  "/transactions-by-customer/:id/account/:account/:startDay/:endDay",
   transactions.getTransactionByCustomerAndAccountNumber
 );
 router.post("/save-new-transaction", transactions.saveTransaction);
