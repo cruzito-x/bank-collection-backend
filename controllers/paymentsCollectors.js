@@ -75,14 +75,17 @@ exports.saveNewPayment = (request, response) => {
         .json({ message: "Error Interno del Servidor" });
     }
 
-    if (amount === 0 && result[0].price === 0) {
+    if (Number(amount) === 0 && Number(result?.[0]?.price) === 0) {
       return response.status(400).json({
         message:
           "El Monto No Puede Ser Cero, ya que el Precio por Defecto es Cero",
       });
     }
 
-    if (amount < result[0].price || amount > result[0].price) {
+    if (
+      amount < result[0].price ||
+      (result[0].price > 0 && amount > result[0].price)
+    ) {
       return response.status(400).json({
         message: "El Monto No Puede Ser Menor ni Mayor al Precio del Servicio",
       });

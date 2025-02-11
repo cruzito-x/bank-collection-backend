@@ -7,7 +7,7 @@ const timeRestrictionMiddleware = (request, response, next) => {
 
   if (currentHour.isBefore(startHour) || currentHour.isAfter(endHour)) {
     return response.status(403).json({
-      message: "El Acceso al Sistema es Inaccesible Fuera del Horario Laboral",
+      message: "El Acceso al Sistema está Restringido Fuera del Horario Laboral",
     });
   }
 
