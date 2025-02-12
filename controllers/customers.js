@@ -20,6 +20,12 @@ exports.updateCustomer = (request, response) => {
   const { id } = request.params;
   const { name, identity_doc, email } = request.body;
 
+  if (!name || !identity_doc || !email) {
+    return response.status(400).json({
+      message: "Por Favor, Rellene Todos los Campos",
+    });
+  }
+
   const getCustomerEmail =
     "SELECT id FROM customers WHERE email = ? AND id != ?";
 
@@ -49,9 +55,7 @@ exports.updateCustomer = (request, response) => {
       audit(
         user_id,
         "Cliente Actualizado",
-        `Se Actualizaron los Datos del Cliente con Número de Identidad ${
-          identity_doc || "N/A"
-        }`,
+        `Se Actualizaron los Datos del Cliente con Número de Identidad ${identity_doc}`,
         request
       );
 

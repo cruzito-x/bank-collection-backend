@@ -19,8 +19,6 @@ exports.getTypes = (request, response) => {
 exports.saveNewTransactionType = (request, response) => {
   const user_id = request.headers["user_id"];
   const { transactionType } = request.body;
-  const getTotalTransactionTypes =
-    "SELECT COUNT(*) AS transactionTypesCounter FROM transaction_types";
 
   if (!transactionType) {
     return response.status(400).json({
@@ -28,39 +26,59 @@ exports.saveNewTransactionType = (request, response) => {
     });
   }
 
-  db.query(getTotalTransactionTypes, (error, result) => {
+  const getTransactionTypeName =
+    "SELECT transaction_type FROM transaction_types WHERE transaction_type = ? AND deleted_at IS NULL";
+
+  db.query(getTransactionTypeName, [transactionType], (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    const transactionTypeId = result[0].transactionTypesCounter + 1;
-    const newTransactionType =
-      "INSERT INTO transaction_types (transaction_type_id, transaction_type) VALUES (?, ?)";
+    if (result.length > 0) {
+      return response.status(409).json({
+        message: "El Nombre del Tipo de Transacción ya Existe",
+      });
+    }
 
-    db.query(
-      newTransactionType,
-      [transactionTypeId, transactionType],
-      (error, result) => {
-        if (error) {
-          return response
-            .status(500)
-            .json({ message: "Error Interno del Servidor" });
-        }
+    const getTotalTransactionTypes =
+      "SELECT COUNT(*) AS transactionTypesCounter FROM transaction_types";
 
-        audit(
-          user_id,
-          "Nuevo Tipo de Transacción Registrado",
-          `${transactionType} Registrado`,
-          request
-        );
-
-        return response.status(200).json({
-          message: "Nuevo Tipo de Transacción Registrado con Éxito",
-        });
+    db.query(getTotalTransactionTypes, (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
       }
-    );
+
+      const transactionTypeId = result[0].transactionTypesCounter + 1;
+      const newTransactionType =
+        "INSERT INTO transaction_types (transaction_type_id, transaction_type) VALUES (?, ?)";
+
+      db.query(
+        newTransactionType,
+        [transactionTypeId, transactionType],
+        (error, result) => {
+          if (error) {
+            return response
+              .status(500)
+              .json({ message: "Error Interno del Servidor" });
+          }
+
+          audit(
+            user_id,
+            "Nuevo Tipo de Transacción Registrado",
+            `${transactionType} Registrado`,
+            request
+          );
+
+          return response.status(200).json({
+            message: "Nuevo Tipo de Transacción Registrado con Éxito",
+          });
+        }
+      );
+    });
   });
 };
 
@@ -69,25 +87,48 @@ exports.updateTransactionType = (request, response) => {
   const { id } = request.params;
   const { transactionType } = request.body;
 
-  const updateTransactionType =
-    "UPDATE transaction_types SET transaction_type = ? WHERE id = ?";
+  if (!transactionType) {
+    return response.status(400).json({
+      message: "Por Favor, Rellene Todos los Campos",
+    });
+  }
 
-  db.query(updateTransactionType, [transactionType, id], (error, result) => {
+  const getTransactionTypeName =
+    "SELECT transaction_type FROM transaction_types WHERE transaction_type = ? AND deleted_at IS NULL";
+
+  db.query(getTransactionTypeName, [transactionType], (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
     }
 
-    audit(
-      user_id,
-      "Tipo de Transacción Actualizado",
-      `Se Actualizó el Nombre del Tipo de Transacción ${transactionType}`,
-      request
-    );
+    if (result.length > 0) {
+      return response.status(409).json({
+        message: "El Nombre del Tipo de Transacción ya Está Registrado",
+      });
+    }
 
-    return response.status(200).json({
-      message: "Datos del Tipo de Transacción Actualizados con Éxito",
+    const updateTransactionType =
+      "UPDATE transaction_types SET transaction_type = ? WHERE id = ?";
+
+    db.query(updateTransactionType, [transactionType, id], (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
+      }
+
+      audit(
+        user_id,
+        "Tipo de Transacción Actualizado",
+        `Se Actualizó el Nombre del Tipo de Transacción ${transactionType}`,
+        request
+      );
+
+      return response.status(200).json({
+        message: "Datos del Tipo de Transacción Actualizados con Éxito",
+      });
     });
   });
 };

@@ -35,8 +35,11 @@ exports.updateUser = (request, response) => {
   const { username, email } = request.body;
   let { new_password } = request.body;
 
-  const updateUser =
-    "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
+  if (user_id === id) {
+    return response
+      .status(400)
+      .json({ message: "No Puedes Modificar Tu Propio Usuario" });
+  }
 
   if (!username || !email) {
     return response
@@ -64,7 +67,8 @@ exports.updateUser = (request, response) => {
         .digest("hex");
     }
 
-    const getUsername = "SELECT username FROM users WHERE username = ?";
+    const getUsername =
+      "SELECT username FROM users WHERE username = ? AND deleted_at IS NULL";
     db.query(getUsername, [username], (error, result) => {
       if (error) {
         return response
@@ -77,6 +81,9 @@ exports.updateUser = (request, response) => {
           .status(409)
           .json({ message: "Este Nombre de Usuario ya Está Registrado" });
       }
+
+      const updateUser =
+        "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
 
       db.query(
         updateUser,

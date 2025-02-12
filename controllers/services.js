@@ -141,7 +141,11 @@ exports.updateService = (request, response) => {
   const { id } = request.params;
   const { collector, service, description, price } = request.body;
 
-  console.log(id, collector);
+  if (!collector || !service || !description || price < 0) {
+    return response
+      .status(400)
+      .json({ message: "Por Favor, Rellene Todos los Campos" });
+  }
 
   const serviceName =
     "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.id = ? AND collectors.collector = ?";
