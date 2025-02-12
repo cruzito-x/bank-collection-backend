@@ -19,25 +19,45 @@ exports.updateCustomer = (request, response) => {
   const user_id = request.headers["user_id"];
   const { id } = request.params;
   const { name, identity_doc, email } = request.body;
-  const updateCustomer =
-    "UPDATE customers SET name = ?, email = ? WHERE id = ?";
 
-  db.query(updateCustomer, [name, email, id], (error, result) => {
+  const getCustomerEmail =
+    "SELECT id FROM customers WHERE email = ? AND id != ?";
+
+  db.query(getCustomerEmail, [email, id], (error, result) => {
     if (error) {
       return response
         .status(500)
         .json({ message: "Error interno del Servidor" });
     }
 
-    audit(
-      user_id,
-      "Cliente Actualizado",
-      `Se Actualizaron los Datos del Cliente con Número de Identidad ${identity_doc}`,
-      request
-    );
+    if (result.length > 0) {
+      return response
+        .status(409)
+        .json({ message: "El Email ya Está en uso Por Otro Cliente" });
+    }
 
-    return response.status(200).json({
-      message: "Datos del Cliente Actualizados con Éxito",
+    const updateCustomer =
+      "UPDATE customers SET name = ?, email = ? WHERE id = ?";
+
+    db.query(updateCustomer, [name, email, id], (error, result) => {
+      if (error) {
+        return response
+          .status(500)
+          .json({ message: "Error interno del Servidor" });
+      }
+
+      audit(
+        user_id,
+        "Cliente Actualizado",
+        `Se Actualizaron los Datos del Cliente con Número de Identidad ${
+          identity_doc || "N/A"
+        }`,
+        request
+      );
+
+      return response.status(200).json({
+        message: "Datos del Cliente Actualizados con Éxito",
+      });
     });
   });
 };
