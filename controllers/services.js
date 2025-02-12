@@ -26,60 +26,89 @@ exports.saveNewService = (request, response) => {
     });
   }
 
-  const getLastServiceId = "SELECT id FROM services ORDER BY id DESC LIMIT 1";
+  const serviceNames = services.map(({ service }) => service);
 
-  db.query(getLastServiceId, (error, result) => {
-    if (error) {
-      return response
-        .status(500)
-        .json({ message: "Error Interno del Servidor" });
-    }
+  const checkExistingServices =
+    "SELECT service_name FROM services WHERE collector_id = ? AND service_name IN (?)";
 
-    let latestId = result.length > 0 ? result[0].id + 1 : 1;
-
-    const servicesToCollector = services.map(
-      ({ service, description, price }) => {
-        const service_id = `SRV${String(latestId++).padStart(8, "0")}`;
-        return [service_id, collector, service, description, price];
-      }
-    );
-
-    const saveNewServices =
-      "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES ?";
-
-    db.query(saveNewServices, [servicesToCollector], (error, result) => {
+  db.query(
+    checkExistingServices,
+    [collector, serviceNames],
+    (error, result) => {
       if (error) {
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
       }
 
-      const getCollectorName = "SELECT collector FROM collectors WHERE id = ?";
+      if (result.length > 0) {
+        const existingServices = result.map((row) => row.service_name);
+        return response.status(409).json({
+          message: `Los Siguientes Servicios ya Están Registrados Para este Colector: ${existingServices.join(
+            ", "
+          )}`,
+        });
+      }
 
-      db.query(getCollectorName, [collector], (error, result) => {
+      const getLastServiceId =
+        "SELECT id FROM services ORDER BY id DESC LIMIT 1";
+
+      db.query(getLastServiceId, (error, result) => {
         if (error) {
           return response
             .status(500)
             .json({ message: "Error Interno del Servidor" });
         }
 
-        const collectorName = result[0].collector;
+        let latestId = result.length > 0 ? result[0].id + 1 : 1;
 
-        services.forEach(({ service }) => {
-          audit(
-            user_id,
-            "Servicio Registrado",
-            `Se Registró el Servicio ${service} Para el Colector ${collectorName}`,
-            request
-          );
+        const servicesToCollector = services.map(
+          ({ service, description, price }) => {
+            const service_id = `SRV${String(latestId++).padStart(8, "0")}`;
+            return [service_id, collector, service, description, price];
+          }
+        );
+
+        const saveNewServices = `
+        INSERT INTO services (service_id, collector_id, service_name, description, price) 
+        VALUES ?`;
+
+        db.query(saveNewServices, [servicesToCollector], (error, result) => {
+          if (error) {
+            return response
+              .status(500)
+              .json({ message: "Error Interno del Servidor" });
+          }
+
+          const getCollectorName =
+            "SELECT collector FROM collectors WHERE id = ?";
+
+          db.query(getCollectorName, [collector], (error, result) => {
+            if (error) {
+              return response
+                .status(500)
+                .json({ message: "Error Interno del Servidor" });
+            }
+
+            const collectorName = result[0].collector;
+
+            services.forEach(({ service }) => {
+              audit(
+                user_id,
+                "Servicio Registrado",
+                `Se Registró el Servicio ${service} Para el Colector ${collectorName}`,
+                request
+              );
+            });
+
+            return response
+              .status(200)
+              .json({ message: "Servicio(s) Registrado(s) con Éxito" });
+          });
         });
-
-        return response
-          .status(200)
-          .json({ message: "Servicio(s) Registrado(s) con Éxito" });
       });
-    });
-  });
+    }
+  );
 };
 
 exports.getServicesByCollector = (request, response) => {
