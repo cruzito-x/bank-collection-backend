@@ -17,7 +17,7 @@ exports.getUsers = (request, response) => {
 };
 
 exports.getUsersRoles = (request, response) => {
-  const roles = "SELECT id as value, role as label FROM roles";
+  const roles = "SELECT id AS value, role AS label FROM roles";
 
   db.query(roles, (error, result) => {
     if (error) {
