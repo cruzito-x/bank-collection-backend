@@ -32,7 +32,7 @@ exports.saveNewService = (request, response) => {
     if (error) {
       return response
         .status(500)
-        .json({ message: "Error interno del servidor" });
+        .json({ message: "Error Interno del Servidor" });
     }
 
     let latestId = result.length > 0 ? result[0].id + 1 : 1;
@@ -76,7 +76,7 @@ exports.saveNewService = (request, response) => {
 
         return response
           .status(200)
-          .json({ message: "Servicios registrados con éxito" });
+          .json({ message: "Servicio(s) Registrado(s) con Éxito" });
       });
     });
   });
