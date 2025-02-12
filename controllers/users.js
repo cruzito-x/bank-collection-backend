@@ -64,28 +64,43 @@ exports.updateUser = (request, response) => {
         .digest("hex");
     }
 
-    db.query(
-      updateUser,
-      [username, email, new_password, id],
-      (error, result) => {
-        if (error) {
-          return response
-            .status(500)
-            .json({ message: "Error Interno del Servidor" });
-        }
-
-        audit(
-          user_id,
-          "Usuario Actualizado",
-          `Se Actualizaron los Datos del Usuario ${username}`,
-          request
-        );
-
+    const getUsername = "SELECT username FROM users WHERE username = ?";
+    db.query(getUsername, [username], (error, result) => {
+      if (error) {
         return response
-          .status(200)
-          .json({ message: "Usuario Actualizado con Éxito" });
+          .status(500)
+          .json({ message: "Error Interno del Servidor" });
       }
-    );
+
+      if (result.length > 0) {
+        return response
+          .status(409)
+          .json({ message: "Este Nombre de Usuario ya Está Registrado" });
+      }
+
+      db.query(
+        updateUser,
+        [username, email, new_password, id],
+        (error, result) => {
+          if (error) {
+            return response
+              .status(500)
+              .json({ message: "Error Interno del Servidor" });
+          }
+
+          audit(
+            user_id,
+            "Usuario Actualizado",
+            `Se Actualizaron los Datos del Usuario ${username}`,
+            request
+          );
+
+          return response
+            .status(200)
+            .json({ message: "Usuario Actualizado con Éxito" });
+        }
+      );
+    });
   });
 };
 
