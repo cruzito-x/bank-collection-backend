@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const audit = require("../global/audit/audit");
+const crypto = require("crypto");
 
 exports.getUsers = (request, response) => {
   const users =
@@ -60,6 +61,10 @@ exports.updateUser = (request, response) => {
 
     if (!new_password) {
       new_password = password;
+    } else if (new_password.length < 6) {
+      return response
+        .status(400)
+        .json({ message: "La Contraseña Debe Tener Al Menos 6 Caracteres" });
     } else {
       new_password = crypto
         .createHash("sha256")
@@ -68,8 +73,8 @@ exports.updateUser = (request, response) => {
     }
 
     const getUsername =
-      "SELECT username FROM users WHERE username = ? AND deleted_at IS NULL";
-    db.query(getUsername, [username], (error, result) => {
+      "SELECT username FROM users WHERE username = ? AND id != ? AND deleted_at IS NULL";
+    db.query(getUsername, [username, id], (error, result) => {
       if (error) {
         return response
           .status(500)
