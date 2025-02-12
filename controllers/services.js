@@ -18,81 +18,66 @@ exports.getServices = (request, response) => {
 
 exports.saveNewService = (request, response) => {
   const user_id = request.headers["user_id"];
-  const { collector, service, description, price } = request.body;
+  const { collector, services } = request.body;
 
-  if (!collector || !service || !description || price < 0) {
-    return response
-      .status(400)
-      .json({ message: "Por Favor, Rellene Todos los Campos" });
+  if (!collector || !Array.isArray(services) || services.length === 0) {
+    return response.status(400).json({
+      message: "Por Favor, Seleccione un Colector y Rellene Todos los Campos",
+    });
   }
 
-  const serviceName =
-    "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.service_name = ? AND collectors.id = ?";
+  const getLastServiceId = "SELECT id FROM services ORDER BY id DESC LIMIT 1";
 
-  db.query(serviceName, [service, collector], (error, result) => {
+  db.query(getLastServiceId, (error, result) => {
     if (error) {
       return response
         .status(500)
-        .json({ message: "Error Interno del Servidor" });
+        .json({ message: "Error interno del servidor" });
     }
 
-    if (result.length > 0) {
-      return response.status(409).json({
-        message:
-          "Este Servicio ya Está Registrado para El Colector Seleccionado",
-      });
-    }
+    let latestId = result.length > 0 ? result[0].id + 1 : 1;
 
-    const getLastServiceId = "SELECT id FROM services ORDER BY id DESC LIMIT 1";
+    const servicesToCollector = services.map(
+      ({ service, description, price }) => {
+        const service_id = `SRV${String(latestId++).padStart(8, "0")}`;
+        return [service_id, collector, service, description, price];
+      }
+    );
 
-    db.query(getLastServiceId, (error, result) => {
+    const saveNewServices =
+      "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES ?";
+
+    db.query(saveNewServices, [servicesToCollector], (error, result) => {
       if (error) {
         return response
           .status(500)
           .json({ message: "Error Interno del Servidor" });
       }
 
-      const latestId = result.length > 0 ? result[0].id + 1 : 0;
-      const service_id = `SRV${String(latestId).padStart(8, "0")}`;
+      const getCollectorName = "SELECT collector FROM collectors WHERE id = ?";
 
-      const saveNewService =
-        "INSERT INTO services (service_id, collector_id, service_name, description, price) VALUES (?, ?, ?, ?, ?)";
-
-      db.query(
-        saveNewService,
-        [service_id, collector, service, description, price],
-        (error, result) => {
-          if (error) {
-            return response
-              .status(500)
-              .json({ message: "Error al guardar el servicio" });
-          }
-
-          const getCollectorName =
-            "SELECT collector FROM collectors WHERE id = ?";
-
-          db.query(getCollectorName, [collector], (error, result) => {
-            if (error) {
-              return response
-                .status(500)
-                .json({ message: "Error Interno del Servidor" });
-            }
-
-            const collectorName = result[0].collector;
-
-            audit(
-              user_id,
-              "Servicio Registrado",
-              `Se Registró el Servicio ${service} Para el Colector ${collectorName} Desde la Vista Servicios`,
-              request
-            );
-
-            return response
-              .status(200)
-              .json({ message: "Servicio Registrado con Éxito" });
-          });
+      db.query(getCollectorName, [collector], (error, result) => {
+        if (error) {
+          return response
+            .status(500)
+            .json({ message: "Error Interno del Servidor" });
         }
-      );
+
+        const collectorName = result[0].collector;
+
+        services.forEach(({ service }) => {
+          audit(
+            user_id,
+            "Servicio Registrado",
+            `Se Registró el Servicio ${service} Para el Colector ${collectorName}`,
+            request
+          );
+        });
+
+        return response
+          .status(200)
+          .json({ message: "Servicios registrados con éxito" });
+      });
     });
   });
 };
