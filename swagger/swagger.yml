@@ -1,0 +1,102 @@
+openapi: "3.0.3"
+info:
+  title: Bank Collection API
+  version: "1.0"
+servers:
+  - url: https://bambu-bank-collection-api.com/v1
+paths:
+  /login:
+    post:
+      summary: Log In
+      description: Permite a los Usuarios Acceder al Sistema.
+      tags:
+        - Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "Jhon Doe"
+                password:
+                  type: string
+                  format: password
+                  example: "12345678"
+      responses:
+        "200":
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "400":
+          description: Por Favor, Introduzca un Usuario y una Contraseña.
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+
+  /logout/{id}:
+    get:
+      summary: Cierre de Sesión.
+      description: Cierra la Sesión de un Usuario Autenticado.
+      tags:
+        - Login
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del Usuario que Cierra su Sesión.
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Cierre de Sesión Correcto.
+        "500":
+          description: Error Interno del Servidor.
+
+  /get-latest-collector-and-collector-payment-data/:
+    get:
+      summary: Obtener Datos Tanto del Último Colector Registrado como del Último Pago Realizado a Algún Colector.
+      description: Muestra un Panel de Control con la Información General de los Movimientos Transaccionales Realizados.
+      tags:
+        - Dashboard
+      responses:
+        "200":
+          description: Datos del Panel de Control obtenidos correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collector:
+                    type: string
+                    example: "Movistar"
+                  most_recent_collector:
+                    type: string
+                    example: "CLESA"
+                  payed_service:
+                    type: string
+                    example: "Intenet Residencial de 15MB"
+                  amount:
+                    type: number
+                    example: 21.10
+                  latest_approved_transaction:
+                    type: string
+                    example: "TSC00000234"
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
