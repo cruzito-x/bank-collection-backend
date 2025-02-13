@@ -3,7 +3,7 @@ info:
   title: Bambú Bank Collection API
   version: "1.0"
 servers:
-  - url: https://bambu-bank-collection-api.com/v1
+  - url: http://localhost:3001
 paths:
   /login:
     post:
@@ -20,13 +20,13 @@ paths:
               properties:
                 username:
                   type: string
-                  example: "Jhon Doe"
+                  example: "Joaquín Reyes"
                 password:
                   type: string
                   format: password
-                  example: "12345678"
+                  example: "31032002"
       responses:
-        "200":
+        200:
           description: Inicio de Sesión Correcto.
           content:
             application/json:
@@ -36,15 +36,14 @@ paths:
                   token:
                     type: string
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        "400":
+        400:
           description: Por Favor, Introduzca un Usuario y una Contraseña.
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
-
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /logout/{id}:
     get:
       summary: Cierre de Sesión.
@@ -60,10 +59,10 @@ paths:
             type: integer
             example: 1
       responses:
-        "200":
+        200:
           description: Cierre de Sesión Correcto.
-        "500":
-          description: Error Interno del Servidor.
+        500:
+          $ref: "#/components/responses/InternalError"
 
   /get-latest-collector-and-collector-payment-data:
     get:
@@ -72,7 +71,7 @@ paths:
       tags:
         - Dashboard
       responses:
-        "200":
+        200:
           description: ""
           content:
             application/json:
@@ -94,16 +93,15 @@ paths:
                   latest_approved_transaction:
                     type: string
                     example: "TSC00000234"
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
-
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /transactions-by-dates/:
     get:
-      summary: Obtener Todas las Transacciones Obtenidas.
+      summary: Obtener Todas las Transacciones Realizadas.
       description: Muestra una lista de Transacciones Realizadas entre dos Días y Filtradas por Monto y Tipo de Transacción.
       tags:
         - Dashboard
@@ -139,7 +137,7 @@ paths:
             type: integer
             example: 1
       responses:
-        "200":
+        200:
           description: ""
           content:
             application/json:
@@ -155,16 +153,16 @@ paths:
                   transactionsCounter:
                     type: integer
                     example: 16
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /approval-and-rejection-rates/:
     get:
-      summary: Obtener Todas las Tasas de Aprobación y Rechazo por Día.
-      description: Muestra una Lista de las Tasas de Aprobación y Rechazo por Día.
+      summary: Obtener Todas las Tasas de Aprobación y Rechazo de Transacciones.
+      description: Muestra una Lista de las Tasas de Aprobación y Rechazo Basado en Rangos de Tiempo.
       tags:
         - Dashboard
       parameters:
@@ -185,7 +183,7 @@ paths:
             format: date
             example: "2025-02-12"
       responses:
-        "200":
+        200:
           description: ""
           content:
             application/json:
@@ -198,12 +196,12 @@ paths:
                   total_transactions:
                     type: integer
                     example: 177
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /processed-amount-by-transactions-and-collectors-payments/:
     get:
       summary: Obtener el Total Procesado por Cada Tipo de Transacción.
@@ -228,7 +226,7 @@ paths:
             format: date
             example: "2025-02-12"
       responses:
-        "200":
+        200:
           description: ""
           content:
             application/json:
@@ -241,12 +239,12 @@ paths:
                   transaction_amount:
                     type: number
                     example: 135170.50
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /customers-with-the-most-money-paid:
     get:
       summary: Obtener a los 5 Clientes con el Monto Más Grande Pagado.
@@ -254,7 +252,7 @@ paths:
       tags:
         - Dashboard
       responses:
-        "200":
+        200:
           description: ""
           content:
             application/json:
@@ -267,12 +265,12 @@ paths:
                   amount:
                     type: number
                     example: 645.97
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /payments-by-collector:
     get:
       summary: Obtener Todos los Pagos Realizados a Colectores.
@@ -280,7 +278,7 @@ paths:
       tags:
         - Dashboard
       responses:
-        "200":
+        200:
           description: ""
           content:
             application/json:
@@ -293,12 +291,12 @@ paths:
                   transactionsByCollector:
                     type: integer
                     example: 41
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /payments-by-collector-denominations:
     get:
       summary: Obtener Todos los Pagos Realizados a Colectores y Dividirlo en Diferentes Denominaciones.
@@ -306,7 +304,7 @@ paths:
       tags:
         - Dashboard
       responses:
-        "200":
+        200:
           description: ""
           content:
             application/json:
@@ -319,15 +317,15 @@ paths:
                   total:
                     type: integer
                     example: 2
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
   /reports-by-date/:
     get:
-      summary: Obtiene los Datos para Generar Reportería desde el Frontend.
+      summary: Obtener los Datos para Generar Reportes.
       description: Muestra una Lista con los Datos necesarios para generar Reportes Basados en Rangos de Tiempo.
       tags:
         - Dashboard
@@ -349,79 +347,296 @@ paths:
             format: date
             example: "2025-02-12"
       responses:
-        "200":
+        200:
           description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: object
+                    oneOf:
+                      - properties:
+                          sender:
+                            type: string
+                            example: "Ricardo Torres"
+                          sender_account:
+                            type: string
+                            example: "**** **** **** 9010"
+                          receiver:
+                            type: string
+                            example: "Ricardo Torres"
+                          receiver_account:
+                            type: string
+                            nullable: true
+                            example: null
+                          amount:
+                            type: number
+                            example: 120.00
+                          transaction_type:
+                            type: string
+                            example: "Deposito"
+                          status:
+                            type: string
+                            example: "Aprobada"
+                          authorized_by:
+                            type: string
+                            example: "David Cruz"
+                          datetime:
+                            type: string
+                            example: "2025-02-12T18:21:27.000Z"
+                      - properties:
+                          transaction_type:
+                            type: string
+                            example: "Retiro"
+                          amount:
+                            type: number
+                            example: 1882536.00
+                      - properties:
+                          collector:
+                            type: string
+                            example: "TIGO"
+                          amount:
+                            type: number
+                            example: 1052.31
+                      - properties:
+                          collector:
+                            type: string
+                            example: "CLARO"
+                          service_name:
+                            type: string
+                            example: "Telefonía Fija"
+                          amount:
+                            type: number
+                            example: 710.96
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  /customers:
+    get:
+      summary: Obtener los Datos de los Clientes.
+      description: Muestra una Lista con los Datos de los Clientes.
+      tags:
+        - Customers
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    customer_id:
+                      type: string
+                      example: "1"
+                    name:
+                      type: string
+                      example: "David Cruz"
+                    identity_doc:
+                      type: string
+                      example: "0000000-1"
+                    email:
+                      type: string
+                      example: "david.cruz@example.com"
+                    deleted_at:
+                      type: string
+                      example: null
+        500:
+          $ref: "#/components/responses/InternalError"
+  /update-customer/:
+    put:
+      summary: Actualizar los Datos de los Clientes.
+      description: Actualiza los Datos de un Cliente Específico.
+      tags:
+        - Customers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del Cliente a Actualizar.
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Datos del Cliente Actualizados con Éxito.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  0:
-                    type: object
-                    properties:
-                      sender:
-                        type: string
-                        example: "Ricardo Torres"
-                      sender_account:
-                        type: string
-                        example: "**** **** **** 9010"
-                      receiver:
-                        type: string
-                        example: "Ricardo Torres"
-                      receiver_account:
-                        type: string
-                        example: null
-                      amount:
-                        type: number
-                        example: 120.00
-                      transaction_type:
-                        type: string
-                        example: "Deposito"
-                      transaction_date:
-                        type: string
-                        example: "Deposito"
-                      status:
-                        type: string
-                        example: "Aprobada"
-                      authorized_by:
-                        type: string
-                        example: "David Cruz"
-                      datetime:
-                        type: string
-                        example: "2025-02-12T18:21:27.000Z"
-                  1:
-                    type: object
-                    properties:
-                      transaction_type:
-                        type: string
-                        example: "Retiro"
-                      amount:
-                        type: number
-                        example: 1882536.00
-                  2:
-                    type: object
-                    properties:
-                      collector:
-                        type: string
-                        example: "TIGO"
-                      amount:
-                        type: number
-                        example: 1052.31
-                  3:
-                    type: object
-                    properties:
-                      collector:
-                        type: string
-                        example: "CLARO"
-                      service_name:
-                        type: string
-                        example: "Telefonía Fija"
-                      amount:
-                        type: number
-                        example: 710.96
-        "401":
-          description: Acceso Denegado, Token no Encontrado.
-        "403":
-          description: Acceso Denegado, Token no Encontrado.
-        "500":
-          description: Error Interno del Servidor.
+                  message:
+                    type: string
+                    example: Datos del Cliente Actualizados con Éxito
+        400:
+          description: Por Favor, Rellene Todos los Campos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Por Favor, Rellene Todos los campos
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        409:
+          description: El Email ya Está en uso Por Otro Cliente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: El Email ya Está en uso Por Otro Cliente
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  /delete-customer/:
+    put:
+      summary: Eliminar los Datos de los Clientes.
+      description: Actualiza el campo deleted_at de un Cliente Específico Realizando así un Borrado Lógico.
+      tags:
+        - Customers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del Cliente a Eliminar.
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Cliente Eliminado con Éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Cliente Eliminado con Éxito
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  /search-customer/:
+    get:
+      summary: Buscar Cliente por Nombre o por Número de Documento de Identidad.
+      description: Muestra los Datos de un Cliente por Nombre o por Número de Documento de Identidad.
+      tags:
+        - Customers
+      parameters:
+        - name: name
+          in: query
+          required: false
+          description: Nombre del Cliente a Buscar.
+          schema:
+            type: string
+            example: "David Cruz"
+        - name: identity_doc
+          in: query
+          required: false
+          description: Número de Documento de Identidad del Cliente a Buscar.
+          schema:
+            type: string
+            example: "0000001-1"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    customer_id:
+                      type: string
+                      example: "1"
+                    name:
+                      type: string
+                      example: "David Cruz"
+                    identity_doc:
+                      type: string
+                      example: "0000001-1"
+                    email:
+                      type: string
+                      example: "david.cruz@example.com"
+                    deleted_at:
+                      type: string
+                      example: null
+        400:
+          $ref: "#/components/responses/BadRequestError"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        404:
+          $ref: "#/components/responses/NotFoundError"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+components:
+  schemas:
+    ErrorMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Error Interno del Servidor
+
+  responses:
+    BadRequestError:
+      description: Por Favor, Introduzca al Menos un Criterio de Búsqueda.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    UnauthorizedError:
+      description: Token Expirado u Horario de Acceso Excedido.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    ForbiddenError:
+      description: Token Expirado u Horario de Acceso Excedido.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    NotFoundError:
+      description: No se Encontraron Resultados.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    InternalError:
+      description: Error Interno del Servidor.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
