@@ -27,15 +27,27 @@ paths:
                   example: "31032002"
       responses:
         200:
-          description: Inicio de Sesión Correcto.
+          description: "Inicio de Sesión Correcto."
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
+                    example: "Inicio de Sesión Correcto"
                   token:
                     type: string
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user_id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "David Cruz"
+                  isSupervisor:
+                    type: boolean
+                    example: true
         400:
           description: Por Favor, Introduzca un Usuario y una Contraseña.
         401:
@@ -426,7 +438,7 @@ paths:
         - Customers
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -469,7 +481,7 @@ paths:
             example: 1
       responses:
         200:
-          description: Datos del Cliente Actualizados con Éxito.
+          description: "Datos del Cliente Actualizados con Éxito."
           content:
             application/json:
               schema:
@@ -520,7 +532,7 @@ paths:
             example: 1
       responses:
         200:
-          description: Cliente Eliminado con Éxito.
+          description: "Cliente Eliminado con Éxito."
           content:
             application/json:
               schema:
@@ -558,7 +570,7 @@ paths:
             example: "0000001-1"
       responses:
         200:
-          description: ""
+          description: "Cliente Encontrado."
           content:
             application/json:
               schema:
@@ -710,7 +722,7 @@ paths:
         - Collectors
       responses:
         200:
-          description: Datos Registrados Exitosamente
+          description: "Datos Registrados Exitosamente."
           content:
             application/json:
               schema:
@@ -872,6 +884,49 @@ paths:
                   message:
                     type: string
                     example: Colector Eliminado con Éxito
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-collector/:
+    get:
+      summary: Buscar Colector por Nombre.
+      description: Muestra los Datos de un Colector Basado en su Nombre.
+      tags:
+        - Collectors
+      parameters:
+        - name: collector
+          in: query
+          required: true
+          description: Nombre del Colector a Buscar.
+          schema:
+            type: string
+            example: "ANDA"
+      responses:
+        200:
+          description: "Colector Encontado."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 4
+                    collector:
+                      type: string
+                      example: "ANDA"
+                    description:
+                      type: string
+                      example: "Administración Nacional de Acueductos y Alcantarillados"
+                    services_names:
+                      type: string
+                      example: "Agua Potable"
+        400:
+          $ref: "#/components/responses/BadRequestError"
         401:
           $ref: "#/components/responses/NotFoundError"
         403:
