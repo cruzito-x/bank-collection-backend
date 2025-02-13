@@ -7,8 +7,8 @@ servers:
 paths:
   /login:
     post:
-      summary: Iniciar Sesión.
-      description: Permite a los Usuarios Acceder al Sistema.
+      summary: "Iniciar Sesión."
+      description: "Permite a los Usuarios Acceder al Sistema."
       tags:
         - Login
       requestBody:
@@ -49,7 +49,7 @@ paths:
                     type: boolean
                     example: true
         400:
-          description: Por Favor, Introduzca un Usuario y una Contraseña.
+          description: "Por Favor, Introduzca un Usuario y una Contraseña."
         401:
           $ref: "#/components/responses/UnauthorizedError"
         403:
@@ -58,15 +58,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /logout/{id}:
     get:
-      summary: Cierre de Sesión.
-      description: Cierra la Sesión de un Usuario Autenticado.
+      summary: "Cierre de Sesión."
+      description: "Cierra la Sesión de un Usuario Autenticado."
       tags:
         - Login
       parameters:
         - name: id
           in: path
           required: true
-          description: Id del Usuario que Cierra su Sesión.
+          description: "Id del Usuario que Cierra su Sesión."
           schema:
             type: integer
             example: 1
@@ -78,8 +78,8 @@ paths:
 
   /get-latest-collector-and-collector-payment-data:
     get:
-      summary: Obtener los Datos Más Recientes Sobre Colectors, Transacciones y Aprobaciones.
-      description: Muestra un Panel de Control con la Información General de los Movimientos Transaccionales Realizados.
+      summary: "Obtener los Datos Más Recientes Sobre Colectors, Transacciones y Aprobaciones."
+      description: "Muestra un Panel de Control con la Información General de los Movimientos Transaccionales Realizados."
       tags:
         - Dashboard
       responses:
@@ -113,15 +113,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /transactions-by-dates/:
     get:
-      summary: Obtener Todas las Transacciones Realizadas.
-      description: Muestra una lista de Transacciones Realizadas entre dos Días y Filtradas por Monto y Tipo de Transacción.
+      summary: "Obtener Todas las Transacciones Realizadas."
+      description: "Muestra una lista de Transacciones Realizadas entre dos Días y Filtradas por Monto y Tipo de Transacción."
       tags:
         - Dashboard
       parameters:
         - name: startDay
           in: path
           required: true
-          description: Día Inicial de la Busqueda.
+          description: "Día Inicial de la Busqueda."
           schema:
             type: string
             format: date
@@ -129,7 +129,7 @@ paths:
         - name: endDay
           in: path
           required: true
-          description: Día Final de la Busqueda.
+          description: "Día Final de la Busqueda."
           schema:
             type: string
             format: date
@@ -137,14 +137,14 @@ paths:
         - name: amountFilter
           in: path
           required: true
-          description: Rango de Montos de las Transacciones a Filtrar.
+          description: "Rango de Montos de las Transacciones a Filtrar."
           schema:
             type: integer
             example: 1
         - name: transactionTypeFilter
           in: path
           required: true
-          description: Tipo de Transacción a Filtrar.
+          description: "Tipo de Transacción a Filtrar."
           schema:
             type: integer
             example: 1
@@ -173,15 +173,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /approval-and-rejection-rates/:
     get:
-      summary: Obtener Todas las Tasas de Aprobación y Rechazo de Transacciones.
-      description: Muestra una Lista de las Tasas de Aprobación y Rechazo Basado en Rangos de Tiempo.
+      summary: "Obtener Todas las Tasas de Aprobación y Rechazo de Transacciones."
+      description: "Muestra una Lista de las Tasas de Aprobación y Rechazo Basado en Rangos de Tiempo."
       tags:
         - Dashboard
       parameters:
         - name: startDay
           in: path
           required: true
-          description: Día Inicial de la Búsqueda.
+          description: "Día Inicial de la Búsqueda."
           schema:
             type: string
             format: date
@@ -189,7 +189,7 @@ paths:
         - name: endDay
           in: path
           required: true
-          description: Día Final de la Búsqueda.
+          description: "Día Final de la Búsqueda."
           schema:
             type: string
             format: date
@@ -216,15 +216,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /processed-amount-by-transactions-and-collectors-payments/:
     get:
-      summary: Obtener el Total Procesado por Cada Tipo de Transacción.
-      description: Muestra una Lista con los Tipos de Transacciones y los Pagos a Colectores y los Montos Totales procesados por Cada Uno.
+      summary: "Obtener el Total Procesado por Cada Tipo de Transacción."
+      description: "Muestra una Lista con los Tipos de Transacciones y los Pagos a Colectores y los Montos Totales procesados por Cada Uno."
       tags:
         - Dashboard
       parameters:
         - name: startDay
           in: path
           required: true
-          description: Día Inicial de la Búsqueda.
+          description: "Día Inicial de la Búsqueda."
           schema:
             type: string
             format: date
@@ -232,7 +232,7 @@ paths:
         - name: endDay
           in: path
           required: true
-          description: Día Final de la Búsqueda.
+          description: "Día Final de la Búsqueda."
           schema:
             type: string
             format: date
@@ -259,8 +259,8 @@ paths:
           $ref: "#/components/responses/InternalError"
   /customers-with-the-most-money-paid:
     get:
-      summary: Obtener a los 5 Clientes con el Monto Más Grande Pagado.
-      description: Muestra una Lista con los 5 Clientes con Los Montos Más Grandes Pagados por Cada Uno.
+      summary: "Obtener a los 5 Clientes con el Monto Más Grande Pagado."
+      description: "Muestra una Lista con los 5 Clientes con Los Montos Más Grandes Pagados por Cada Uno."
       tags:
         - Dashboard
       responses:
@@ -285,8 +285,8 @@ paths:
           $ref: "#/components/responses/InternalError"
   /payments-by-collector:
     get:
-      summary: Obtener Todos los Pagos Realizados a Colectores.
-      description: Muestra una Lista de los Colectores y la Cantidad de Pagos que ha Recibido Cada Uno.
+      summary: "Obtener Todos los Pagos Realizados a Colectores."
+      description: "Muestra una Lista de los Colectores y la Cantidad de Pagos que ha Recibido Cada Uno."
       tags:
         - Dashboard
       responses:
@@ -311,8 +311,8 @@ paths:
           $ref: "#/components/responses/InternalError"
   /payments-by-collector-denominations:
     get:
-      summary: Obtener Todos los Pagos Realizados a Colectores y Dividirlo en Diferentes Denominaciones.
-      description: Muestra una Lista con las Denominaciones y en que Cantidades Conforman el Total Procesado por Pagos a Colectores.
+      summary: "Obtener Todos los Pagos Realizados a Colectores y Dividirlo en Diferentes Denominaciones."
+      description: "Muestra una Lista con las Denominaciones y en que Cantidades Conforman el Total Procesado por Pagos a Colectores."
       tags:
         - Dashboard
       responses:
@@ -337,15 +337,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /reports-by-date/:
     get:
-      summary: Obtener los Datos para Generar Reportes.
-      description: Muestra una Lista con los Datos necesarios para generar Reportes Basados en Rangos de Tiempo.
+      summary: "Obtener los Datos para Generar Reportes."
+      description: "Muestra una Lista con los Datos necesarios para generar Reportes Basados en Rangos de Tiempo."
       tags:
         - Dashboard
       parameters:
         - name: startDay
           in: path
           required: true
-          description: Día Inicial de la Búsqueda.
+          description: "Día Inicial de la Búsqueda."
           schema:
             type: string
             format: date
@@ -353,7 +353,7 @@ paths:
         - name: endDay
           in: path
           required: true
-          description: Día Final de la Búsqueda.
+          description: "Día Final de la Búsqueda."
           schema:
             type: string
             format: date
@@ -432,8 +432,8 @@ paths:
 
   /customers:
     get:
-      summary: Obtener los Datos de los Clientes.
-      description: Muestra una Lista con los Datos de los Clientes.
+      summary: "Obtener los Datos de los Clientes."
+      description: "Muestra una Lista con los Datos de los Clientes."
       tags:
         - Customers
       responses:
@@ -467,15 +467,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /update-customer/:
     put:
-      summary: Actualizar los Datos de los Clientes.
-      description: Actualiza los Datos de un Cliente Específico.
+      summary: "Actualizar los Datos de los Clientes."
+      description: "Actualiza los Datos de un Cliente Específico."
       tags:
         - Customers
       parameters:
         - name: id
           in: path
           required: true
-          description: Id del Cliente a Actualizar.
+          description: "Id del Cliente a Actualizar."
           schema:
             type: integer
             example: 1
@@ -489,9 +489,9 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Datos del Cliente Actualizados con Éxito
+                    example: "Datos del Cliente Actualizados con Éxito"
         400:
-          description: Por Favor, Rellene Todos los Campos.
+          description: "Por Favor, Rellene Todos los Campos."
           content:
             application/json:
               schema:
@@ -499,13 +499,13 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Por Favor, Rellene Todos los campos
+                    example: "Por Favor, Rellene Todos los campos"
         401:
           $ref: "#/components/responses/UnauthorizedError"
         403:
           $ref: "#/components/responses/ForbiddenError"
         409:
-          description: El Email ya Está en uso Por Otro Cliente.
+          description: "El Email ya Está en uso Por Otro Cliente."
           content:
             application/json:
               schema:
@@ -513,20 +513,20 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: El Email ya Está en uso Por Otro Cliente
+                    example: "El Email ya Está en uso Por Otro Cliente"
         500:
           $ref: "#/components/responses/InternalError"
   /delete-customer/:
     put:
-      summary: Eliminar los Datos de los Clientes.
-      description: Actualiza el campo deleted_at de un Cliente Específico Realizando así un Borrado Lógico.
+      summary: "Eliminar los Datos de los Clientes."
+      description: "Actualiza el campo deleted_at de un Cliente Específico Realizando así un Borrado Lógico."
       tags:
         - Customers
       parameters:
         - name: id
           in: path
           required: true
-          description: Id del Cliente a Eliminar.
+          description: "Id del Cliente a Eliminar."
           schema:
             type: integer
             example: 1
@@ -549,22 +549,22 @@ paths:
           $ref: "#/components/responses/InternalError"
   /search-customer/:
     get:
-      summary: Buscar Cliente por Nombre o por Número de Documento de Identidad.
-      description: Muestra los Datos de un Cliente por Nombre o por Número de Documento de Identidad.
+      summary: "Buscar Cliente por Nombre o por Número de Documento de Identidad."
+      description: "Muestra los Datos de un Cliente por Nombre o por Número de Documento de Identidad."
       tags:
         - Customers
       parameters:
         - name: name
           in: query
           required: false
-          description: Nombre del Cliente a Buscar.
+          description: "Nombre del Cliente a Buscar."
           schema:
             type: string
             example: "David Cruz"
         - name: identity_doc
           in: query
           required: false
-          description: Número de Documento de Identidad del Cliente a Buscar.
+          description: "Número de Documento de Identidad del Cliente a Buscar."
           schema:
             type: string
             example: "0000001-1"
@@ -608,8 +608,8 @@ paths:
 
   /accounts:
     get:
-      summary: Obtener las Cuentas de los Clientes.
-      description: Muestra una Lista con las Cuentas de los Clientes.
+      summary: "Obtener las Cuentas de los Clientes."
+      description: "Muestra una Lista con las Cuentas de los Clientes."
       tags:
         - Accounts
       responses:
@@ -641,15 +641,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /accounts-by-customer/:
     get:
-      summary: Obtener las Cuentas de un Cliente.
-      description: Muestra una Lista con las Cuentas de un Cliente en Específico.
+      summary: "Obtener las Cuentas de un Cliente."
+      description: "Muestra una Lista con las Cuentas de un Cliente en Específico."
       tags:
         - Accounts
       parameters:
         - name: id
           in: path
           required: true
-          description: Id del Cliente.
+          description: "Id del Cliente."
           schema:
             type: integer
             example: 1
@@ -683,8 +683,8 @@ paths:
 
   /collectors:
     get:
-      summary: Obtener la Lista de Todos los Colectores.
-      description: Muestra una Lista con los Colectores que No han Sido Eliminados.
+      summary: "Obtener la Lista de Todos los Colectores."
+      description: "Muestra una Lista con los Colectores que No han Sido Eliminados."
       tags:
         - Collectors
       responses:
@@ -716,8 +716,8 @@ paths:
           $ref: "#/components/responses/InternalError"
   /save-collector:
     post:
-      summary: Guardar un Nuevo Collector.
-      description: Crea un Nuevo Collector en la Base de Datos.
+      summary: "Guardar un Nuevo Collector."
+      description: "Crea un Nuevo Collector en la Base de Datos."
       tags:
         - Collectors
       responses:
@@ -741,29 +741,29 @@ paths:
           $ref: "#/components/responses/InternalError"
   /view-payments-collector-details/:
     get:
-      summary: Obtener los Pagos Recibidos por Cada Colector.
-      description: Muestra los Pagos Recibidos de un Colector Específico en un Rango de Días Específicos.
+      summary: "Obtener los Pagos Recibidos por Cada Colector."
+      description: "Muestra los Pagos Recibidos de un Colector Específico en un Rango de Días Específicos."
       tags:
         - Collectors
       parameters:
         - name: id
           in: path
           required: true
-          description: Id del Colector.
+          description: "Id del Colector."
           schema:
             type: integer
             example: 4
         - name: startDay
           in: path
           required: true
-          description: Día Inicial para el Rango de Días.
+          description: "Día Inicial para el Rango de Días."
           schema:
             type: string
             example: "2025-01-13"
         - name: endDay
           in: path
           required: true
-          description: Día Final para el Rango de Días.
+          description: "Día Final para el Rango de Días."
           schema:
             type: string
             example: "2025-02-13"
@@ -805,15 +805,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /update-collector/:
     put:
-      summary: Actualizar un Collector.
-      description: Actualiza los Datos de un Collector en la Base de Datos.
+      summary: "Actualizar un Collector."
+      description: "Actualiza los Datos de un Collector en la Base de Datos."
       tags:
         - Collectors
       parameters:
         - name: id
           in: path
           required: true
-          description: Id del Collector a Actualizar.
+          description: "Id del Collector a Actualizar."
           schema:
             type: integer
             example: 4
@@ -861,15 +861,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /delete-collector/:
     put:
-      summary: Eliminar los Datos de un Collector.
-      description: Actualiza el campo deleted_at de un Colector Específico Realizando así un Borrado Lógico.
+      summary: "Eliminar los Datos de un Collector."
+      description: "Actualiza el campo deleted_at de un Colector Específico Realizando así un Borrado Lógico."
       tags:
         - Collectors
       parameters:
         - name: id
           in: path
           required: true
-          description: Id del Collector a Eliminar.
+          description: "Id del Collector a Eliminar."
           schema:
             type: integer
             example: 4
@@ -892,15 +892,15 @@ paths:
           $ref: "#/components/responses/InternalError"
   /search-collector/:
     get:
-      summary: Buscar Colector por Nombre.
-      description: Muestra los Datos de un Colector Basado en su Nombre.
+      summary: "Buscar Colector por Nombre."
+      description: "Muestra los Datos de un Colector Basado en su Nombre."
       tags:
         - Collectors
       parameters:
         - name: collector
           in: query
           required: true
-          description: Nombre del Colector a Buscar.
+          description: "Nombre del Colector a Buscar."
           schema:
             type: string
             example: "ANDA"
@@ -933,11 +933,11 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-          
+
   /services:
     get:
-      summary: Obtener la lista de Servicios de todos los Colectores.
-      description: Muestra la lista de Servicios de todos los Colectores en la Base de Datos que No han Sido Eliminados.
+      summary: "Obtener la lista de Servicios de todos los Colectores."
+      description: "Muestra la lista de Servicios de todos los Colectores en la Base de Datos que No han Sido Eliminados."
       tags:
         - Services
       responses:
@@ -974,6 +974,225 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
+  /save-service:
+    post:
+      summary: "Guardar Uno o Más Servicios."
+      description: "Registra Uno o Más Servicios para un Colector Específico."
+      tags:
+        - Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                collector:
+                  type: integer
+                  example: 1
+                services:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      services:
+                        type: string
+                        example: "Internet Residencial de 150 MB"
+      responses:
+        200:
+          description: "Servicios Guardados Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Servicio(s) Registrado(s) con Éxito"
+        400:
+          description: "Colector No Seleccionado o No Servicios Introducidos."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Por Favor, Seleccione un Colector y Rellene Todos los Campos"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        409:
+          description: "Servicio Duplicado para un Colector Específico."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Los Siguientes Servicios ya Están Registrados Para este Colector: TIGO"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /view-payments-by-service-details/:
+    get:
+      summary: "Obtener los Pagos Recibidos por Cada Servicio."
+      description: "Muestra los Pagos Recibidos de un Servicio Específico en un Rango de Días Específicos."
+      tags:
+        - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Id del Servicio."
+          schema:
+            type: integer
+            example: 1
+        - name: startDay
+          in: path
+          required: true
+          description: "Día Inicial para el Rango de Días."
+          schema:
+            type: string
+            example: "2025-01-12"
+        - name: endDay
+          in: path
+          required: true
+          description: "Día Final para el Rango de Días."
+          schema:
+            type: string
+            example: "2025-02-12"
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    service:
+                      type: string
+                      example: "Internet Residencial de 150MB"
+                    collector:
+                      type: string
+                      example: "TIGO"
+                    amount:
+                      type: number
+                      example: 27.99
+                    payed_by:
+                      type: string
+                      example: "Marina Silva"
+                    registered_by:
+                      type: string
+                      example: "David Cruz"
+                    datetime:
+                      type: string
+                      example: "2025-02-09T01:40:44.000Z"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /update-service/:
+    put:
+      summary: "Actualizar un Servicio de un Colector."
+      description: "Actualiza los Datos de un Servicio de un Colector en la Base de Datos."
+      tags:
+        - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Id del Servicio a Actualizar."
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: "Servicio Actualizado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Datos del Servicio Actualizados con Éxito"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        409:
+          description: "Servicio Duplicado."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Este Servicio ya Está Registrado para El Colector Seleccionado"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /delete-service/:
+    put:
+      summary: "Elimina los Datos de un Servicio de un Colector."
+      description: "Actualiza el campo deleted_at de un Colector Específico Realizando así un Borrado Lógico."
+      tags:
+        - Services
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Id del Servicio a Eliminar."
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: "Servicio Eliminado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Servicio Eliminado con Éxito"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-service/:collector?/:service?:
+    get:
+      summary: "Buscar Servicios por Colector y/o Servicio."
+      description: "Muestra los Servicios de un Colector Específico o Todos los Servicios si No se Especifica el Colector."
+      tags:
+        - Services
+      parameters:
+        - name: collector
+          in: query
+          required: false
+          description: "Id del Colector."
+          schema:
+            type: integer
+            example: 1
+        - name: service
+          in: query
+          required: false
+          description: "Nombre del Servicio."
+          schema:
+            type: string
+            example: "Internet Residencial de 150MB"
 
 components:
   schemas:

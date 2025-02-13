@@ -7,6 +7,7 @@ exports.getServices = (request, response) => {
 
   db.query(services, (error, result) => {
     if (error) {
+      console.log(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
@@ -255,7 +256,7 @@ exports.searchService = (request, response) => {
   }
 
   let searchService =
-    "services.id, services.service_name AS service, collectors.collector, services.description, services.price, services.deleted_at FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.deleted_at IS NULL";
+    "SELECT services.*, services.service_name AS service, collectors.collector FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.deleted_at IS NULL";
   let serviceData = [];
 
   if (collector) {
