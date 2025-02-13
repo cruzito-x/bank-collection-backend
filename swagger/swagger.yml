@@ -933,6 +933,47 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
+          
+  /services:
+    get:
+      summary: Obtener la lista de Servicios de todos los Colectores.
+      description: Muestra la lista de Servicios de todos los Colectores en la Base de Datos que No han Sido Eliminados.
+      tags:
+        - Services
+      responses:
+        200:
+          description: "Servicios Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 4
+                    service:
+                      type: string
+                      example: "Agua Potable"
+                    collector:
+                      type: string
+                      example: "ANDA"
+                    description:
+                      type: string
+                      example: "Servicio de Agua Potable"
+                    price:
+                      type: number
+                      example: 0.00
+                    deleted_at:
+                      type: string
+                      nullable: true
+                      example: null
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
 
 components:
   schemas:
