@@ -27,7 +27,7 @@ exports.login = (request, response) => {
 
     if (result.length === 0) {
       return response
-        .status(401)
+        .status(400)
         .json({ message: "Usuario o Contraseña no Válidos" });
     }
 
