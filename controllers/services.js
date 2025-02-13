@@ -7,7 +7,6 @@ exports.getServices = (request, response) => {
 
   db.query(services, (error, result) => {
     if (error) {
-      console.log(error);
       return response
         .status(500)
         .json({ message: "Error Interno del Servidor" });
