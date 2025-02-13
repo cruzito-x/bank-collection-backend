@@ -72,7 +72,7 @@ paths:
         - Dashboard
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -138,7 +138,7 @@ paths:
             example: 1
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -184,7 +184,7 @@ paths:
             example: "2025-02-12"
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -227,7 +227,7 @@ paths:
             example: "2025-02-12"
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -253,7 +253,7 @@ paths:
         - Dashboard
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -279,7 +279,7 @@ paths:
         - Dashboard
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -305,7 +305,7 @@ paths:
         - Dashboard
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -348,7 +348,7 @@ paths:
             example: "2025-02-12"
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -602,7 +602,7 @@ paths:
         - Accounts
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -621,6 +621,10 @@ paths:
                     datetime:
                       type: string
                       example: "2025-01-30T06:00:00.000Z"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
   /accounts-by-customer/:
@@ -639,7 +643,7 @@ paths:
             example: 1
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -658,6 +662,10 @@ paths:
                     datetime:
                       type: string
                       example: "2025-01-30T06:00:00.000Z"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
 
@@ -669,7 +677,7 @@ paths:
         - Collectors
       responses:
         200:
-          description: ""
+          description: "Datos Obtenidos Exitosamente."
           content:
             application/json:
               schema:
@@ -688,6 +696,155 @@ paths:
                     services_names:
                       type: string
                       example: "Agua Potable"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /save-collector:
+    post:
+      summary: Guardar un Nuevo Collector.
+      description: Crea un Nuevo Collector en la Base de Datos.
+      tags:
+        - Collectors
+      responses:
+        200:
+          description: Datos Registrados Exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Collector Registrado con Éxito
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /view-payments-collector-details/:
+    get:
+      summary: Obtener los Pagos Recibidos por Cada Colector.
+      description: Muestra los Pagos Recibidos de un Colector Específico en un Rango de Días Específicos.
+      tags:
+        - Collectors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del Colector.
+          schema:
+            type: integer
+            example: 4
+        - name: startDay
+          in: path
+          required: true
+          description: Día Inicial para el Rango de Días.
+          schema:
+            type: string
+            example: "2025-01-13"
+        - name: endDay
+          in: path
+          required: true
+          description: Día Final para el Rango de Días.
+          schema:
+            type: string
+            example: "2025-02-13"
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 216
+                    collector:
+                      type: string
+                      example: "ANDA"
+                    service:
+                      type: string
+                      example: "Agua Potable"
+                    amount:
+                      type: number
+                      example: 15.00
+                    payed_by:
+                      type: string
+                      example: "Luis Mendez"
+                    registered_by:
+                      type: string
+                      example: "David Cruz"
+                    datetime:
+                      type: string
+                      example: "2025-02-11T02:22:13.000Z"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /update-collector/:
+    put:
+      summary: Actualizar un Collector.
+      description: Actualiza los Datos de un Collector en la Base de Datos.
+      tags:
+        - Collectors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del Collector a Actualizar.
+          schema:
+            type: integer
+            example: 4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                collector:
+                  type: string
+                  example: "ANDA Actualizado"
+                description:
+                  type: string
+                  example: "Administración Nacional de Acueductos y Alcantarillados Actualizado"
+      responses:
+        200:
+          description: "Datos Actualizados Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Datos del Colector Actualizados con Éxito
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        409:
+          description: "Colector Duplicado."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Este Colector ya Está Registrado"
         500:
           $ref: "#/components/responses/InternalError"
 
@@ -703,6 +860,13 @@ components:
   responses:
     BadRequestError:
       description: Por Favor, Introduzca al Menos un Criterio de Búsqueda.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    BadRequestErrorByEmptyFields:
+      description: Por Favor, Rellene Todos los Campos.
       content:
         application/json:
           schema:
