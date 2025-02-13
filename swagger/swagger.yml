@@ -847,6 +847,37 @@ paths:
                     example: "Este Colector ya Está Registrado"
         500:
           $ref: "#/components/responses/InternalError"
+  /delete-collector/:
+    put:
+      summary: Eliminar los Datos de un Collector.
+      description: Actualiza el campo deleted_at de un Colector Específico Realizando así un Borrado Lógico.
+      tags:
+        - Collectors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del Collector a Eliminar.
+          schema:
+            type: integer
+            example: 4
+      responses:
+        200:
+          description: "Datos Eliminados Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Colector Eliminado con Éxito
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
 
 components:
   schemas:
