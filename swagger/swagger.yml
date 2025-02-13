@@ -1193,6 +1193,48 @@ paths:
           schema:
             type: string
             example: "Internet Residencial de 150MB"
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    sevice_id:
+                      type: string
+                      example: "SRV000001"
+                    collector_id:
+                      type: integer
+                      example: "1"
+                    service:
+                      type: string
+                      example: "Internet Residencial de 150MB"
+                    description:
+                      type: string
+                      example: "Servicio de Internet Residencial de 150MB"
+                    price:
+                      type: number
+                      example: 27.99
+                    deleted_at:
+                      type: string
+                      nullable: true
+                      example: null
+                    collector:
+                      type: string
+                      example: "TIGO"
+        400:
+          $ref: "#/components/responses/BadRequestError"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
 
 components:
   schemas:
