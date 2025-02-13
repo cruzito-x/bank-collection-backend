@@ -1,13 +1,13 @@
 openapi: "3.0.3"
 info:
-  title: Bank Collection API
+  title: Bambú Bank Collection API
   version: "1.0"
 servers:
   - url: https://bambu-bank-collection-api.com/v1
 paths:
   /login:
     post:
-      summary: Log In
+      summary: Iniciar Sesión.
       description: Permite a los Usuarios Acceder al Sistema.
       tags:
         - Login
@@ -27,7 +27,7 @@ paths:
                   example: "12345678"
       responses:
         "200":
-          description: Inicio de sesión exitoso
+          description: Inicio de Sesión Correcto.
           content:
             application/json:
               schema:
@@ -65,15 +65,15 @@ paths:
         "500":
           description: Error Interno del Servidor.
 
-  /get-latest-collector-and-collector-payment-data/:
+  /get-latest-collector-and-collector-payment-data:
     get:
-      summary: Obtener Datos Tanto del Último Colector Registrado como del Último Pago Realizado a Algún Colector.
+      summary: Obtener los Datos Más Recientes Sobre Colectors, Transacciones y Aprobaciones.
       description: Muestra un Panel de Control con la Información General de los Movimientos Transaccionales Realizados.
       tags:
         - Dashboard
       responses:
         "200":
-          description: Datos del Panel de Control obtenidos correctamente.
+          description: ""
           content:
             application/json:
               schema:
@@ -94,6 +94,331 @@ paths:
                   latest_approved_transaction:
                     type: string
                     example: "TSC00000234"
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+
+  /transactions-by-dates/:
+    get:
+      summary: Obtener Todas las Transacciones Obtenidas.
+      description: Muestra una lista de Transacciones Realizadas entre dos Días y Filtradas por Monto y Tipo de Transacción.
+      tags:
+        - Dashboard
+      parameters:
+        - name: startDay
+          in: path
+          required: true
+          description: Día Inicial de la Busqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-01-12"
+        - name: endDay
+          in: path
+          required: true
+          description: Día Final de la Busqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-02-12"
+        - name: amountFilter
+          in: path
+          required: true
+          description: Rango de Montos de las Transacciones a Filtrar.
+          schema:
+            type: integer
+            example: 1
+        - name: transactionTypeFilter
+          in: path
+          required: true
+          description: Tipo de Transacción a Filtrar.
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  label:
+                    type: string
+                    example: "12/01/2025 - 12/02/2025"
+                  totalAmount:
+                    type: number
+                    example: 463
+                  transactionsCounter:
+                    type: integer
+                    example: 16
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+  /approval-and-rejection-rates/:
+    get:
+      summary: Obtener Todas las Tasas de Aprobación y Rechazo por Día.
+      description: Muestra una Lista de las Tasas de Aprobación y Rechazo por Día.
+      tags:
+        - Dashboard
+      parameters:
+        - name: startDay
+          in: path
+          required: true
+          description: Día Inicial de la Búsqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-01-12"
+        - name: endDay
+          in: path
+          required: true
+          description: Día Final de la Búsqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-02-12"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction_type:
+                    type: string
+                    example: "Aprobadas"
+                  total_transactions:
+                    type: integer
+                    example: 177
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+  /processed-amount-by-transactions-and-collectors-payments/:
+    get:
+      summary: Obtener el Total Procesado por Cada Tipo de Transacción.
+      description: Muestra una Lista con los Tipos de Transacciones y los Pagos a Colectores y los Montos Totales procesados por Cada Uno.
+      tags:
+        - Dashboard
+      parameters:
+        - name: startDay
+          in: path
+          required: true
+          description: Día Inicial de la Búsqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-01-12"
+        - name: endDay
+          in: path
+          required: true
+          description: Día Final de la Búsqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-02-12"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction_type:
+                    type: string
+                    example: Deposito
+                  transaction_amount:
+                    type: number
+                    example: 135170.50
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+  /customers-with-the-most-money-paid:
+    get:
+      summary: Obtener a los 5 Clientes con el Monto Más Grande Pagado.
+      description: Muestra una Lista con los 5 Clientes con Los Montos Más Grandes Pagados por Cada Uno.
+      tags:
+        - Dashboard
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:
+                    type: string
+                    example: "David Cruz"
+                  amount:
+                    type: number
+                    example: 645.97
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+  /payments-by-collector:
+    get:
+      summary: Obtener Todos los Pagos Realizados a Colectores.
+      description: Muestra una Lista de los Colectores y la Cantidad de Pagos que ha Recibido Cada Uno.
+      tags:
+        - Dashboard
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collector:
+                    type: string
+                    example: "TIGO"
+                  transactionsByCollector:
+                    type: integer
+                    example: 41
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+  /payments-by-collector-denominations:
+    get:
+      summary: Obtener Todos los Pagos Realizados a Colectores y Dividirlo en Diferentes Denominaciones.
+      description: Muestra una Lista con las Denominaciones y en que Cantidades Conforman el Total Procesado por Pagos a Colectores.
+      tags:
+        - Dashboard
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  denomination:
+                    type: string
+                    example: "Billetes de $100"
+                  total:
+                    type: integer
+                    example: 2
+        "401":
+          description: Acceso Denegado, Token no Encontrado.
+        "403":
+          description: Acceso Denegado, Token no Encontrado.
+        "500":
+          description: Error Interno del Servidor.
+  /reports-by-date/:
+    get:
+      summary: Obtiene los Datos para Generar Reportería desde el Frontend.
+      description: Muestra una Lista con los Datos necesarios para generar Reportes Basados en Rangos de Tiempo.
+      tags:
+        - Dashboard
+      parameters:
+        - name: startDay
+          in: path
+          required: true
+          description: Día Inicial de la Búsqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-01-12"
+        - name: endDay
+          in: path
+          required: true
+          description: Día Final de la Búsqueda.
+          schema:
+            type: string
+            format: date
+            example: "2025-02-12"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  0:
+                    type: object
+                    properties:
+                      sender:
+                        type: string
+                        example: "Ricardo Torres"
+                      sender_account:
+                        type: string
+                        example: "**** **** **** 9010"
+                      receiver:
+                        type: string
+                        example: "Ricardo Torres"
+                      receiver_account:
+                        type: string
+                        example: null
+                      amount:
+                        type: number
+                        example: 120.00
+                      transaction_type:
+                        type: string
+                        example: "Deposito"
+                      transaction_date:
+                        type: string
+                        example: "Deposito"
+                      status:
+                        type: string
+                        example: "Aprobada"
+                      authorized_by:
+                        type: string
+                        example: "David Cruz"
+                      datetime:
+                        type: string
+                        example: "2025-02-12T18:21:27.000Z"
+                  1:
+                    type: object
+                    properties:
+                      transaction_type:
+                        type: string
+                        example: "Retiro"
+                      amount:
+                        type: number
+                        example: 1882536.00
+                  2:
+                    type: object
+                    properties:
+                      collector:
+                        type: string
+                        example: "TIGO"
+                      amount:
+                        type: number
+                        example: 1052.31
+                  3:
+                    type: object
+                    properties:
+                      collector:
+                        type: string
+                        example: "CLARO"
+                      service_name:
+                        type: string
+                        example: "Telefonía Fija"
+                      amount:
+                        type: number
+                        example: 710.96
         "401":
           description: Acceso Denegado, Token no Encontrado.
         "403":

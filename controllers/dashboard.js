@@ -103,13 +103,13 @@ exports.getTransactionsByDates = (request, response) => {
               label: `${moment(startDay).format("DD/MM/YYYY")} - ${moment(
                 endDay
               ).format("DD/MM/YYYY")}`,
-              totalAmount: result[0]?.totalAmount || 0,
+              totalAmount: parseFloat(result[0]?.totalAmount) || 0,
               transactionsCounter: result[0]?.transactionsCounter || 0,
             },
           ]
         : result.map((row) => ({
             label: row.interval_name,
-            totalAmount: row.totalAmount,
+            totalAmount: parseFloat(row.totalAmount),
             transactionsCounter: row.transactionsCounter,
           }));
 
@@ -160,7 +160,7 @@ exports.getProcessedAmountByTransactionsAndCollectorsPayments = (
       if (error) {
         return response
           .status(500)
-          .json({ message: "Error Interno del Servidor", error: error });
+          .json({ message: "Error Interno del Servidor" });
       }
 
       return response.status(200).json(result);
