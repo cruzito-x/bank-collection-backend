@@ -504,7 +504,6 @@ paths:
                     example: El Email ya Está en uso Por Otro Cliente
         500:
           $ref: "#/components/responses/InternalError"
-
   /delete-customer/:
     put:
       summary: Eliminar los Datos de los Clientes.
@@ -536,7 +535,6 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-
   /search-customer/:
     get:
       summary: Buscar Cliente por Nombre o por Número de Documento de Identidad.
@@ -593,6 +591,103 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         404:
           $ref: "#/components/responses/NotFoundError"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  /accounts:
+    get:
+      summary: Obtener las Cuentas de los Clientes.
+      description: Muestra una Lista con las Cuentas de los Clientes.
+      tags:
+        - Accounts
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    account_number:
+                      type: string
+                      example: "0000 1234 5678 9000"
+                    owner:
+                      type: string
+                      example: "David Cruz"
+                    balance:
+                      type: number
+                      example: 24875.00
+                    datetime:
+                      type: string
+                      example: "2025-01-30T06:00:00.000Z"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /accounts-by-customer/:
+    get:
+      summary: Obtener las Cuentas de un Cliente.
+      description: Muestra una Lista con las Cuentas de un Cliente en Específico.
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id del Cliente.
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    account_number:
+                      type: string
+                      example: "0000 1234 5678 9000"
+                    owner:
+                      type: string
+                      example: "David Cruz"
+                    balance:
+                      type: number
+                      example: 34875.00
+                    datetime:
+                      type: string
+                      example: "2025-01-30T06:00:00.000Z"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  /collectors:
+    get:
+      summary: Obtener la Lista de Todos los Colectores.
+      description: Muestra una Lista con los Colectores que No han Sido Eliminados.
+      tags:
+        - Collectors
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 4
+                    collector:
+                      type: string
+                      example: "ANDA"
+                    description:
+                      type: string
+                      example: "Administración Nacional de Acueductos y Alcantarillados"
+                    services_names:
+                      type: string
+                      example: "Agua Potable"
         500:
           $ref: "#/components/responses/InternalError"
 
