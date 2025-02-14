@@ -281,6 +281,7 @@ exports.saveTransaction = (request, response) => {
             if (transaction_type === 1) {
               const updateBalance =
                 "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
+
               db.query(
                 updateBalance,
                 [amount, receiver_account_number],
@@ -289,6 +290,7 @@ exports.saveTransaction = (request, response) => {
             } else if (transaction_type === 2) {
               const updateBalance =
                 "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
+
               db.query(
                 updateBalance,
                 [amount, sender_account_number],
@@ -297,6 +299,7 @@ exports.saveTransaction = (request, response) => {
             } else if (transaction_type === 3) {
               const updateSenderBalance =
                 "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
+
               db.query(
                 updateSenderBalance,
                 [amount, sender_account_number],
