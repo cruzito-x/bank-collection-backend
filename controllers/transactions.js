@@ -68,6 +68,15 @@ exports.saveTransaction = (request, response) => {
     });
   }
 
+  if (
+    transaction_type === 3 &&
+    sender_account_number === receiver_account_number
+  ) {
+    return response.status(400).json({
+      message: "No Puede Transferir Dinero a su Mismo Número de Cuenta",
+    });
+  }
+
   if (transaction_type !== 1) {
     const getBalanceAndCompareData =
       "SELECT balance FROM accounts WHERE account_number = ?";
