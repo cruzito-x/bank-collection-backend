@@ -549,8 +549,8 @@ paths:
           $ref: "#/components/responses/InternalError"
   /search-customer/:
     get:
-      summary: "Buscar Cliente por Nombre o por Número de Documento de Identidad."
-      description: "Muestra los Datos de un Cliente por Nombre o por Número de Documento de Identidad."
+      summary: "Buscar Cliente por Nombre y/o por Número de Documento de Identidad."
+      description: "Muestra los Datos de un Cliente por Nombre y/o por Número de Documento de Identidad."
       tags:
         - Customers
       parameters:
@@ -1172,7 +1172,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /search-service/:collector?/:service?:
+  /search-service/:
     get:
       summary: "Buscar Servicios por Colector y/o Servicio."
       description: "Muestra los Servicios de un Colector Específico o Todos los Servicios si No se Especifica el Colector."
@@ -1235,7 +1235,211 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-
+  /payments-collectors:
+    get:
+      summary: "Obtener la Lista de Todos los Pagos a Colectores."
+      description: "Muestra todos los Pagos a Colectores en la Base de Datos."
+      tags:
+        - Payments Collectors
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    payment_id:
+                      type: string
+                      example: "PAY000001"
+                    customer:
+                      type: string
+                      example: José Fernández
+                    collector:
+                      type: string
+                      example: "Movistar"
+                    service:
+                      type: string
+                      example: "Internet Residencial de 100MB"
+                    amount:
+                      type: number
+                      example: 24.99
+                    registered_by:
+                      type: string
+                      example: "David Cruz"
+                    datetime:
+                      type: string
+                      example: "2025-02-14T04:45:15.000Z"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /total-payments-amount:
+    get:
+      summary: "Obtener el Total de Pagos Realizados."
+      description: "Muestra el Total de Pagos Realizados a Colectores en la Base de Datos."
+      tags:
+        - Payments Collectors
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    amount:
+                      type: number
+                      example: 5647.65
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /payments-by-collector/:
+    get:
+      summary: "Obtener los Pagos Realizados a un Colector en un Rango de Tiempo."
+      description: "Muestra los Pagos Realizados a un Colector Específico en un Rango de Tiempo Específico."
+      tags:
+        - Payments Collectors
+      parameters:
+        - name: collector
+          in: path
+          required: true
+          description: "Id del Colector."
+          schema:
+            type: integer
+            example: 1
+        - name: startDay
+          in: path
+          required: true
+          description: "Fecha Inicial de la Búsqueda."
+          schema:
+            type: string
+            example: "2025-01-14"
+        - name: endDay
+          in: path
+          required: true
+          description: "Fecha Final de la Búsqueda."
+          schema:
+            type: string
+            example: "2025-02-14"
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    collector:
+                      type: string
+                      example: "TIGO"
+                    amount:
+                      type: number
+                      example: 1052.31
+                    percentage:
+                      type: number
+                      example: 18.632706
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /save-new-payment:
+    post:
+      summary: "Registar un Nuevo Pago de Servicio a Colector."
+      description: "Registra un Nuevo Pago para un Servicio de un Colector."
+      tags:
+        - Payments Collectors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                customer_id:
+                  type: integer
+                  example: 5
+                collector_id:
+                  type: integer
+                  example: 1
+                service_id:
+                  type: integer
+                  example: 2
+                amount:
+                  type: number
+                  example: 15.99
+      responses:
+        200:
+          description: "Pago Registrado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Pago Registrado con Éxito"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-payments-collectors/:
+    get:
+      summary: "Buscar Pagos por Nombre de Colector."
+      description: "Muestra los Pagos Realizados a un Colector Específico."
+      tags:
+        - Payments Collectors
+      parameters:
+        - name: collector
+          in: query
+          required: false
+          description: "Nombre del Colector."
+          schema:
+            type: string
+            example: "TIGO"
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    payment_id:
+                      type: string
+                      example: "PAY00000215"
+                    customer:
+                      type: string
+                      example: "David Cruz"
+                    collector:
+                      type: string
+                      example: "TIGO"
+                    service:
+                      type: string
+                      example: "Internet Residencial de 200MB"
+                    amount:
+                      type: number
+                      example: 32.99
+                    registered_by:
+                      type: string
+                      example: "David Cruz"
+                    datetime:
+                      type: string
+                      example: "2025-02-11T01:43:13.000Z"
 components:
   schemas:
     ErrorMessage:
