@@ -163,9 +163,9 @@ exports.updateService = (request, response) => {
   }
 
   const serviceName =
-    "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE services.id = ? AND collectors.collector = ?";
+    "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.collector = ? AND services.service_name = ? AND services.deleted_at IS NULL";
 
-  db.query(serviceName, [id, collector], (error, result) => {
+  db.query(serviceName, [collector, service], (error, result) => {
     if (error) {
       return response
         .status(500)
