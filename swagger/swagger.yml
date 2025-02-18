@@ -803,7 +803,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /update-collector/:
+  /update-collector/{id}:
     put:
       summary: "Actualizar un Collector."
       description: "Actualiza los Datos de un Collector en la Base de Datos."
@@ -859,7 +859,7 @@ paths:
                     example: "Este Colector ya Está Registrado"
         500:
           $ref: "#/components/responses/InternalError"
-  /delete-collector/:
+  /delete-collector/{id}:
     put:
       summary: "Eliminar los Datos de un Collector."
       description: "Actualiza el campo deleted_at de un Colector Específico Realizando así un Borrado Lógico."
@@ -906,7 +906,7 @@ paths:
             example: "ANDA"
       responses:
         200:
-          description: "Colector Encontado."
+          description: "Colector Encontrado."
           content:
             application/json:
               schema:
@@ -1396,7 +1396,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /search-payments-collectors/:
+  /search-payments-collectors/{collector}:
     get:
       summary: "Buscar Pagos por Nombre de Colector."
       description: "Muestra los Pagos Realizados a un Colector Específico."
@@ -1440,6 +1440,337 @@ paths:
                     datetime:
                       type: string
                       example: "2025-02-11T01:43:13.000Z"
+  /transactions:
+    get:
+      summary: "Obtener la Lista de Movimientos Transaccionales Realizados por los Clientes."
+      description: "Muestra todos los Movimientos Transaccionales Realizados por los Clientes en la Base de Datos."
+      tags:
+        - Transactions
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: string
+                      example: "TSC00000267"
+                    customer:
+                      type: string
+                      example: "Pablo Castillo"
+                    sender_account:
+                      type: string
+                      example: "**** **** **** 9020"
+                    receiver:
+                      type: string
+                      example: "Juan Perez"
+                    receiver_account:
+                      type: string
+                      example: "**** **** **** 9022"
+                    amount:
+                      type: number
+                      example: 123.00
+                    concept:
+                      type: string
+                      nullable: true
+                      example: null
+                    status:
+                      type: integer
+                      example: 2
+                    datetime:
+                      type: string
+                      example: "2025-02-14T07:34:51.000Z"
+                    realized_by:
+                      type: string
+                      example: "David Cruz"
+                    authorized_by:
+                      type: string
+                      example: "David Cruz"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /transactions-by-customer/{id}/account/{account}/{startDay}/{endDay}:
+    get:
+      summary: "Obtener las Transacciones de una Cuenta Específica de un Cliente Específico en un Rango de Tiempo."
+      description: "Muestra las Transacciones Realizadas a una Cuenta Específica de un Cliente Específico en un Rango de Tiempo Específico."
+      tags:
+        - Transactions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Id del Cliente."
+          schema:
+            type: integer
+            example: 1
+        - name: account
+          in: path
+          required: true
+          description: "Número de Cuenta del Cliente Seleccionado."
+          schema:
+            type: string
+            example: "0000 1234 5678 9000"
+        - name: startDay
+          in: path
+          required: true
+          description: "Fecha Inicial de la Búsqueda."
+          schema:
+            type: string
+            example: "2025-01-14"
+        - name: endDay
+          in: path
+          required: true
+          description: "Fecha Final de la Búsqueda."
+          schema:
+            type: string
+            example: "2025-02-14"
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 263
+                    transaction_id:
+                      type: string
+                      example: "TSC00000263"
+                    customer:
+                      type: string
+                      example: "David Cruz"
+                    receiver:
+                      type: string
+                      example: "Ana Gomez"
+                    transaction_type:
+                      type: string
+                      example: "Transferencia"
+                    sender_account:
+                      type: string
+                      example: "**** **** **** 9000"
+                    amount:
+                      type: number
+                      example: 45.00
+                    receiver_account:
+                      type: string
+                      example: "**** **** **** 9001"
+                    datetime:
+                      type: string
+                      example: "2025-02-14T05:29:34.000Z"
+                    authorized_by:
+                      type: string
+                      example: "Joaquín Reyes"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /save-new-transaction:
+    post:
+      summary: "Guardar una Nueva Transacción."
+      description: "Registra una Nueva Transacción, ya sea un Deposito, Retiro o Transferencia."
+      tags:
+        - Transactions
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                customer:
+                  type: integer
+                  example: 1
+                transaction_type:
+                  type: integer
+                  example: 1
+                sender_account_number:
+                  type: string
+                  example: "0000 1234 5678 9000"
+                receiver_account_number:
+                  type: string
+                  nullable: true
+                  example: null
+                amount:
+                  type: number
+                  example: 123.00
+                concept:
+                  type: string
+                  nullable: true
+                  example: null
+      responses:
+        200:
+          description: "Transacción Registrada Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Transacción Registrada con Éxito"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/NotFoundError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-transactions-by/{transaction_id}/{realized_by}/{transaction_type}/{date}:
+    get:
+      summary: "Buscar Transacciones por su Código o Cajero o Tipo de Transacción y Fecha."
+      description: "Muestra las Transacciones que coincidan con Alguno de los Criterios de Búsqueda Introducidos."
+      tags:
+        - Transactions
+      parameters:
+        - name: transaction_id
+          in: query
+          description: "Código de la Transacción."
+          schema:
+            type: string
+            example: "TSC00000267"
+        - name: realized_by
+          in: query
+          description: "Cajero que Realizó la Transacción."
+          schema:
+            type: string
+            example: "David Cruz"
+        - name: transaction_type
+          in: query
+          description: "Tipo de Transacción."
+          schema:
+            type: integer
+            example: 3
+        - name: date
+          in: query
+          description: "Fecha de la Transacción."
+          schema:
+            type: string
+            example: "2025-02-14"
+      responses:
+        200:
+          description: "Datos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: string
+                      example: "TSC00000267"
+                    customer:
+                      type: string
+                      example: "Pablo Castillo"
+                    sender_account:
+                      type: string
+                      example: "**** **** **** 9020"
+                    receiver:
+                      type: string
+                      example: "Juan Perez"
+                    receiver_account:
+                      type: string
+                      example: "**** **** **** 9022"
+                    amount:
+                      type: number
+                      example: 123.00
+                    concept:
+                      type: string
+                      nullable: true
+                      example: null
+                    status:
+                      type: integer
+                      example: 2
+                    datetime:
+                      type: string
+                      example: "2025-02-14T07:34:51.000Z"
+                    realized_by:
+                      type: string
+                      example: "David Cruz"
+                    authorized_by:
+                      type: string
+                      example: "David Cruz"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /user-by-pin/{pin}:
+    get:
+      summary: "Obtener el Pin de Autorización de un Usuario Supervisor."
+      description: "Muestra el Pin de Autorización de un Usuario Supervisor para la Aprobación de una Transacción."
+      tags:
+        - Transactions
+      parameters:
+        - name: pin
+          in: path
+          required: true
+          description: "Pin del Usuario."
+          schema:
+            type: string
+            example: "22032002"
+      responses:
+        200:
+          description: "Pin Obtenido Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    role:
+                      type: string
+                      example: "Supervisor"
+        400:
+          description: "Pin no Introducido."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Por Favor, Introduzca una Clave de Aprobación"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        404:
+          description: "Pin no Encontrado."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "El Pin Introducido no Existe"
+        500:
+          $ref: "#/components/responses/InternalError"
+
 components:
   schemas:
     ErrorMessage:

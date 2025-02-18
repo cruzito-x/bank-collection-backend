@@ -9,7 +9,7 @@ router.get(
 );
 router.post("/save-new-transaction", transactions.saveTransaction);
 router.get(
-  "/search-transactions/:transaction_id?/:realized_by?/:transaction_type?/:date?",
+  "/search-transactions-by/:transaction_id?/:realized_by?/:transaction_type?/:date?",
   transactions.searchTransaction
 );
 router.get("/user-by-pin/:pin", transactions.getUserByPin);
