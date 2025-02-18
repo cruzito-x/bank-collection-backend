@@ -2515,7 +2515,97 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
-  
+  /audit/:
+    get:
+      summary: "Obtener Auditorías de la Aplicación."
+      description: "Muestra las Auditorías de la Aplicación."
+      tags:
+        - Audit
+      responses:
+        200:
+          description: "Auditorías Obtenidas Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      example: "David Cruz"
+                    action:
+                      type: string
+                      example: "Transacción Aprobada"
+                    details:
+                      type: string
+                      example: "Se Aprobó la Transacción TSC00000268 por un Monto de $12000.00"
+                    client_details:
+                      type: string
+                      example: "Desde: Other 0.0.0; OS: Other 0.0.0; IP: ::ffff:127.0.0.1"
+                    datetime:
+                      type: string
+                      example: "2025-02-18T19:37:03.000Z"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-audit/{username}/{date}:
+    get:
+      summary: "Buscar Auditorías por Usuario y/o Fecha."
+      description: "Permite Buscar Auditorías por Usuario y/o Fecha."
+      tags:
+        - Audit
+      parameters:
+        - name: username
+          in: query
+          description: "Nombre del Usuario."
+          schema:
+            type: string
+            example: "David Cruz"
+        - name: date
+          in: query
+          description: "Fecha de Auditoría."
+          schema:
+            type: string
+            example: "2025-02-18"
+      responses:
+        200:
+          description: "Auditorías Obtenidas Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      example: "David Cruz"
+                    action:
+                      type: string
+                      example: "Transacción Aprobada"
+                    details:
+                      type: string
+                      example: "Se Aprobó la Transacción TSC00000268 por un Monto de $12000.00"
+                    client_details:
+                      type: string
+                      example: "Desde: Other 0.0.0; OS: Other 0.0.0; IP: ::ffff:127.0.0.1"
+                    datetime:
+                      type: string
+                      example: "2025-02-18T19:37:03.000Z"
+        400:
+          $ref: "#/components/responses/BadRequestError"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        404:
+          $ref: "#/components/responses/NotFoundError"
+        500:
+          $ref: "#/components/responses/InternalError"
 
 components:
   schemas:
