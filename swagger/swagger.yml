@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://localhost:3001
 paths:
-  /login:
+  /login/:
     post:
       summary: "Iniciar Sesión."
       description: "Permite a los Usuarios Acceder al Sistema."
@@ -56,7 +56,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /logout/{id}:
+  /logout/{id}/:
     get:
       summary: "Cierre de Sesión."
       description: "Cierra la Sesión de un Usuario Autenticado."
@@ -76,10 +76,10 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
-  /get-latest-collector-and-collector-payment-data:
+  /get-latest-collector-and-collector-payment-data/:
     get:
       summary: "Obtener los Datos Más Recientes Sobre Colectors, Transacciones y Aprobaciones."
-      description: "Muestra un Panel de Control con la Información General de los Movimientos Transaccionales Realizados."
+      description: "Muestra un Dashboard con la Información General de los Movimientos Transaccionales Realizados."
       tags:
         - Dashboard
       responses:
@@ -111,7 +111,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /transactions-by-dates/:
+  /transactions-by-dates/{startDay}/{endDay}/{amountFilter}/{transactionTypeFilter}/:
     get:
       summary: "Obtener Todas las Transacciones Realizadas."
       description: "Muestra una lista de Transacciones Realizadas entre dos Días y Filtradas por Monto y Tipo de Transacción."
@@ -171,7 +171,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /approval-and-rejection-rates/:
+  /approval-and-rejection-rates/{startDay}/{endDay}/:
     get:
       summary: "Obtener Todas las Tasas de Aprobación y Rechazo de Transacciones."
       description: "Muestra una Lista de las Tasas de Aprobación y Rechazo Basado en Rangos de Tiempo."
@@ -214,7 +214,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /processed-amount-by-transactions-and-collectors-payments/:
+  /processed-amount-by-transactions-and-collectors-payments/{startDay}/{endDay}/:
     get:
       summary: "Obtener el Total Procesado por Cada Tipo de Transacción."
       description: "Muestra una Lista con los Tipos de Transacciones y los Pagos a Colectores y los Montos Totales procesados por Cada Uno."
@@ -257,7 +257,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /customers-with-the-most-money-paid:
+  /customers-with-the-most-money-paid/:
     get:
       summary: "Obtener a los 5 Clientes con el Monto Más Grande Pagado."
       description: "Muestra una Lista con los 5 Clientes con Los Montos Más Grandes Pagados por Cada Uno."
@@ -283,7 +283,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /payments-by-collector:
+  /payments-by-collector/:
     get:
       summary: "Obtener Todos los Pagos Realizados a Colectores."
       description: "Muestra una Lista de los Colectores y la Cantidad de Pagos que ha Recibido Cada Uno."
@@ -309,7 +309,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /payments-by-collector-denominations:
+  /payments-by-collector-denominations/:
     get:
       summary: "Obtener Todos los Pagos Realizados a Colectores y Dividirlo en Diferentes Denominaciones."
       description: "Muestra una Lista con las Denominaciones y en que Cantidades Conforman el Total Procesado por Pagos a Colectores."
@@ -430,7 +430,7 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
-  /customers:
+  /customers/:
     get:
       summary: "Obtener los Datos de los Clientes."
       description: "Muestra una Lista con los Datos de los Clientes."
@@ -465,7 +465,7 @@ paths:
                       example: null
         500:
           $ref: "#/components/responses/InternalError"
-  /update-customer/:
+  /update-customer/{id}/:
     put:
       summary: "Actualizar los Datos de los Clientes."
       description: "Actualiza los Datos de un Cliente Específico."
@@ -516,8 +516,8 @@ paths:
                     example: "El Email ya Está en uso Por Otro Cliente"
         500:
           $ref: "#/components/responses/InternalError"
-  /delete-customer/:
-    put:
+  /delete-customer/{id}/:
+    delete:
       summary: "Eliminar los Datos de los Clientes."
       description: "Actualiza el campo deleted_at de un Cliente Específico Realizando así un Borrado Lógico."
       tags:
@@ -547,7 +547,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /search-customer/:
+  /search-customer/{name}/{identity_doc}/:
     get:
       summary: "Buscar Cliente por Nombre y/o por Número de Documento de Identidad."
       description: "Muestra los Datos de un Cliente por Nombre y/o por Número de Documento de Identidad."
@@ -606,7 +606,7 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
-  /accounts:
+  /accounts/:
     get:
       summary: "Obtener las Cuentas de los Clientes."
       description: "Muestra una Lista con las Cuentas de los Clientes."
@@ -639,7 +639,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /accounts-by-customer/:
+  /accounts-by-customer/{id}/:
     get:
       summary: "Obtener las Cuentas de un Cliente."
       description: "Muestra una Lista con las Cuentas de un Cliente en Específico."
@@ -681,7 +681,7 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
-  /collectors:
+  /collectors/:
     get:
       summary: "Obtener la Lista de Todos los Colectores."
       description: "Muestra una Lista con los Colectores que No han Sido Eliminados."
@@ -714,7 +714,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /save-collector:
+  /save-collector/:
     post:
       summary: "Guardar un Nuevo Collector."
       description: "Crea un Nuevo Collector en la Base de Datos."
@@ -739,7 +739,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /view-payments-collector-details/:
+  /view-payments-collector-details/{id}/{startDay}/{endDay}/:
     get:
       summary: "Obtener los Pagos Recibidos por Cada Colector."
       description: "Muestra los Pagos Recibidos de un Colector Específico en un Rango de Días Específicos."
@@ -803,7 +803,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /update-collector/{id}:
+  /update-collector/{id}/:
     put:
       summary: "Actualizar un Collector."
       description: "Actualiza los Datos de un Collector en la Base de Datos."
@@ -859,8 +859,8 @@ paths:
                     example: "Este Colector ya Está Registrado"
         500:
           $ref: "#/components/responses/InternalError"
-  /delete-collector/{id}:
-    put:
+  /delete-collector/{id}/:
+    delete:
       summary: "Eliminar los Datos de un Collector."
       description: "Actualiza el campo deleted_at de un Colector Específico Realizando así un Borrado Lógico."
       tags:
@@ -890,7 +890,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /search-collector/:
+  /search-collector/{collector}/:
     get:
       summary: "Buscar Colector por Nombre."
       description: "Muestra los Datos de un Colector Basado en su Nombre."
@@ -934,7 +934,7 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
-  /services:
+  /services/:
     get:
       summary: "Obtener la lista de Servicios de todos los Colectores."
       description: "Muestra la lista de Servicios de todos los Colectores en la Base de Datos que No han Sido Eliminados."
@@ -974,7 +974,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /save-service:
+  /save-service/:
     post:
       summary: "Guardar Uno o Más Servicios."
       description: "Registra Uno o Más Servicios para un Colector Específico."
@@ -1035,7 +1035,7 @@ paths:
                     example: "Los Siguientes Servicios ya Están Registrados Para este Colector: TIGO"
         500:
           $ref: "#/components/responses/InternalError"
-  /view-payments-by-service-details/:
+  /view-payments-by-service-details/{id}/{startDay}/{endDay}/:
     get:
       summary: "Obtener los Pagos Recibidos por Cada Servicio."
       description: "Muestra los Pagos Recibidos de un Servicio Específico en un Rango de Días Específicos."
@@ -1096,7 +1096,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /update-service/:
+  /update-service/{id}/:
     put:
       summary: "Actualizar un Servicio de un Colector."
       description: "Actualiza los Datos de un Servicio de un Colector en la Base de Datos."
@@ -1139,8 +1139,8 @@ paths:
                     example: "Este Servicio ya Está Registrado para El Colector Seleccionado"
         500:
           $ref: "#/components/responses/InternalError"
-  /delete-service/:
-    put:
+  /delete-service/{id}/:
+    delete:
       summary: "Elimina los Datos de un Servicio de un Colector."
       description: "Actualiza el campo deleted_at de un Colector Específico Realizando así un Borrado Lógico."
       tags:
@@ -1172,7 +1172,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /search-service/:
+  /search-service/{collector}/{service}/:
     get:
       summary: "Buscar Servicios por Colector y/o Servicio."
       description: "Muestra los Servicios de un Colector Específico o Todos los Servicios si No se Especifica el Colector."
@@ -1235,7 +1235,8 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /payments-collectors:
+
+  /payments-collectors/:
     get:
       summary: "Obtener la Lista de Todos los Pagos a Colectores."
       description: "Muestra todos los Pagos a Colectores en la Base de Datos."
@@ -1277,7 +1278,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /total-payments-amount:
+  /total-payments-amount/:
     get:
       summary: "Obtener el Total de Pagos Realizados."
       description: "Muestra el Total de Pagos Realizados a Colectores en la Base de Datos."
@@ -1301,7 +1302,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /payments-by-collector/:
+  /payments-by-collector/{id}/{startDay}/{endDay}:
     get:
       summary: "Obtener los Pagos Realizados a un Colector en un Rango de Tiempo."
       description: "Muestra los Pagos Realizados a un Colector Específico en un Rango de Tiempo Específico."
@@ -1440,7 +1441,8 @@ paths:
                     datetime:
                       type: string
                       example: "2025-02-11T01:43:13.000Z"
-  /transactions:
+
+  /transactions/:
     get:
       summary: "Obtener la Lista de Movimientos Transaccionales Realizados por los Clientes."
       description: "Muestra todos los Movimientos Transaccionales Realizados por los Clientes en la Base de Datos."
@@ -1495,7 +1497,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /transactions-by-customer/{id}/account/{account}/{startDay}/{endDay}:
+  /transactions-by-customer/{id}/account/{account}/{startDay}/{endDay}/:
     get:
       summary: "Obtener las Transacciones de una Cuenta Específica de un Cliente Específico en un Rango de Tiempo."
       description: "Muestra las Transacciones Realizadas a una Cuenta Específica de un Cliente Específico en un Rango de Tiempo Específico."
@@ -1575,7 +1577,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
-  /save-new-transaction:
+  /save-new-transaction/:
     post:
       summary: "Guardar una Nueva Transacción."
       description: "Registra una Nueva Transacción, ya sea un Deposito, Retiro o Transferencia."
@@ -1768,6 +1770,166 @@ paths:
                   message:
                     type: string
                     example: "El Pin Introducido no Existe"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  /transactions_types/:
+    get:
+      summary: "Obtener la Lista de Todos los Tipos de Transacciones."
+      description: "Muestra todos los Tipos de Transacciones Registrados."
+      tags:
+        - Transactions Types
+      responses:
+        200:
+          description: "Tipos de Transacciones Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    transaction_type:
+                      type: string
+                      example: "Depósito"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /save-new-transaction-type/:
+    post:
+      summary: "Guardar un Nuevo Tipo de Transacción."
+      description: "Registra un Nuevo Tipo de Transacción."
+      tags:
+        - Transactions Types
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                transactionType:
+                  type: string
+                  example: "Nuevo Tipo de Transacción"
+      responses:
+        200:
+          description: "Tipo de Transacción Registrado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Nuevo Tipo de Transacción Registrado con Éxito"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /update-transaction-type/{id}/:
+    put:
+      summary: "Actualizar un Tipo de Transacción."
+      description: "Actualiza un Tipo de Transacción."
+      tags:
+        - Transactions Types
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: id
+          in: path
+          required: true
+          description: "Id del Tipo de Transacción."
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                transactionType:
+                  type: string
+                  example: "Nuevo Nombre para Tipo de Transacción."
+      responses:
+        200:
+          description: "Tipo de Transacción Actualizado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Datos del Tipo de Transacción Actualizados con Éxito"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        409:
+          description: "Tipo de Transacción Duplicado."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "El Nombre del Tipo de Transacción ya Está Registrado"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /delete-transaction-type/{id}/:
+    delete:
+      summary: "Eliminar los Datos de un Tipo de Transacción."
+      description: "Actualiza el campo deleted_at de un Tipo de Transacción Específico Realizando así un Borrado Lógico."
+      tags:
+        - Transactions Types
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: id
+          in: path
+          required: true
+          description: "Id del Tipo de Transacción."
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: "Tipo de Transacción Eliminado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Tipo de Transacción Eliminado con Éxito"
         500:
           $ref: "#/components/responses/InternalError"
 
