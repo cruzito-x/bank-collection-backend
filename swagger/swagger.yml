@@ -1,9 +1,9 @@
 openapi: "3.0.3"
 info:
-  title: Bambú Bank Collection API
+  title: Bambú Bank - Collection API
   version: "1.0"
 servers:
-  - url: http://localhost:3001
+  - url: http://bambu-bank-api.com
 paths:
   /login/:
     post:
@@ -1773,7 +1773,7 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
-  /transactions_types/:
+  /transactions-types/:
     get:
       summary: "Obtener la Lista de Todos los Tipos de Transacciones."
       description: "Muestra todos los Tipos de Transacciones Registrados."
@@ -1930,6 +1930,318 @@ paths:
                   message:
                     type: string
                     example: "Tipo de Transacción Eliminado con Éxito"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-transaction-type/:transaction_type?:
+    get:
+      summary: "Obtener los Datos de un Tipo de Transacción."
+      description: "Muestra los Datos de un Tipo de Transacción por su Nombre."
+      tags:
+        - Transactions Types
+      parameters:
+        - name: transaction_type
+          in: query
+          description: "Nombre del Tipo de Transacción."
+          schema:
+            type: string
+            example: "Retiro"
+      responses:
+        200:
+          description: "Tipo de Transacción Obtenido Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 2
+                  transaction_type_id:
+                    type: string
+                    example: "2"
+                  transaction_type:
+                    type: string
+                    example: "Retiro"
+                  deleted_at:
+                    type: string
+                    nullable: true
+                    example: null
+        400:
+          $ref: "#/components/responses/BadRequestError"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        404:
+          $ref: "#/components/responses/NotFoundError"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  /approvals/:
+    get:
+      summary: "Obtener la Lista de Todas las Aprobaciones o Rechazos"
+      description: "Muestra todos las Aprobaciones o Rechazos Realizados."
+      tags:
+        - Approvals
+      responses:
+        200:
+          description: "Aprobaciones y Rechazos Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    approval_id:
+                      type: string
+                      example: "APVL000182"
+                    transaction_id:
+                      type: string
+                      example: "TSC00000259"
+                    transaction_type:
+                      type: string
+                      example: "Retiro"
+                    sender_name:
+                      type: string
+                      example: "David Cruz"
+                    sender_email:
+                      type: string
+                      example: "david.cruz@example.com"
+                    sender_account:
+                      type: string
+                      example: "**** **** **** 9000"
+                    receiver_account:
+                      type: string
+                      example: "**** **** **** 9000"
+                    receiver_name:
+                      type: string
+                      example: "David Cruz"
+                    receiver_email:
+                      type: string
+                      example: "david.cruz@example.com"
+                    amount:
+                      type: number
+                      example: 12567.00
+                    concept:
+                      type: string
+                      nullable: true
+                      example: null
+                    realized_by:
+                      type: string
+                      example: "Jorge Cabrera"
+                    authorized_by:
+                      type: string
+                      example: "David Cruz"
+                    authorized_at:
+                      type: string
+                      example: "2025-02-14T05:22:53.000Z"
+                    datetime:
+                      type: string
+                      example: "2025-02-14T05:22:53.000Z"
+                    is_approved:
+                      type: integer
+                      example: 1
+        500:
+          $ref: "#/components/responses/InternalError"
+  /notifications/:
+    get:
+      summary: "Obtener la Lista de Transacciones en Espera de Aprobación."
+      description: "Muestra las Transacciones que están en Espera de Aprobación."
+      tags:
+        - Approvals
+      responses:
+        200:
+          description: "Transacciones en Espera de Aprobación Obtenidas Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    approval_id:
+                      type: string
+                      example: "APVL000183"
+                    transaction_id:
+                      type: string
+                      example: "TSC00000268"
+                    sender_name:
+                      type: string
+                      example: "José Fernández"
+                    sender_email:
+                      type: string
+                      example: "jose.fernandez@example.com"
+                    amount:
+                      type: number
+                      example: 12000.00
+                    datetime:
+                      type: string
+                      example: "2025-02-18T19:10:32.000Z"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /approve-or-reject-transaction/{approvalId}/transaction/{transactionId}/approved/{isApproved}/authorized-by/{authorizer}/:
+    put:
+      summary: "Aprobar o Rechazar una Transacción."
+      description: "Permite Aprobar o Rechazar una Transacción."
+      tags:
+        - Approvals
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: approvalId
+          in: path
+          required: true
+          description: "Id de la Aprobación."
+          schema:
+            type: string
+            example: "APVL000183"
+        - name: transactionId
+          in: path
+          required: true
+          description: "Id de la Transacción."
+          schema:
+            type: string
+            example: "TSC00000268"
+        - name: isApproved
+          in: path
+          required: true
+          description: "Si la Transacción está Aprobada o Rechazada, Siendo 1 'Aprobada' y 0 'Rechazada'."
+          schema:
+            type: integer
+            example: 1
+        - name: authorizer
+          in: path
+          required: true
+          description: "Id. del Autorizador"
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: "Transacción Aprobada o Rechazada Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Transacción Aprobada"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-approval/{transaction_id}/{authorized_by}/:
+    get:
+      summary: "Obtener los datos de una Transacción o la Lista de Aprobaciones y Rechazos Realizados por un Autorizador."
+      description: "Permite obtener los datos de una Transacción por Código o la Lista de Aprobaciones y Rechazos Realizados por un Autorizador."
+      tags:
+        - Approvals
+      parameters:
+        - name: transaction_id
+          in: query
+          description: "Código de la Transacción."
+          schema:
+            type: string
+            example: "TSC00000268"
+        - name: authorized_by
+          in: query
+          description: "Nombre del del Autorizador."
+          schema:
+            type: string
+            example: "David Cruz"
+      responses:
+        200:
+          description: "Transacciones Aprobadas por Autorizador Obtenidas Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    approval_id:
+                      type: string
+                      example: "APVL000182"
+                    transaction_id:
+                      type: string
+                      example: "TSC00000259"
+                    transaction_type:
+                      type: string
+                      example: "Retiro"
+                    sender_name:
+                      type: string
+                      example: "David Cruz"
+                    sender_email:
+                      type: string
+                      example: "david.cruz@example.com"
+                    sender_account:
+                      type: string
+                      example: "**** **** **** 9000"
+                    receiver_account:
+                      type: string
+                      example: "**** **** **** 9000"
+                    receiver_name:
+                      type: string
+                      example: "David Cruz"
+                    receiver_email:
+                      type: string
+                      example: "david.cruz@example.com"
+                    amount:
+                      type: number
+                      example: 12567.00
+                    concept:
+                      type: string
+                      nullable: true
+                      example: null
+                    realized_by:
+                      type: string
+                      example: "Jorge Cabrera"
+                    authorized_by:
+                      type: string
+                      example: "David Cruz"
+                    authorized_at:
+                      type: string
+                      example: "2025-02-14T05:22:53.000Z"
+                    datetime:
+                      type: string
+                      example: "2025-02-14T05:22:53.000Z"
+                    is_approved:
+                      type: integer
+                      example: 1
+  /latest-approval/:
+    get:
+      summary: "Obtener la Última Transacción Realizada."
+      description: "Permite obtener la Última Transacción Realizada."
+      tags:
+        - Approvals
+      responses:
+        200:
+          description: "Última Transacción Realizada Obtenida Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    approval_id:
+                      type: string
+                      example: "APVL000183"
+                    transaction_id:
+                      type: integer
+                      example: 268
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
         500:
           $ref: "#/components/responses/InternalError"
 
