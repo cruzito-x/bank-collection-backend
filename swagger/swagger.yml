@@ -2640,7 +2640,7 @@ components:
             properties:
               message:
                 type: string
-                example: "Token Expirado / Horario de Acceso Excedido"
+                example: "Acceso Denegado, Token no Encontrado / El Acceso al Sistema está Restringido Fuera del Horario Laboral"
 
     ForbiddenError:
       description: Token Expirado u Horario de Acceso Excedido.
@@ -2651,7 +2651,7 @@ components:
             properties:
               message:
                 type: string
-                example: "Token Expirado / Horario de Acceso Excedido"
+                example: "Acceso Denegado, Token no Encontrado / El Acceso al Sistema está Restringido Fuera del Horario Laboral"
 
     NotFoundError:
       description: No se Encontraron Resultados.
