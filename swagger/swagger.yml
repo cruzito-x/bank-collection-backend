@@ -2608,53 +2608,69 @@ paths:
           $ref: "#/components/responses/InternalError"
 
 components:
-  schemas:
-    ErrorMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          example: Error Interno del Servidor
-
   responses:
     BadRequestError:
       description: Por Favor, Introduzca al Menos un Criterio de Búsqueda.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorMessage"
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Por Favor, Introduzca al Menos un Criterio de Búsqueda"
 
     BadRequestErrorByEmptyFields:
       description: Por Favor, Rellene Todos los Campos.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorMessage"
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Por Favor, Rellene Todos los Campos"
 
     UnauthorizedError:
       description: Token Expirado u Horario de Acceso Excedido.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorMessage"
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Token Expirado / Horario de Acceso Excedido"
 
     ForbiddenError:
       description: Token Expirado u Horario de Acceso Excedido.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorMessage"
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Token Expirado / Horario de Acceso Excedido"
 
     NotFoundError:
       description: No se Encontraron Resultados.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorMessage"
+            type: object
+            properties:
+              message:
+                type: string
+                example: "No se Encontraron Resultados"
 
     InternalError:
       description: Error Interno del Servidor.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorMessage"
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Error Interno del Servidor"
