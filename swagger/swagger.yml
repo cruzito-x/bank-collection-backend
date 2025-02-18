@@ -2245,6 +2245,278 @@ paths:
         500:
           $ref: "#/components/responses/InternalError"
 
+  /users/:
+    get:
+      summary: "Obtener la Lista de Usuarios."
+      description: "Muestra la Lista de Usuarios."
+      tags:
+        - Users
+      responses:
+        200:
+          description: "Usuarios Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: "David Cruz"
+                    email:
+                      type: string
+                      example: "david.cruz@bambu.com"
+                    role:
+                      type: string
+                      example: "Supervisor"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /roles/:
+    get:
+      summary: "Obtener la Lista de Roles de Usuario."
+      description: "Muestra la Lista de Roles de Usuario."
+      tags:
+        - Users
+      responses:
+        200:
+          description: "Roles de Usuario Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: integer
+                      example: 1
+                    label:
+                      type: string
+                      example: "Supervisor"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /update-user/{id}:
+    put:
+      summary: "Actualizar los Datos de un Usuario."
+      description: "Permite Actualizar los Datos de un Usuario."
+      tags:
+        - Users
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: id
+          in: path
+          required: true
+          description: "Id del Usuario."
+          schema:
+            type: integer
+            example: 2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "David Cruz"
+                email:
+                  type: string
+                  example: "david.cruz@bambu.com"
+                password:
+                  type: string
+                  nullable: true
+                  example: null
+      responses:
+        200:
+          description: "Usuario Actualizado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuario Actualizado con Éxito"
+        400:
+          $ref: "#/components/responses/BadRequestErrorByEmptyFields"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        409:
+          description: "Usuario Existente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Este Nombre de Usuario ya Está Registrado"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /update-user-role/{id}:
+    put:
+      summary: "Actualizar el Rol de un Usuario."
+      description: "Permite Actualizar el Rol de un Usuario."
+      tags:
+        - Users
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: id
+          in: path
+          required: true
+          description: "Id del Usuario."
+          schema:
+            type: integer
+            example: 2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newRole:
+                  type: integer
+                  example: 2
+      responses:
+        200:
+          description: "Rol Actualizado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "El Rol del Usuario ha Sido Actualizado con Éxito"
+        400:
+          description: "Asignación de Rol Inválida."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No Puede Asignar el Rol al Usuario Activo"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /delete-user/{id}:
+    delete:
+      summary: "Eliminar los Datos de un Usuario."
+      description: "Actualiza el campo deleted_at de un Usuario Específico Realizando así un Borrado Lógico."
+      tags:
+        - Users
+      parameters:
+        - name: user_id
+          in: header
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: id
+          in: path
+          required: true
+          description: "Id del Usuario."
+          schema:
+            type: integer
+            example: 2
+      responses:
+        200:
+          description: "Usuario Eliminado Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuario Eliminado con Éxito"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+  /search-user/{username}/{role}:
+    get:
+      summary: "Buscar Usuarios por Nombre y/o Rol."
+      description: "Permite Buscar Usuarios por Nombre y/o Rol."
+      tags:
+        - Users
+      parameters:
+        - name: username
+          in: query
+          description: "Nombre del Usuario."
+          schema:
+            type: string
+            example: "David Cruz"
+        - name: role
+          in: query
+          description: "Rol del Usuario."
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: "Usuarios Obtenidos Exitosamente."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: "David Cruz"
+                    email:
+                      type: string
+                      example: "david.cruz@bambu.com"
+                    role:
+                      type: string
+                      example: "Supervisor"
+        400:
+          $ref: "#/components/responses/BadRequestError"
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+        500:
+          $ref: "#/components/responses/InternalError"
+
+  
+
 components:
   schemas:
     ErrorMessage:
