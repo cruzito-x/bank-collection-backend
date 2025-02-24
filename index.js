@@ -46,8 +46,8 @@ const {
 } = require("./middleware/timeRestrictionMiddleware");
 
 // Routes settings
-app.get("/", (request, response) => {
-  response.status(200).json({ message: "Server Online" });
+app.get("/", timeRestrictionMiddleware, (request, response) => {
+  return response.status(200).json({ message: "Server Online" });
 });
 const login = require("./routes/login");
 const dashboard = require("./routes/dashboard");
