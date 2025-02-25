@@ -156,7 +156,7 @@ exports.saveNewPayment = (request, response) => {
 
                 await sendMail(
                   collectorName,
-                  "xdigitalbit@gmail.com",
+                  "dcruzer92@gmail.com",
                   "¡Su Pago ha Sido Aprobado!",
                   "Prueba de email",
                   customerName,
