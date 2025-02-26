@@ -162,10 +162,10 @@ exports.updateService = (request, response) => {
       .json({ message: "Por Favor, Rellene Todos los Campos" });
   }
 
-  const serviceName =
-    "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.collector = ? AND services.service_name = ? AND services.deleted_at IS NULL";
+  const servicesValidation =
+    "SELECT services.service_name FROM services INNER JOIN collectors ON collectors.id = services.collector_id WHERE collectors.collector = ? AND services.service_name = ? AND services.deleted_at IS NULL AND services.id != ?";
 
-  db.query(serviceName, [collector, service], (error, result) => {
+  db.query(servicesValidation, [collector, service, id], (error, result) => {
     if (error) {
       return response
         .status(500)
