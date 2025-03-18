@@ -14,3 +14,8 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: bank_collection_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
