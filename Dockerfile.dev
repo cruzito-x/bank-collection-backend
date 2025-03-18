@@ -1,0 +1,10 @@
+FROM node:22
+
+RUN "node --watch index.js"
+RUN mkdir -p /home/app
+
+WORKDIR /home/app
+
+EXPOSE 3001
+
+CMD ["node", "index.js"]

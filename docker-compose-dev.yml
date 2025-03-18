@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  bank_collection_app_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    links:
+      - mysql
+    volumes: -.:/app
+  mysql:
+    image: mysql
+    ports:
+      - "3308:3308"
+    environment:
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: bank_collection_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
